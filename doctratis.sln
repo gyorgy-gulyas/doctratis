@@ -5,18 +5,9 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "d3", "d3", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		src\CustomerManagement.d3 = src\CustomerManagement.d3
-		src\Sales.d3 = src\Sales.d3
-		src\webshop.d3 = src\webshop.d3
+		src\doctratis.d3 = src\doctratis.d3
+		src\IdentityAccessManagement.d3 = src\IdentityAccessManagement.d3
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sales", "Sales", "{89DA3415-3F0E-4BE0-BE6A-189A5AFBE58E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrderManagement", "OrderManagement", "{B2C06C85-AD07-43B3-B119-6FC6F01F658A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderManagement.Models", "src\Sales\OrderManagement\models\OrderManagement.Models.csproj", "{12D447E4-D47A-B8A3-BAE5-328DE1165EF3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderManagement.Service", "src\Sales\OrderManagement\Service\OrderManagement.Service.csproj", "{3CCA7CC0-DCF5-7335-9123-49856E17C744}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Files", ".Solution Files", "{41500286-EC99-4144-8C50-FA625976875B}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,28 +17,53 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Files", ".Solutio
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TemplateManagement", "TemplateManagement", "{65DBD68F-F13D-4F6A-919F-2D3E385359C3}"
+	ProjectSection(SolutionItems) = preProject
+		src\TemplateManagement\TemplateManagement.d3 = src\TemplateManagement\TemplateManagement.d3
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Service", "src\TemplateManagement\Projects\Service\TemplateManagement.Projects.Service.csproj", "{671CD9B4-A606-65CB-FF18-DFCE46A19442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Interfaces", "src\TemplateManagement\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj", "{99046452-2502-15EB-3A85-1FCA0E4AB93A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Models", "src\TemplateManagement\Projects\Models\TemplateManagement.Projects.Models.csproj", "{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.InternalClient", "src\TemplateManagement\Projects\InternalClient\TemplateManagement.Projects.InternalClient.csproj", "{5ECF7476-A56A-D981-6AAE-2AF747E86520}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{12D447E4-D47A-B8A3-BAE5-328DE1165EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12D447E4-D47A-B8A3-BAE5-328DE1165EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12D447E4-D47A-B8A3-BAE5-328DE1165EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12D447E4-D47A-B8A3-BAE5-328DE1165EF3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3CCA7CC0-DCF5-7335-9123-49856E17C744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CCA7CC0-DCF5-7335-9123-49856E17C744}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CCA7CC0-DCF5-7335-9123-49856E17C744}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CCA7CC0-DCF5-7335-9123-49856E17C744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{671CD9B4-A606-65CB-FF18-DFCE46A19442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{671CD9B4-A606-65CB-FF18-DFCE46A19442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{671CD9B4-A606-65CB-FF18-DFCE46A19442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{671CD9B4-A606-65CB-FF18-DFCE46A19442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99046452-2502-15EB-3A85-1FCA0E4AB93A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99046452-2502-15EB-3A85-1FCA0E4AB93A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99046452-2502-15EB-3A85-1FCA0E4AB93A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99046452-2502-15EB-3A85-1FCA0E4AB93A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ECF7476-A56A-D981-6AAE-2AF747E86520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ECF7476-A56A-D981-6AAE-2AF747E86520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ECF7476-A56A-D981-6AAE-2AF747E86520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ECF7476-A56A-D981-6AAE-2AF747E86520}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B2C06C85-AD07-43B3-B119-6FC6F01F658A} = {89DA3415-3F0E-4BE0-BE6A-189A5AFBE58E}
-		{12D447E4-D47A-B8A3-BAE5-328DE1165EF3} = {B2C06C85-AD07-43B3-B119-6FC6F01F658A}
-		{3CCA7CC0-DCF5-7335-9123-49856E17C744} = {B2C06C85-AD07-43B3-B119-6FC6F01F658A}
+		{671CD9B4-A606-65CB-FF18-DFCE46A19442} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
+		{99046452-2502-15EB-3A85-1FCA0E4AB93A} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
+		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
+		{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD} = {65DBD68F-F13D-4F6A-919F-2D3E385359C3}
+		{5ECF7476-A56A-D981-6AAE-2AF747E86520} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C074C67E-A13B-4F7B-A375-8EC8A5BDFC1F}

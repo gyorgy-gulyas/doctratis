@@ -1,0 +1,169 @@
+﻿domain TemplateManagement {
+
+    context Projects {
+
+        composite Base {
+            id:string
+            etag:string
+            LastUpdate:datetime
+        }
+
+        aggregate Project {
+            enum ProjectStatuses {
+                # A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.
+                Draft,
+                # A projekt éles állapotban van, a benne lévő sablonokat használják, csak korlátozottan módosítható.
+                Active,
+                # A projekt lezárva vagy lefagyasztva, tartalma nem módosítható (pl. audit miatt).
+                Locked,
+                # A projekt kivezetett, csak olvasható, történeti célból van megtartva.
+                Archived,
+                # A projekt törlésre lett jelölve, de még nem véglegesen törölt audit miatt.
+                Deleted
+            }
+
+            root entity ProjectHeader inherits Base {
+                Name:string
+                Description:string
+                Tags:List[string]
+
+                Status:ProjectStatuses
+                SubFolders: List[ProjectFolder]
+
+                CreatedAt:datetime
+                CreatedBy:string
+            }
+
+            valueobject ProjectFolder {
+                id:string
+                Name:string
+                Description:string
+                SubFolders: List[ProjectFolder]
+            }
+
+            entity ProjectAccess inherits Base {
+                enum Roles {
+                    # Csak olvasásra jogosult
+                    Reader,
+                    # Módosíthat sablonokat, mappákat
+                    Editor,
+                    # Teljes hozzáférés, hozzáférések kezelése is
+                    Owner,
+                    # Csak audit/jogosultság-nézethez van hozzáférése
+                    Auditor,
+                    # Csak a hozzáférések kezelése
+                    Admin
+                }
+
+                enum Statuses {
+                    # Meghívás elküldve, még nincs elfogadva. (pl. emailes invite)
+                    Pending,
+                    # Hozzáférés él, a felhasználó vagy rendszer rendelkezik a szerepkörrel
+                    Active,
+                    # Átmenetileg inaktiválva (pl. biztonsági okból, fiók zárolása).
+                    Suspended,
+                    # Visszavonva manuálisan. Már nem érvényes.
+                    Revoked,
+                    # Törölve, de még auditálás miatt megvan az adat.
+                    Deleted 
+                }
+                
+                ProjectId:string
+                IdentityId:string
+                Role:Roles
+                Status:Statuses
+            }
+        }
+
+        service ProjectService {
+            event ProjectCreated version 1 {
+                projectId: string
+            }
+
+            command createProject( name:string, description:string, createdBy:string ) : Project.ProjectHeader
+            query getAllProjectForUser( userId:string ) : List[Project.ProjectHeader]
+        }
+
+        @publish(grpc,rest)
+        interface ProjectIF version 1 {
+            enum ProjectStatuses {
+                # A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.
+                Draft,
+                # A projekt éles állapotban van, a benne lévő sablonokat használják, csak korlátozottan módosítható.
+                Active,
+                # A projekt lezárva vagy lefagyasztva, tartalma nem módosítható (pl. audit miatt).
+                Locked,
+                # A projekt kivezetett, csak olvasható, történeti célból van megtartva.
+                Archived,
+                # A projekt törlésre lett jelölve, de még nem véglegesen törölt audit miatt.
+                Deleted
+            }
+
+            dto ProjectFolderDTO {
+                id:string
+                Name:string
+                Description:string
+                SubFolders: List[ProjectFolderDTO]
+            }
+
+            enum ProjectAccessRoles {
+                # Csak olvasásra jogosult
+                Reader,
+                # Módosíthat sablonokat, mappákat
+                Editor,
+                # Teljes hozzáférés, hozzáférések kezelése is
+                Owner,
+                # Csak audit/jogosultság-nézethez van hozzáférése
+                Auditor,
+                # Csak a hozzáférések kezelése
+                Admin
+            }
+            enum ProjectAccessStatuses {
+                # Meghívás elküldve, még nincs elfogadva. (pl. emailes invite)
+                Pending,
+                # Hozzáférés él, a felhasználó vagy rendszer rendelkezik a szerepkörrel
+                Active,
+                # Átmenetileg inaktiválva (pl. biztonsági okból, fiók zárolása).
+                Suspended,
+                # Visszavonva manuálisan. Már nem érvényes.
+                Revoked,
+                # Törölve, de még auditálás miatt megvan az adat.
+                Deleted 
+            }
+
+            dto ProjectAccessDTO {
+                id:string
+                IdentityId:string
+                Role:ProjectAccessRoles
+                Status:ProjectAccessStatuses
+            }
+                
+            dto ProjectSummaryDTO {
+                id:string
+                Name:string
+                Description:string
+                Tags:List[string]
+
+                Status:ProjectStatuses
+            }
+
+            dto ProjectDetailsDTO {
+                id:string
+                etag:string
+                Name:string
+                Description:string
+                Tags:List[string]
+
+                Status:ProjectStatuses
+                SubFolders: List[ProjectFolderDTO]
+                Accesses: List[ProjectAccessDTO]
+
+                CreatedAt:datetime
+                CreatedBy:string
+            }
+
+            command createProject( name:string, description:string, createdBy:string ) : ProjectSummaryDTO
+            query listAccesibleProjects() : List[ProjectSummaryDTO]
+        }
+    }
+}

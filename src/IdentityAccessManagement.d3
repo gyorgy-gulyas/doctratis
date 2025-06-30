@@ -1,13 +1,8 @@
 domain IdentityAccessManagement {
 
     context Identity {
-        service Login {
-            valueobject LoginResponse
-            login( userName:string , password:string )
-        }
     }
 
     context Access {
-        
     }
 }
