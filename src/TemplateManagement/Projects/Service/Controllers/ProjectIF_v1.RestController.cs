@@ -76,7 +76,7 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpGet( "listaccesibleprojects" )] 
+		[HttpGet( "listaccessibleprojects" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -85,15 +85,15 @@ namespace TemplateManagement.Projects
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> listAccesibleProjects()
+		public async Task<IActionResult> listAccessibleProjects()
 		{
-			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccesibleProjects" ))
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccessibleProjects" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
 				try
 				{
 					// calling the service function itself
-					var response = await _service.listAccesibleProjects( ctx );
+					var response = await _service.listAccessibleProjects( ctx );
 
 					if( response.IsSuccess() == true )
 					{
@@ -103,7 +103,99 @@ namespace TemplateManagement.Projects
 						}
 						else
 						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.listAccesibleProjects'" );
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.listAccessibleProjects'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpGet( "listaccessibleprojectsforuser/{urseId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> listAccessibleProjectsForUser( [FromRoute] string urseId)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccessibleProjectsForUser" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.listAccessibleProjectsForUser( ctx, urseId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.listAccessibleProjectsForUser'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getproject/{projectId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectDetailsDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getProject( [FromRoute] string projectId)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.getProject" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getProject( ctx, projectId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.getProject'" );
 						}
 					}
 					else

@@ -75,7 +75,7 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
-		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccesibleProjects(CallingContext ctx)
+		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
 		{
 			try
 			{
@@ -83,8 +83,8 @@ namespace TemplateManagement.Projects
 				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
 
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccesibleprojects" ) );
-				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccesibleProjects" );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
+				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjects" );
 
 				// call http client 
 				HttpResponseMessage response = await _httpClient.SendAsync( request );
@@ -103,7 +103,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccesibleProjects'",
+						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjects'",
 					} );
 				}
 			}
@@ -118,6 +118,108 @@ namespace TemplateManagement.Projects
 			catch (Exception ex)
 			{
 				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string urseId)
+		{
+			try
+			{
+				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
+				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojectsforuser/{urseId}" ) );
+				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjectsForUser" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<List<IProjectIF_v1.ProjectSummaryDTO>>();
+					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( error );
+				}
+				else
+				{
+					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.getProject(CallingContext ctx, string projectId)
+		{
+			try
+			{
+				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
+				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/getproject/{projectId}" ) );
+				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "getProject" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<IProjectIF_v1.ProjectDetailsDTO>();
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( error );
+				}
+				else
+				{
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_getProject'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),

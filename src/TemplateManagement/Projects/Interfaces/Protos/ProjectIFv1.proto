@@ -19,7 +19,9 @@ import "servicekit_error.proto";
 
 service ProjectIF_v1 {
 	rpc createProject(ProjectIF_v1_createProjectRequest) returns (ProjectIF_v1_createProjectResponse);
-	rpc listAccesibleProjects(google.protobuf.Empty) returns (ProjectIF_v1_listAccesibleProjectsResponse);
+	rpc listAccessibleProjects(google.protobuf.Empty) returns (ProjectIF_v1_listAccessibleProjectsResponse);
+	rpc listAccessibleProjectsForUser(ProjectIF_v1_listAccessibleProjectsForUserRequest) returns (ProjectIF_v1_listAccessibleProjectsForUserResponse);
+	rpc getProject(ProjectIF_v1_getProjectRequest) returns (ProjectIF_v1_getProjectResponse);
 }
 
 message ProjectIF_v1_createProjectRequest {
@@ -34,9 +36,31 @@ message ProjectIF_v1_createProjectResponse {
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
-message ProjectIF_v1_listAccesibleProjectsResponse {
+message ProjectIF_v1_listAccessibleProjectsResponse {
 	oneof result {
 		list_ProjectSummaryDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message ProjectIF_v1_listAccessibleProjectsForUserRequest {
+	string urseId = 1;
+}
+
+message ProjectIF_v1_listAccessibleProjectsForUserResponse {
+	oneof result {
+		list_ProjectSummaryDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message ProjectIF_v1_getProjectRequest {
+	string projectId = 1;
+}
+
+message ProjectIF_v1_getProjectResponse {
+	oneof result {
+		ProjectDetailsDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }

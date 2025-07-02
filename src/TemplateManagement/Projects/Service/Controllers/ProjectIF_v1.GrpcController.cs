@@ -88,38 +88,38 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		public override async Task<ProjectIF_v1_listAccesibleProjectsResponse> listAccesibleProjects( Empty request, ServerCallContext grpcContext)
+		public override async Task<ProjectIF_v1_listAccessibleProjectsResponse> listAccessibleProjects( Empty request, ServerCallContext grpcContext)
 		{
-			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccesibleProjects" ))
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccessibleProjects" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
 
 					// calling the service function itself
-					var response = await _service.listAccesibleProjects( ctx  );
+					var response = await _service.listAccessibleProjects( ctx  );
 
 					if( response.IsSuccess() == true )
 					{
 						if( response.HasValue() == true )
 						{
-							var result = new ProjectIF_v1_listAccesibleProjectsResponse();
+							var result = new ProjectIF_v1_listAccessibleProjectsResponse();
 							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.ToGrpc( v ) ));
 							return result;
 						}
 						else
 						{
-							return new ProjectIF_v1_listAccesibleProjectsResponse {
+							return new ProjectIF_v1_listAccessibleProjectsResponse {
 								Error = new () {
 									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.listAccesibleProjects'",
+									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.listAccessibleProjects'",
 								}
 							};
 						}
 					}
 					else
 					{
-						return new ProjectIF_v1_listAccesibleProjectsResponse {
+						return new ProjectIF_v1_listAccessibleProjectsResponse {
 							Error = new () {
 								Status = response.Error.Status.ToGrpc(),
 								MessageText = response.Error.MessageText,
@@ -130,7 +130,125 @@ namespace TemplateManagement.Projects
 				}
 				catch(Exception ex)
 				{
-					return new ProjectIF_v1_listAccesibleProjectsResponse {
+					return new ProjectIF_v1_listAccessibleProjectsResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<ProjectIF_v1_listAccessibleProjectsForUserResponse> listAccessibleProjectsForUser( ProjectIF_v1_listAccessibleProjectsForUserRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccessibleProjectsForUser" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string urseId;
+					urseId = request.UrseId;
+
+					// calling the service function itself
+					var response = await _service.listAccessibleProjectsForUser( ctx , urseId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new ProjectIF_v1_listAccessibleProjectsForUserResponse();
+							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.ToGrpc( v ) ));
+							return result;
+						}
+						else
+						{
+							return new ProjectIF_v1_listAccessibleProjectsForUserResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.listAccessibleProjectsForUser'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new ProjectIF_v1_listAccessibleProjectsForUserResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new ProjectIF_v1_listAccessibleProjectsForUserResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<ProjectIF_v1_getProjectResponse> getProject( ProjectIF_v1_getProjectRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.getProject" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string projectId;
+					projectId = request.ProjectId;
+
+					// calling the service function itself
+					var response = await _service.getProject( ctx , projectId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new ProjectIF_v1_getProjectResponse();
+							result.Value = response.Value != null ? IProjectIF_v1.ProjectDetailsDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new ProjectIF_v1_getProjectResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.getProject'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new ProjectIF_v1_getProjectResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new ProjectIF_v1_getProjectResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

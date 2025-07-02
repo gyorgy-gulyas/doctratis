@@ -18,7 +18,13 @@ namespace TemplateManagement.Projects
 		public Task<Response<ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description, string createdBy);
 
 		/// <return>List<ProjectSummaryDTO></return>
-		public Task<Response<List<ProjectSummaryDTO>>> listAccesibleProjects(CallingContext ctx);
+		public Task<Response<List<ProjectSummaryDTO>>> listAccessibleProjects(CallingContext ctx);
+
+		/// <return>List<ProjectSummaryDTO></return>
+		public Task<Response<List<ProjectSummaryDTO>>> listAccessibleProjectsForUser(CallingContext ctx, string urseId);
+
+		/// <return>ProjectDetailsDTO</return>
+		public Task<Response<ProjectDetailsDTO>> getProject(CallingContext ctx, string projectId);
 
 
 		public enum ProjectStatuses

@@ -82,6 +82,8 @@
 
             command createProject( name:string, description:string, createdBy:string ) : Project.ProjectHeader
             query getAllProjectForUser( userId:string ) : List[Project.ProjectHeader]
+            query getAllAccessForProject( projectId:string ) : List[Project.ProjectAccess]
+            query getProjectForUser( projectId:string, userId:string ) : Project.ProjectHeader
         }
 
         @publish(grpc,rest)
@@ -163,7 +165,9 @@
             }
 
             command createProject( name:string, description:string, createdBy:string ) : ProjectSummaryDTO
-            query listAccesibleProjects() : List[ProjectSummaryDTO]
+            query listAccessibleProjects() : List[ProjectSummaryDTO]
+            query listAccessibleProjectsForUser( urseId:string) : List[ProjectSummaryDTO]
+            command getProject( projectId:string ) : ProjectDetailsDTO
         }
     }
 }
