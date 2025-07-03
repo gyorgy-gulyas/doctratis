@@ -9,6 +9,7 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
+
 	public partial class ProjectHeader : IBase
 	{
 		#region IBase

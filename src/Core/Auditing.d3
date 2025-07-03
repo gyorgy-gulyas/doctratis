@@ -1,0 +1,49 @@
+﻿domain Core {
+
+    context Auditing {
+
+        enum TrailOperations {
+            # A new entity was created in the system.
+            Create,
+            # An existing entity was modified.
+            Update,
+            # An entity was deleted (soft or hard delete).
+            Delete,
+            # A previously deleted entity was restored.
+            Restore
+        }
+
+        # audit trail bázis osztély, ebben lehet egy entity (root entity) változásait követni
+        composite AuditTrail {
+            id: string
+            etag:string
+            LastUpdate:datetime
+            PartitionKey:string
+
+            trailOperation:TrailOperations
+            timestamp:datetime
+            entityType:string
+            entityId:string
+            userId:string
+            userName:string
+                
+            payload:string
+        }
+
+        composite AuditEventLog {
+            id: string
+            etag:string
+            LastUpdate:datetime
+            partitionKey:string
+
+            operation:string
+            operationDescription:string
+            userId:string
+            userName:string
+            serviceName:string
+            requestId:string
+            correlationId:string
+            payload:string
+        }
+    }
+}

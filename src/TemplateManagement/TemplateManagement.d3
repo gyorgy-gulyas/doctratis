@@ -8,6 +8,7 @@
             LastUpdate:datetime
         }
 
+        // todo: datasource
         aggregate Project {
             enum ProjectStatuses {
                 # A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.
@@ -72,6 +73,9 @@
                 IdentityId:string
                 Role:Roles
                 Status:Statuses
+            }
+
+            entity ProjectAuditTrail inherits Core.Auditing.AuditTrail {
             }
         }
 

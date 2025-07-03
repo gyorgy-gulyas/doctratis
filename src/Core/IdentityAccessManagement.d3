@@ -1,4 +1,4 @@
-domain IdentityAccessManagement {
+domain Core {
 
     context Identity {
     }

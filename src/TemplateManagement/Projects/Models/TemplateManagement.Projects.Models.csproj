@@ -11,4 +11,8 @@
       <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+  </ItemGroup>
 </Project>

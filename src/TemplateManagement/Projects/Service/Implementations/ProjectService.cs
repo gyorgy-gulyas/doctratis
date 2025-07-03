@@ -44,6 +44,8 @@ namespace TemplateManagement.Projects.Service.Implementations
             };
             await _context.ProjectAccesses.Insert(access);
 
+            _context.EnqueueProjectAudit(ctx, Core.Auditing.TrailOperations.Create, header, [access]);
+            
             return new(header);
         }
 

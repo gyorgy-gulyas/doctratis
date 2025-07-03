@@ -9,7 +9,7 @@
 namespace TemplateManagement.Projects
 {
 
-	public interface IBase
+	public partial interface IBase
 	{
 		public string id { get; set; }
 		public string etag { get; set; }
