@@ -44,12 +44,12 @@ namespace TemplateManagement.Projects.Service.Implementations
             };
             await _context.ProjectAccesses.Insert(access);
 
-            _context.EnqueueProjectAudit(ctx, Core.Auditing.TrailOperations.Create, header, [access]);
-            
+            _context.Audit(Core.Auditing.TrailOperations.Create, ctx, header, [access]);
+
             return new(header);
         }
 
-        async Task<Response<List<ProjectHeader>>> IProjectService.getAllProjectForUser(CallingContext ctx, string userId)
+        Task<Response<List<ProjectHeader>>> IProjectService.getAllProjectForUser(CallingContext ctx, string userId)
         {
             var projectIds = _context
                 .ProjectAccesses
@@ -65,7 +65,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .Where(ph => projectIds.Contains(ph.id))
                 .ToList();
 
-            return new(result);
+            return Task.FromResult<Response<List<ProjectHeader>>>(new(result));
         }
 
         async Task<Response<ProjectHeader>> IProjectService.getProjectForUser(CallingContext ctx, string projectId, string userId)

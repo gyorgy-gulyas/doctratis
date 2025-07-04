@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using System.Threading.Channels;
+﻿using System.Text.Json;
 using Core.Auditing;
+using Core.Auditing.Worker;
 using PolyPersist;
 using PolyPersist.Net.Context;
 using PolyPersist.Net.Extensions;
@@ -12,13 +11,16 @@ namespace TemplateManagement.Projects.Service.Implementations
 {
     public class ProjectStoreContext : StoreContext
     {
+        private readonly IAuditEntryContainer _auditEntryContainer;
         public readonly IDocumentCollection<ProjectHeader> ProjectHeaders;
         public readonly IDocumentCollection<ProjectAccess> ProjectAccesses;
         public readonly IColumnTable<ProjectAuditTrail> ProjectAuditTrails;
 
-        public ProjectStoreContext(IStoreProvider storeProvider)
+        public ProjectStoreContext(IStoreProvider storeProvider, IAuditEntryContainer auditEntryContainer)
             : base(storeProvider)
         {
+            _auditEntryContainer = auditEntryContainer;
+
             IDocumentStore documentStore = (IDocumentStore)storeProvider.getStore(IStore.StorageModels.Document);
 
             ProjectHeaders = documentStore.GetCollectionByName<ProjectHeader>(nameof(ProjectHeader)).Result;
@@ -35,81 +37,41 @@ namespace TemplateManagement.Projects.Service.Implementations
                 ProjectAuditTrails = columnStore.CreateTable<ProjectAuditTrail>(nameof(ProjectAuditTrail)).Result;
         }
 
-        internal void EnqueueProjectAudit(CallingContext ctx, TrailOperations operation, ProjectHeader header, IEnumerable<ProjectAccess> accesses)
+        internal void Audit(TrailOperations operation, CallingContext ctx, ProjectHeader header = null, IEnumerable<ProjectAccess> accesses = null, string projectId = null )
         {
-            _EnqueueProjectAuditAsync(ctx, operation, header, accesses).SafeFireAndForget();
-        }
-        internal void EnqueueProjectAudit(CallingContext ctx, TrailOperations operation, ProjectHeader header )
-        {
-            _EnqueueProjectAuditAsync(ctx, operation, header).SafeFireAndForget();
-        }
-        internal void EnqueueProjectAudit(CallingContext ctx, TrailOperations operation, string projectId)
-        {
-            _EnqueueProjectAuditAsync(ctx, operation, projectId).SafeFireAndForget();
-        }
-
-        internal async Task _EnqueueProjectAuditAsync(CallingContext ctx, TrailOperations operation, ProjectHeader header, IEnumerable<ProjectAccess> accesses)
-        {
-            ProjectAuditTrail trail = new()
-            {
-                entityType = "Project",
-                entityId = header.id,
-                PartitionKey = header.id,
-                payload = JsonSerializer.Serialize(new { header, accesses }),
-                timestamp = DateTime.UtcNow,
-                trailOperation = operation,
-                userId = ctx.ClientInfo.CallingUserId,
-                userName = ctx.ClientInfo.CallingUserId,
-            };
-
-            await ProjectAuditTrails.Insert(trail);
-        }
-
-        private async Task _EnqueueProjectAuditAsync(CallingContext ctx, TrailOperations operation, string projectId)
-        {
-            var header = await ProjectHeaders.Find(projectId, projectId);
-            var accesses = ProjectAccesses
-                .AsQueryable()
-                .Where(pa => pa.ProjectId == projectId);
-
-            await _EnqueueProjectAuditAsync(ctx, operation, header, accesses);
-        }
-        
-        private async Task _EnqueueProjectAuditAsync(CallingContext ctx, TrailOperations operation, ProjectHeader header)
-        {
-            var accesses = ProjectAccesses
-                .AsQueryable()
-                .Where(pa => pa.ProjectId == header.id);
-
-            await _EnqueueProjectAuditAsync(ctx, operation, header, accesses);
+            _auditEntryContainer.AddEntryForBackgrondSave(new ProjectAuditEntry(this, ctx, operation) {
+                projectId = header != null ? header.id : projectId,
+                header = header,
+                accesses = accesses,
+            });
         }
     }
-    
-    public static class TaskExtensions
-{
-    public static void SafeFireAndForget(
-        this Task task,
-        bool continueOnCapturedContext = false,
-        Action<Exception> onException = null)
+
+    public class ProjectAuditEntry : AuditEntry<ProjectAuditTrail>
     {
-        if (task == null) throw new ArgumentNullException(nameof(task));
+        private readonly ProjectStoreContext _storeContext;
+        public string projectId { get; set; }
+        public ProjectHeader header { get; set; }
+        public IEnumerable<ProjectAccess> accesses { get; set; }
 
-        async void FireAndForgetWrapper()
+        public ProjectAuditEntry(ProjectStoreContext storeContext, CallingContext callingContext, TrailOperations operation)
+            : base(callingContext, operation)
         {
-            try
-            {
-                await task.ConfigureAwait(continueOnCapturedContext);
-            }
-            catch (Exception ex)
-            {
-                // Logolhatod vagy callback-et hívhatsz
-                onException?.Invoke(ex);
-                // Vagy globális logger:
-                // Logger.LogError(ex, "SafeFireAndForget error");
-            }
+            _storeContext = storeContext;
         }
 
-        FireAndForgetWrapper();
+        protected override async Task InitializeAsync()
+        {
+            header ??= await _storeContext.ProjectHeaders.Find(projectId, projectId);
+            accesses ??= _storeContext.ProjectAccesses
+                    .AsQueryable()
+                    .Where(pa => pa.ProjectId == projectId)
+                    .ToArray();
+        }
+
+        protected override IEntity GetRootEntity() => header;
+        protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { header, accesses });
+        protected override IColumnTable<ProjectAuditTrail> GetTable() => _storeContext.ProjectAuditTrails;
+
     }
-}
 }

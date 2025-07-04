@@ -1,3 +1,9 @@
+using PolyPersist;
+using PolyPersist.Net.Extensions;
+using ServiceKit.Net;
+using JsonDiffPatchDotNet;
+using Newtonsoft.Json.Linq;
+
 namespace Core.Auditing.Worker
 {
     public interface IAuditEntry
@@ -5,35 +11,64 @@ namespace Core.Auditing.Worker
         public Task SaveEntry();
     }
 
-    public class AuditEntry<T> : IAuditEntry
-        where T : IAuditTrail, new()
+    public abstract class AuditEntry<T> : IAuditEntry
+        where T : IAuditTrail, IRow, new()
     {
-        public readonly T _entry;
+        public readonly CallingContext _callingContext;
+        public readonly TrailOperations _operation;
 
-        public AuditEntry(T entry)
+        public AuditEntry(CallingContext ctx, TrailOperations operation)
         {
-            _entry = entry;
+            _callingContext = ctx;
+            _operation = operation;
         }
-        
-        public Task SaveEntry()
+
+        public async Task SaveEntry()
         {
-            T trail = new()
+            await InitializeAsync();
+
+            T newTrail = new T()
             {
-                entityType = _entry.GetType().Name,
-                entityId = _entry.id,
-                PartitionKey = _entry.id,
-                payload = JsonSerializer.Serialize(new { header, accesses }),
-     
+                entityId = GetRootEntity().id,
+                entityType = GetRootEntity().GetType().Name,
+                PartitionKey = GetRootEntity().id,
+                payload = GetEntitySpecificPayloadJSON(),
                 timestamp = DateTime.UtcNow,
-                trailOperation = _entry.operation,
-                userId = ctx.ClientInfo.CallingUserId,
-                userName = ctx.ClientInfo.CallingUserId,
-            };        
+                trailOperation = _operation,
+                userId = _callingContext.ClientInfo.CallingUserId,
+                userName = _callingContext.ClientInfo.CallingUserId,
+            };
+
+            var table = GetTable();
+            if (_operation != TrailOperations.Create)
+            {
+                var lastTrail = table
+                    .AsQueryable()
+                    .Where(t => t.id == newTrail.id && t.PartitionKey == newTrail.PartitionKey)
+                    .OrderByDescending(t => t.timestamp)
+                    .Take(1)
+                    .FirstOrDefault();
+
+                if (lastTrail != null)
+                {
+                    JToken oldJson = JToken.Parse(newTrail.payload);
+                    JToken newJson = JToken.Parse(lastTrail.payload);
+
+                    newTrail.previousTrailId = lastTrail.id;
+                    newTrail.deltaPayload = new JsonDiffPatch().Diff(oldJson, newJson).ToString();
+                }
+            }
+            await table.Insert(newTrail);
         }
+
+        protected abstract Task InitializeAsync();
+        protected abstract IEntity GetRootEntity();
+        protected abstract string GetEntitySpecificPayloadJSON();
+        protected abstract IColumnTable<T> GetTable();
     }
 
     public interface IAuditEntryContainer
     {
-        public void AddEntry(IAuditEntry entry);
+        public void AddEntryForBackgrondSave(IAuditEntry entry);
     }
 }

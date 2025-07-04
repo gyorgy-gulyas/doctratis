@@ -15,19 +15,17 @@
 
         # audit trail bázis osztély, ebben lehet egy entity (root entity) változásait követni
         composite AuditTrail {
-            id: string
-            etag:string
-            LastUpdate:datetime
-            PartitionKey:string
-
             trailOperation:TrailOperations
-            timestamp:datetime
             entityType:string
             entityId:string
             userId:string
             userName:string
                 
             payload:string
+            previousTrailId:string
+            deltaPayload:string
+            @dotnet_code( namespace="PolyPersist.Net.Attributes", code="[ClusteringColumn(1)]")
+            timestamp:datetime
         }
 
         composite AuditEventLog {

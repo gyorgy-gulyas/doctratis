@@ -6,6 +6,7 @@
 // </auto-generated>
 
 using Core.Auditing;
+using PolyPersist.Net.Attributes;
 
 namespace Core.Auditing
 {
@@ -13,16 +14,15 @@ namespace Core.Auditing
 	/// audit trail bázis osztély, ebben lehet egy entity (root entity) változásait követni
 	public partial interface IAuditTrail
 	{
-		public string id { get; set; }
-		public string etag { get; set; }
-		public DateTime LastUpdate { get; set; }
-		public string PartitionKey { get; set; }
 		public TrailOperations trailOperation { get; set; }
-		public DateTime timestamp { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
 		public string userId { get; set; }
 		public string userName { get; set; }
 		public string payload { get; set; }
+		public string previousTrailId { get; set; }
+		public string deltaPayload { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 	}
 }

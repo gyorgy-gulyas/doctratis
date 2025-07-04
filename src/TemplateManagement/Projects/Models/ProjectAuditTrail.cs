@@ -6,23 +6,29 @@
 // </auto-generated>
 
 using Core.Auditing;
+using PolyPersist.Net.Attributes;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectAuditTrail : Core.Auditing.IAuditTrail
+	public partial class ProjectAuditTrail : IBase, Core.Auditing.IAuditTrail
 	{
-		#region IAuditTrail
+		#region IBase
 		public string id { get; set; }
 		public string etag { get; set; }
 		public DateTime LastUpdate { get; set; }
-		public string PartitionKey { get; set; }
+		#endregion IBase
+
+		#region IAuditTrail
 		public TrailOperations trailOperation { get; set; }
-		public DateTime timestamp { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
 		public string userId { get; set; }
 		public string userName { get; set; }
 		public string payload { get; set; }
+		public string previousTrailId { get; set; }
+		public string deltaPayload { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 		#endregion IAuditTrail
 
 
@@ -31,18 +37,22 @@ namespace TemplateManagement.Projects.Project
 		{
 			ProjectAuditTrail clone = new();
 
-			// unfold begin: AuditTrail
+			// unfold begin: Base
 			clone.id = new string(id.ToCharArray());
 			clone.etag = new string(etag.ToCharArray());
 			clone.LastUpdate = LastUpdate;
-			clone.PartitionKey = new string(PartitionKey.ToCharArray());
+			// unfold end Base
+
+			// unfold begin: AuditTrail
 			clone.trailOperation = trailOperation;
-			clone.timestamp = timestamp;
 			clone.entityType = new string(entityType.ToCharArray());
 			clone.entityId = new string(entityId.ToCharArray());
 			clone.userId = new string(userId.ToCharArray());
 			clone.userName = new string(userName.ToCharArray());
 			clone.payload = new string(payload.ToCharArray());
+			clone.previousTrailId = new string(previousTrailId.ToCharArray());
+			clone.deltaPayload = new string(deltaPayload.ToCharArray());
+			clone.timestamp = timestamp;
 			// unfold end AuditTrail
 
 

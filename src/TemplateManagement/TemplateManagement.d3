@@ -75,7 +75,7 @@
                 Status:Statuses
             }
 
-            entity ProjectAuditTrail inherits Core.Auditing.AuditTrail {
+            entity ProjectAuditTrail inherits Base, Core.Auditing.AuditTrail {
             }
         }
 
@@ -172,6 +172,7 @@
             query listAccessibleProjects() : List[ProjectSummaryDTO]
             query listAccessibleProjectsForUser( urseId:string) : List[ProjectSummaryDTO]
             command getProject( projectId:string ) : ProjectDetailsDTO
+            command addProjectAccess( projectId:string,  ) : ProjectDetailsDTO
         }
     }
 }

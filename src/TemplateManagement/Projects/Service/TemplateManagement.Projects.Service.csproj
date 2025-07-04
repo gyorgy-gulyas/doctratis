@@ -15,6 +15,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
     <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
   </ItemGroup>
 
 

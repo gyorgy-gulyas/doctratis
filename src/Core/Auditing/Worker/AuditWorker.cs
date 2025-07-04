@@ -15,14 +15,14 @@ namespace Core.Auditing.Worker
             _logger = logger;
         }
 
-        void IAuditEntryContainer.AddEntry(IAuditEntry entry)
+        void IAuditEntryContainer.AddEntryForBackgrondSave(IAuditEntry entry)
         {
             _channel.Writer.TryWrite(entry);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Task.Run(async () =>
+            return Task.Run(async () =>
             {
                 await foreach (var entry in _channel.Reader.ReadAllAsync(stoppingToken))
                 {
@@ -32,7 +32,7 @@ namespace Core.Auditing.Worker
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error( ex.ToString());
+                        _logger.LogError( ex.ToString());
                     }
                 }
             }, stoppingToken);
