@@ -8,6 +8,7 @@
 using ServiceKit.Net;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects
@@ -67,6 +68,60 @@ namespace TemplateManagement.Projects
 			catch (Exception ex)
 			{
 				return Response<IProjectIF_v1.ProjectSummaryDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.updateProject(CallingContext ctx, IProjectIF_v1.ProjectDetailsDTO project)
+		{
+			try
+			{
+				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
+				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
+				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "updateProject" );
+
+				// build content
+				request.Content = new StringContent( JsonSerializer.Serialize<IProjectIF_v1.ProjectDetailsDTO>( project ));
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<IProjectIF_v1.ProjectDetailsDTO>();
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( error );
+				}
+				else
+				{
+					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_updateProject'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -220,6 +275,57 @@ namespace TemplateManagement.Projects
 			catch (Exception ex)
 			{
 				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IProjectIF_v1.ProjectAccessDTO>> IProjectIF_v1.addProjectAccess(CallingContext ctx, string projectId, string identityId, IProjectIF_v1.ProjectAccessRoles role)
+		{
+			try
+			{
+				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
+				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/addprojectaccess/{projectId}/{identityId}?_str_role={role.ToString()}" ) );
+				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "addProjectAccess" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<IProjectIF_v1.ProjectAccessDTO>();
+					return Response<IProjectIF_v1.ProjectAccessDTO>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( error );
+				}
+				else
+				{
+					return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_addProjectAccess'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),

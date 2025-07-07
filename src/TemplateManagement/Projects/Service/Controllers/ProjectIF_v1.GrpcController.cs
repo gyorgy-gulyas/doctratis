@@ -10,6 +10,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Serilog.Context;
 using ServiceKit.Net;
+using TemplateManagement.Projects;
 using TemplateManagement.Projects.Protos.ProjectIF_v1;
 
 namespace TemplateManagement.Projects
@@ -74,6 +75,65 @@ namespace TemplateManagement.Projects
 				catch(Exception ex)
 				{
 					return new ProjectIF_v1_createProjectResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<ProjectIF_v1_updateProjectResponse> updateProject( ProjectIF_v1_updateProjectRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.updateProject" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					IProjectIF_v1.ProjectDetailsDTO project;
+					project = request.Project != null ? IProjectIF_v1.ProjectDetailsDTO.FromGrpc( request.Project ) : null;
+
+					// calling the service function itself
+					var response = await _service.updateProject( ctx , project );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new ProjectIF_v1_updateProjectResponse();
+							result.Value = response.Value != null ? IProjectIF_v1.ProjectDetailsDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new ProjectIF_v1_updateProjectResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.updateProject'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new ProjectIF_v1_updateProjectResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new ProjectIF_v1_updateProjectResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,
@@ -249,6 +309,69 @@ namespace TemplateManagement.Projects
 				catch(Exception ex)
 				{
 					return new ProjectIF_v1_getProjectResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<ProjectIF_v1_addProjectAccessResponse> addProjectAccess( ProjectIF_v1_addProjectAccessRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.addProjectAccess" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string projectId;
+					projectId = request.ProjectId;
+					string identityId;
+					identityId = request.IdentityId;
+					IProjectIF_v1.ProjectAccessRoles role;
+					role = IProjectIF_v1.ProjectAccessRolesMappings.FromGrpc( request.Role) ;
+
+					// calling the service function itself
+					var response = await _service.addProjectAccess( ctx , projectId, identityId, role );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new ProjectIF_v1_addProjectAccessResponse();
+							result.Value = response.Value != null ? IProjectIF_v1.ProjectAccessDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new ProjectIF_v1_addProjectAccessResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'ProjectIF_v1.addProjectAccess'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new ProjectIF_v1_addProjectAccessResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new ProjectIF_v1_addProjectAccessResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

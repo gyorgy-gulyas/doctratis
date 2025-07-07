@@ -76,6 +76,52 @@ namespace TemplateManagement.Projects
 			}
 		}
 
+		[HttpPost( "updateproject" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectDetailsDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> updateProject( [FromBody] IProjectIF_v1.ProjectDetailsDTO project)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.updateProject" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.updateProject( ctx, project );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.updateProject'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		[HttpGet( "listaccessibleprojects" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
@@ -196,6 +242,53 @@ namespace TemplateManagement.Projects
 						else
 						{
 							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.getProject'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "addprojectaccess/{projectId}/{identityId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectAccessDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> addProjectAccess( [FromRoute] string projectId,  [FromRoute] string identityId,  [FromQuery] string _str_role)
+		{
+			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.addProjectAccess" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					IProjectIF_v1.ProjectAccessRoles role = (IProjectIF_v1.ProjectAccessRoles)Enum.Parse(typeof(IProjectIF_v1.ProjectAccessRoles), _str_role);
+					// calling the service function itself
+					var response = await _service.addProjectAccess( ctx, projectId, identityId, role );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'ProjectIF_v1.addProjectAccess'" );
 						}
 					}
 					else

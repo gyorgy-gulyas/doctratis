@@ -85,9 +85,11 @@
             }
 
             command createProject( name:string, description:string, createdBy:string ) : Project.ProjectHeader
+            command updateProject( project:Project.ProjectHeader, accesses:List[Project.ProjectAccess] ) : Project.ProjectHeader
             query getAllProjectForUser( userId:string ) : List[Project.ProjectHeader]
             query getAllAccessForProject( projectId:string ) : List[Project.ProjectAccess]
             query getProjectForUser( projectId:string, userId:string ) : Project.ProjectHeader
+            command addProjectAccess( projectId:string, identityId:string, role:Project.ProjectAccess.Roles ) : Project.ProjectAccess
         }
 
         @publish(grpc,rest)
@@ -169,10 +171,11 @@
             }
 
             command createProject( name:string, description:string, createdBy:string ) : ProjectSummaryDTO
+            command updateProject( project:ProjectDetailsDTO ) : ProjectDetailsDTO
             query listAccessibleProjects() : List[ProjectSummaryDTO]
             query listAccessibleProjectsForUser( urseId:string) : List[ProjectSummaryDTO]
             command getProject( projectId:string ) : ProjectDetailsDTO
-            command addProjectAccess( projectId:string,  ) : ProjectDetailsDTO
+            command addProjectAccess( projectId:string, identityId:string, role:ProjectAccessRoles ) : ProjectAccessDTO
         }
     }
 }

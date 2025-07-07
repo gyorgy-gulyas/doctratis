@@ -17,6 +17,9 @@ namespace TemplateManagement.Projects
 		/// <return>ProjectSummaryDTO</return>
 		public Task<Response<ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description, string createdBy);
 
+		/// <return>ProjectDetailsDTO</return>
+		public Task<Response<ProjectDetailsDTO>> updateProject(CallingContext ctx, ProjectDetailsDTO project);
+
 		/// <return>List<ProjectSummaryDTO></return>
 		public Task<Response<List<ProjectSummaryDTO>>> listAccessibleProjects(CallingContext ctx);
 
@@ -25,6 +28,9 @@ namespace TemplateManagement.Projects
 
 		/// <return>ProjectDetailsDTO</return>
 		public Task<Response<ProjectDetailsDTO>> getProject(CallingContext ctx, string projectId);
+
+		/// <return>ProjectAccessDTO</return>
+		public Task<Response<ProjectAccessDTO>> addProjectAccess(CallingContext ctx, string projectId, string identityId, ProjectAccessRoles role);
 
 
 		public enum ProjectStatuses

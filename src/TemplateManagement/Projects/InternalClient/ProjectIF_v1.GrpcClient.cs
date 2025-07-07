@@ -82,6 +82,59 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
+		async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.updateProject(CallingContext ctx, IProjectIF_v1.ProjectDetailsDTO project)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new ProjectIF_v1_updateProjectRequest();
+				request.Project = project != null ? IProjectIF_v1.ProjectDetailsDTO.ToGrpc( project ) : null;
+
+				// calling grpc client
+				var grpc_response = await _client.updateProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "updateProject" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case ProjectIF_v1_updateProjectResponse.ResultOneofCase.Value:
+						IProjectIF_v1.ProjectDetailsDTO value;
+						value = grpc_response.Value != null ? IProjectIF_v1.ProjectDetailsDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IProjectIF_v1.ProjectDetailsDTO>.Success( value );
+
+					case ProjectIF_v1_updateProjectResponse.ResultOneofCase.Error:
+						return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case ProjectIF_v1_updateProjectResponse.ResultOneofCase.None:
+					default:
+						return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_updateProject'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
 		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
 		{
 			try
@@ -232,6 +285,61 @@ namespace TemplateManagement.Projects
 			catch (Exception ex)
 			{
 				return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IProjectIF_v1.ProjectAccessDTO>> IProjectIF_v1.addProjectAccess(CallingContext ctx, string projectId, string identityId, IProjectIF_v1.ProjectAccessRoles role)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new ProjectIF_v1_addProjectAccessRequest();
+				request.ProjectId = projectId;
+				request.IdentityId = identityId;
+				request.Role = IProjectIF_v1.ProjectAccessRolesMappings.ToGrpc( role );
+
+				// calling grpc client
+				var grpc_response = await _client.addProjectAccessAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "addProjectAccess" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case ProjectIF_v1_addProjectAccessResponse.ResultOneofCase.Value:
+						IProjectIF_v1.ProjectAccessDTO value;
+						value = grpc_response.Value != null ? IProjectIF_v1.ProjectAccessDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IProjectIF_v1.ProjectAccessDTO>.Success( value );
+
+					case ProjectIF_v1_addProjectAccessResponse.ResultOneofCase.Error:
+						return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case ProjectIF_v1_addProjectAccessResponse.ResultOneofCase.None:
+					default:
+						return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_addProjectAccess'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),

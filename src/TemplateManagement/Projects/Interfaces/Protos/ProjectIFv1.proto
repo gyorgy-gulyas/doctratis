@@ -19,9 +19,11 @@ import "servicekit_error.proto";
 
 service ProjectIF_v1 {
 	rpc createProject(ProjectIF_v1_createProjectRequest) returns (ProjectIF_v1_createProjectResponse);
+	rpc updateProject(ProjectIF_v1_updateProjectRequest) returns (ProjectIF_v1_updateProjectResponse);
 	rpc listAccessibleProjects(google.protobuf.Empty) returns (ProjectIF_v1_listAccessibleProjectsResponse);
 	rpc listAccessibleProjectsForUser(ProjectIF_v1_listAccessibleProjectsForUserRequest) returns (ProjectIF_v1_listAccessibleProjectsForUserResponse);
 	rpc getProject(ProjectIF_v1_getProjectRequest) returns (ProjectIF_v1_getProjectResponse);
+	rpc addProjectAccess(ProjectIF_v1_addProjectAccessRequest) returns (ProjectIF_v1_addProjectAccessResponse);
 }
 
 message ProjectIF_v1_createProjectRequest {
@@ -33,6 +35,17 @@ message ProjectIF_v1_createProjectRequest {
 message ProjectIF_v1_createProjectResponse {
 	oneof result {
 		ProjectSummaryDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message ProjectIF_v1_updateProjectRequest {
+	ProjectDetailsDTO project = 1;
+}
+
+message ProjectIF_v1_updateProjectResponse {
+	oneof result {
+		ProjectDetailsDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
@@ -61,6 +74,19 @@ message ProjectIF_v1_getProjectRequest {
 message ProjectIF_v1_getProjectResponse {
 	oneof result {
 		ProjectDetailsDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message ProjectIF_v1_addProjectAccessRequest {
+	string projectId = 1;
+	string identityId = 2;
+	ProjectAccessRoles role = 3;
+}
+
+message ProjectIF_v1_addProjectAccessResponse {
+	oneof result {
+		ProjectAccessDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
