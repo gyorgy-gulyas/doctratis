@@ -9,26 +9,58 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectFolder
+	public partial class ProjectFolder : IEquatable<ProjectFolder>
 	{
 		public string id { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public List<ProjectFolder> SubFolders { get; set; } = new();
 
-		#region Clone & Copy 
-		virtual public ProjectFolder Clone()
+		#region Clone 
+		public virtual ProjectFolder Clone()
 		{
 			ProjectFolder clone = new();
 
-			clone.id = new string(id.ToCharArray());
 			clone.Name = new string(Name.ToCharArray());
 			clone.Description = new string(Description.ToCharArray());
+
+			// clone of SubFolders
 			clone.SubFolders.AddRange( SubFolders.Select( v => v.Clone() ));
 
 			return clone;
 		}
-		#endregion Clone & Copy 
+		#endregion Clone 
+
+		#region Equals & HashCode 
+		public bool Equals( ProjectFolder other )
+		{
+			if (other is null) return false;
+
+			if(Name != other.Name) return false;
+			if(Description != other.Description) return false;
+
+			// equals of SubFolders
+			if(SubFolders.SequenceEqual(other.SubFolders) == false ) return false;
+
+			return true;
+		}
+
+		public override bool Equals(object obj) => Equals(obj as ProjectFolder);
+
+		public override int GetHashCode()
+		{
+			var hash = new HashCode();
+			hash.Add(id);
+			hash.Add(Name);
+			hash.Add(Description);
+
+			// hash of SubFolders
+			foreach( var element_SubFolders in SubFolders)
+				hash.Add(element_SubFolders);
+
+			return hash.ToHashCode();
+		}
+		#endregion Equals & HashCode 
 	}
 
 }

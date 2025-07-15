@@ -156,9 +156,11 @@ message ProjectFolderDTO {
 
 message ProjectAccessDTO {
 	string id = 1;
-	string IdentityId = 2;
-	ProjectAccessRoles Role = 3;
-	ProjectAccessStatuses Status = 4;
+	string etag = 2;
+	string IdentityId = 3;
+	string IdentityName = 4;
+	ProjectAccessRoles Role = 5;
+	ProjectAccessStatuses Status = 6;
 }
 
 message ProjectSummaryDTO {

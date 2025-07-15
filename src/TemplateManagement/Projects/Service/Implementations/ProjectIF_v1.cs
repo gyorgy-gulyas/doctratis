@@ -23,21 +23,14 @@ namespace TemplateManagement.Projects.Service.Implementations
         }
         async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.updateProject(CallingContext ctx, IProjectIF_v1.ProjectDetailsDTO project)
         {
-            var header = await _service.updateProject(ctx, project.ConvertToHeader()).ConfigureAwait(false);
-            if (header.IsSuccess() == false)
-                return new(header.Error);
+            var header = project.ConvertToHeader();
+            var accesses = project.Accesses.Select(a => a.ConvertToAccess( header )).ToList();
 
-            List<Project.ProjectAccess> accesses = new();
-            foreach (var dto in project.SubFolders)
-            {
-                var access = await _service.updateProjectAccess(ctx, dto.Convert()).ConfigureAwait(false);
-                if (access.IsSuccess() == false)
-                    return new(access.Error);
-
-                accesses.Add(access.Value);
-            }
+            var result = await _service.updateProject(ctx, header, accesses ).ConfigureAwait(false);
+            if (result.IsSuccess() == false)
+                return new(result.Error);
             
-            return new(header.Value.ConvertToDetailsDTO(accesses));
+            return new(result.Value.ConvertToDetailsDTO(accesses));
         }
 
         async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
@@ -221,20 +214,29 @@ namespace TemplateManagement.Projects.Service.Implementations
             return new()
             {
                 id = @this.id,
+                etag = @this.etag,
+
                 IdentityId = @this.IdentityId,
+                IdentityName =@this.IdentityName,
+
                 Role = @this.Role.Convert(),
                 Status = @this.Status.Convert(),
             };
         }
         
-        internal static Project.ProjectAccess ConvertToSummaryDTO(this IProjectIF_v1.ProjectAccessDTO @this)
+        internal static Project.ProjectAccess ConvertToAccess(this IProjectIF_v1.ProjectAccessDTO @this, Project.ProjectHeader header )
         {
             return new()
             {
                 id = @this.id,
-                id = @this.et,
+                etag = @this.etag,
+
+                ProjectId = header.id,
+                ProjectName = header.Name,
+                IdentityId = @this.IdentityId,
+                Role = @this.Role.Convert(),
+                Status = @this.Status.Convert(),
             };
         }
-
     }
 }

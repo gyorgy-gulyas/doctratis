@@ -9,7 +9,7 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectAccess : IBase
+	public partial class ProjectAccess : IBase, IEquatable<ProjectAccess>
 	{
 		public enum Roles
 		{
@@ -54,29 +54,70 @@ namespace TemplateManagement.Projects.Project
 		#endregion IBase
 
 		public string ProjectId { get; set; }
+		public string ProjectName { get; set; }
 		public string IdentityId { get; set; }
+		public string IdentityName { get; set; }
 		public Roles Role { get; set; }
 		public Statuses Status { get; set; }
 
-		#region Clone & Copy 
-		virtual public ProjectAccess Clone()
+		#region Clone 
+		public virtual ProjectAccess Clone()
 		{
 			ProjectAccess clone = new();
 
-			// unfold begin: Base
-			clone.id = new string(id.ToCharArray());
-			clone.etag = new string(etag.ToCharArray());
-			clone.LastUpdate = LastUpdate;
-			// unfold end Base
+			// begin: Base
+			// end: Base
 
 			clone.ProjectId = new string(ProjectId.ToCharArray());
+			clone.ProjectName = new string(ProjectName.ToCharArray());
 			clone.IdentityId = new string(IdentityId.ToCharArray());
+			clone.IdentityName = new string(IdentityName.ToCharArray());
 			clone.Role = Role;
 			clone.Status = Status;
 
 			return clone;
 		}
-		#endregion Clone & Copy 
+		#endregion Clone 
+
+		#region Equals & HashCode 
+		public bool Equals( ProjectAccess other )
+		{
+			if (other is null) return false;
+
+			// begin: Base
+			// end: Base
+
+			if(ProjectId != other.ProjectId) return false;
+			if(ProjectName != other.ProjectName) return false;
+			if(IdentityId != other.IdentityId) return false;
+			if(IdentityName != other.IdentityName) return false;
+			if(Role != other.Role) return false;
+			if(Status != other.Status) return false;
+
+			return true;
+		}
+
+		public override bool Equals(object obj) => Equals(obj as ProjectAccess);
+
+		public override int GetHashCode()
+		{
+			var hash = new HashCode();
+			// begin: Base
+			hash.Add(id);
+			hash.Add(etag);
+			hash.Add(LastUpdate);
+			// end: Base
+
+			hash.Add(ProjectId);
+			hash.Add(ProjectName);
+			hash.Add(IdentityId);
+			hash.Add(IdentityName);
+			hash.Add(Role);
+			hash.Add(Status);
+
+			return hash.ToHashCode();
+		}
+		#endregion Equals & HashCode 
 	}
 
 }

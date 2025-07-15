@@ -21,20 +21,9 @@ namespace TemplateManagement.Projects.Service.Implementations
         {
             _auditEntryContainer = auditEntryContainer;
 
-            IDocumentStore documentStore = (IDocumentStore)storeProvider.getStore(IStore.StorageModels.Document);
-
-            ProjectHeaders = documentStore.GetCollectionByName<ProjectHeader>(nameof(ProjectHeader)).Result;
-            if (ProjectHeaders == null)
-                ProjectHeaders = documentStore.CreateCollection<ProjectHeader>(nameof(ProjectHeader)).Result;
-
-            ProjectAccesses = documentStore.GetCollectionByName<ProjectAccess>(nameof(ProjectAccess)).Result;
-            if (ProjectAccesses == null)
-                ProjectAccesses = documentStore.CreateCollection<ProjectAccess>(nameof(ProjectAccess)).Result;
-
-            IColumnStore columnStore = (IColumnStore)storeProvider.getStore(IStore.StorageModels.ColumnStore);
-            ProjectAuditTrails = columnStore.GetTableByName<ProjectAuditTrail>(nameof(ProjectAuditTrail)).Result;
-            if (ProjectAuditTrails == null)
-                ProjectAuditTrails = columnStore.CreateTable<ProjectAuditTrail>(nameof(ProjectAuditTrail)).Result;
+            ProjectHeaders = base.GetOrCreateDocumentCollection<ProjectHeader>().Result;
+            ProjectAccesses = base.GetOrCreateDocumentCollection<ProjectAccess>().Result;
+            ProjectAuditTrails = base.GetOrCreateColumnTable<ProjectAuditTrail>().Result;
         }
 
         internal void Audit(TrailOperations operation, CallingContext ctx, ProjectHeader header = null, IEnumerable<ProjectAccess> accesses = null, string projectId = null )
@@ -69,9 +58,13 @@ namespace TemplateManagement.Projects.Service.Implementations
                     .ToArray();
         }
 
+        protected override void FillAddtionalMembers(ProjectAuditTrail trail)
+        {
+            trail.projectId = projectId;
+        }
+
         protected override IEntity GetRootEntity() => header;
         protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { header, accesses });
         protected override IColumnTable<ProjectAuditTrail> GetTable() => _storeContext.ProjectAuditTrails;
-
     }
 }

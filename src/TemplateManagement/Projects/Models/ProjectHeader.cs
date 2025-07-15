@@ -9,7 +9,7 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectHeader : IBase
+	public partial class ProjectHeader : IBase, IEquatable<ProjectHeader>
 	{
 		#region IBase
 		public string id { get; set; }
@@ -25,28 +25,77 @@ namespace TemplateManagement.Projects.Project
 		public DateTime CreatedAt { get; set; }
 		public string CreatedBy { get; set; }
 
-		#region Clone & Copy 
-		virtual public ProjectHeader Clone()
+		#region Clone 
+		public virtual ProjectHeader Clone()
 		{
 			ProjectHeader clone = new();
 
-			// unfold begin: Base
-			clone.id = new string(id.ToCharArray());
-			clone.etag = new string(etag.ToCharArray());
-			clone.LastUpdate = LastUpdate;
-			// unfold end Base
+			// begin: Base
+			// end: Base
 
 			clone.Name = new string(Name.ToCharArray());
 			clone.Description = new string(Description.ToCharArray());
+
+			// clone of Tags
 			clone.Tags.AddRange( Tags.Select( v => new string(v.ToCharArray()) ));
 			clone.Status = Status;
+
+			// clone of SubFolders
 			clone.SubFolders.AddRange( SubFolders.Select( v => v.Clone() ));
-			clone.CreatedAt = CreatedAt;
-			clone.CreatedBy = new string(CreatedBy.ToCharArray());
 
 			return clone;
 		}
-		#endregion Clone & Copy 
+		#endregion Clone 
+
+		#region Equals & HashCode 
+		public bool Equals( ProjectHeader other )
+		{
+			if (other is null) return false;
+
+			// begin: Base
+			// end: Base
+
+			if(Name != other.Name) return false;
+			if(Description != other.Description) return false;
+
+			// equals of Tags
+			if(Tags.SequenceEqual(other.Tags) == false ) return false;
+			if(Status != other.Status) return false;
+
+			// equals of SubFolders
+			if(SubFolders.SequenceEqual(other.SubFolders) == false ) return false;
+
+			return true;
+		}
+
+		public override bool Equals(object obj) => Equals(obj as ProjectHeader);
+
+		public override int GetHashCode()
+		{
+			var hash = new HashCode();
+			// begin: Base
+			hash.Add(id);
+			hash.Add(etag);
+			hash.Add(LastUpdate);
+			// end: Base
+
+			hash.Add(Name);
+			hash.Add(Description);
+
+			// hash of Tags
+			foreach( var element_Tags in Tags)
+				hash.Add(element_Tags);
+			hash.Add(Status);
+
+			// hash of SubFolders
+			foreach( var element_SubFolders in SubFolders)
+				hash.Add(element_SubFolders);
+			hash.Add(CreatedAt);
+			hash.Add(CreatedBy);
+
+			return hash.ToHashCode();
+		}
+		#endregion Equals & HashCode 
 	}
 
 }

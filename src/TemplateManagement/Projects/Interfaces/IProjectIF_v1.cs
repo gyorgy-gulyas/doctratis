@@ -180,26 +180,58 @@ namespace TemplateManagement.Projects
 
 		}
 		#endregion GrpcMapping
-		public partial class ProjectFolderDTO
+		public partial class ProjectFolderDTO : IEquatable<ProjectFolderDTO>
 		{
 			public string id { get; set; }
 			public string Name { get; set; }
 			public string Description { get; set; }
 			public List<ProjectFolderDTO> SubFolders { get; set; } = new();
 
-			#region Clone & Copy 
-			virtual public ProjectFolderDTO Clone()
+			#region Clone 
+			public virtual ProjectFolderDTO Clone()
 			{
 				ProjectFolderDTO clone = new();
 
-				clone.id = new string(id.ToCharArray());
 				clone.Name = new string(Name.ToCharArray());
 				clone.Description = new string(Description.ToCharArray());
+
+				// clone of SubFolders
 				clone.SubFolders.AddRange( SubFolders.Select( v => v.Clone() ));
 
 				return clone;
 			}
-			#endregion Clone & Copy 
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectFolderDTO other )
+			{
+				if (other is null) return false;
+
+				if(Name != other.Name) return false;
+				if(Description != other.Description) return false;
+
+				// equals of SubFolders
+				if(SubFolders.SequenceEqual(other.SubFolders) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectFolderDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(Name);
+				hash.Add(Description);
+
+				// hash of SubFolders
+				foreach( var element_SubFolders in SubFolders)
+					hash.Add(element_SubFolders);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
 
 			#region GrpcMapping
 			public static Protos.ProjectIF_v1.ProjectFolderDTO ToGrpc( IProjectIF_v1.ProjectFolderDTO @this )
@@ -227,26 +259,57 @@ namespace TemplateManagement.Projects
 			#endregion GrpcMapping
 		}
 
-		public partial class ProjectAccessDTO
+		public partial class ProjectAccessDTO : IEquatable<ProjectAccessDTO>
 		{
 			public string id { get; set; }
+			public string etag { get; set; }
 			public string IdentityId { get; set; }
+			public string IdentityName { get; set; }
 			public ProjectAccessRoles Role { get; set; }
 			public ProjectAccessStatuses Status { get; set; }
 
-			#region Clone & Copy 
-			virtual public ProjectAccessDTO Clone()
+			#region Clone 
+			public virtual ProjectAccessDTO Clone()
 			{
 				ProjectAccessDTO clone = new();
 
-				clone.id = new string(id.ToCharArray());
 				clone.IdentityId = new string(IdentityId.ToCharArray());
+				clone.IdentityName = new string(IdentityName.ToCharArray());
 				clone.Role = Role;
 				clone.Status = Status;
 
 				return clone;
 			}
-			#endregion Clone & Copy 
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectAccessDTO other )
+			{
+				if (other is null) return false;
+
+				if(IdentityId != other.IdentityId) return false;
+				if(IdentityName != other.IdentityName) return false;
+				if(Role != other.Role) return false;
+				if(Status != other.Status) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectAccessDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(IdentityId);
+				hash.Add(IdentityName);
+				hash.Add(Role);
+				hash.Add(Status);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
 
 			#region GrpcMapping
 			public static Protos.ProjectIF_v1.ProjectAccessDTO ToGrpc( IProjectIF_v1.ProjectAccessDTO @this )
@@ -254,7 +317,9 @@ namespace TemplateManagement.Projects
 				Protos.ProjectIF_v1.ProjectAccessDTO result = new();
 
 				result.Id = @this.id;
+				result.Etag = @this.etag;
 				result.IdentityId = @this.IdentityId;
+				result.IdentityName = @this.IdentityName;
 				result.Role = IProjectIF_v1.ProjectAccessRolesMappings.ToGrpc( @this.Role );
 				result.Status = IProjectIF_v1.ProjectAccessStatusesMappings.ToGrpc( @this.Status );
 
@@ -265,7 +330,9 @@ namespace TemplateManagement.Projects
 				IProjectIF_v1.ProjectAccessDTO result = new();
 
 				result.id = @from.Id;
+				result.etag = @from.Etag;
 				result.IdentityId = @from.IdentityId;
+				result.IdentityName = @from.IdentityName;
 				result.Role = IProjectIF_v1.ProjectAccessRolesMappings.FromGrpc( @from.Role) ;
 				result.Status = IProjectIF_v1.ProjectAccessStatusesMappings.FromGrpc( @from.Status) ;
 
@@ -274,7 +341,7 @@ namespace TemplateManagement.Projects
 			#endregion GrpcMapping
 		}
 
-		public partial class ProjectSummaryDTO
+		public partial class ProjectSummaryDTO : IEquatable<ProjectSummaryDTO>
 		{
 			public string id { get; set; }
 			public string Name { get; set; }
@@ -282,20 +349,54 @@ namespace TemplateManagement.Projects
 			public List<string> Tags { get; set; } = new();
 			public ProjectStatuses Status { get; set; }
 
-			#region Clone & Copy 
-			virtual public ProjectSummaryDTO Clone()
+			#region Clone 
+			public virtual ProjectSummaryDTO Clone()
 			{
 				ProjectSummaryDTO clone = new();
 
-				clone.id = new string(id.ToCharArray());
 				clone.Name = new string(Name.ToCharArray());
 				clone.Description = new string(Description.ToCharArray());
+
+				// clone of Tags
 				clone.Tags.AddRange( Tags.Select( v => new string(v.ToCharArray()) ));
 				clone.Status = Status;
 
 				return clone;
 			}
-			#endregion Clone & Copy 
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectSummaryDTO other )
+			{
+				if (other is null) return false;
+
+				if(Name != other.Name) return false;
+				if(Description != other.Description) return false;
+
+				// equals of Tags
+				if(Tags.SequenceEqual(other.Tags) == false ) return false;
+				if(Status != other.Status) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectSummaryDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(Name);
+				hash.Add(Description);
+
+				// hash of Tags
+				foreach( var element_Tags in Tags)
+					hash.Add(element_Tags);
+				hash.Add(Status);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
 
 			#region GrpcMapping
 			public static Protos.ProjectIF_v1.ProjectSummaryDTO ToGrpc( IProjectIF_v1.ProjectSummaryDTO @this )
@@ -325,7 +426,7 @@ namespace TemplateManagement.Projects
 			#endregion GrpcMapping
 		}
 
-		public partial class ProjectDetailsDTO
+		public partial class ProjectDetailsDTO : IEquatable<ProjectDetailsDTO>
 		{
 			public string id { get; set; }
 			public string etag { get; set; }
@@ -338,25 +439,81 @@ namespace TemplateManagement.Projects
 			public DateTime CreatedAt { get; set; }
 			public string CreatedBy { get; set; }
 
-			#region Clone & Copy 
-			virtual public ProjectDetailsDTO Clone()
+			#region Clone 
+			public virtual ProjectDetailsDTO Clone()
 			{
 				ProjectDetailsDTO clone = new();
 
-				clone.id = new string(id.ToCharArray());
-				clone.etag = new string(etag.ToCharArray());
 				clone.Name = new string(Name.ToCharArray());
 				clone.Description = new string(Description.ToCharArray());
+
+				// clone of Tags
 				clone.Tags.AddRange( Tags.Select( v => new string(v.ToCharArray()) ));
 				clone.Status = Status;
+
+				// clone of SubFolders
 				clone.SubFolders.AddRange( SubFolders.Select( v => v.Clone() ));
+
+				// clone of Accesses
 				clone.Accesses.AddRange( Accesses.Select( v => v.Clone() ));
 				clone.CreatedAt = CreatedAt;
 				clone.CreatedBy = new string(CreatedBy.ToCharArray());
 
 				return clone;
 			}
-			#endregion Clone & Copy 
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectDetailsDTO other )
+			{
+				if (other is null) return false;
+
+				if(Name != other.Name) return false;
+				if(Description != other.Description) return false;
+
+				// equals of Tags
+				if(Tags.SequenceEqual(other.Tags) == false ) return false;
+				if(Status != other.Status) return false;
+
+				// equals of SubFolders
+				if(SubFolders.SequenceEqual(other.SubFolders) == false ) return false;
+
+				// equals of Accesses
+				if(Accesses.SequenceEqual(other.Accesses) == false ) return false;
+				if(CreatedAt != other.CreatedAt) return false;
+				if(CreatedBy != other.CreatedBy) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectDetailsDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(Name);
+				hash.Add(Description);
+
+				// hash of Tags
+				foreach( var element_Tags in Tags)
+					hash.Add(element_Tags);
+				hash.Add(Status);
+
+				// hash of SubFolders
+				foreach( var element_SubFolders in SubFolders)
+					hash.Add(element_SubFolders);
+
+				// hash of Accesses
+				foreach( var element_Accesses in Accesses)
+					hash.Add(element_Accesses);
+				hash.Add(CreatedAt);
+				hash.Add(CreatedBy);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
 
 			#region GrpcMapping
 			public static Protos.ProjectIF_v1.ProjectDetailsDTO ToGrpc( IProjectIF_v1.ProjectDetailsDTO @this )

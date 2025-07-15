@@ -30,6 +30,9 @@
     <Reference Include="PolyPersist.Net.DocumentStore.MongoDB">
       <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.DocumentStore.MongoDB.dll</HintPath>
     </Reference>
+    <Reference Include="PolyPersist.Net.Transactions">
+      <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.Transactions\bin\Debug\net8.0\PolyPersist.Net.Transactions.dll</HintPath>
+    </Reference>
     <Reference Include="SrvKit.General">
       <HintPath>..\..\..\..\..\SrvKit\src\dotnet\SrvKit.General\bin\Debug\net8.0\SrvKit.General.dll</HintPath>
     </Reference>

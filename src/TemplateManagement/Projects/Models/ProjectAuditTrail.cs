@@ -10,7 +10,7 @@ using PolyPersist.Net.Attributes;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectAuditTrail : IBase, Core.Auditing.IAuditTrail
+	public partial class ProjectAuditTrail : IBase, Core.Auditing.IAuditTrail, IEquatable<ProjectAuditTrail>
 	{
 		#region IBase
 		public string id { get; set; }
@@ -31,19 +31,17 @@ namespace TemplateManagement.Projects.Project
 		public DateTime timestamp { get; set; }
 		#endregion IAuditTrail
 
+		public string projectId { get; set; }
 
-		#region Clone & Copy 
-		virtual public ProjectAuditTrail Clone()
+		#region Clone 
+		public virtual ProjectAuditTrail Clone()
 		{
 			ProjectAuditTrail clone = new();
 
-			// unfold begin: Base
-			clone.id = new string(id.ToCharArray());
-			clone.etag = new string(etag.ToCharArray());
-			clone.LastUpdate = LastUpdate;
-			// unfold end Base
+			// begin: Base
+			// end: Base
 
-			// unfold begin: AuditTrail
+			// begin: AuditTrail
 			clone.trailOperation = trailOperation;
 			clone.entityType = new string(entityType.ToCharArray());
 			clone.entityId = new string(entityId.ToCharArray());
@@ -53,12 +51,67 @@ namespace TemplateManagement.Projects.Project
 			clone.previousTrailId = new string(previousTrailId.ToCharArray());
 			clone.deltaPayload = new string(deltaPayload.ToCharArray());
 			clone.timestamp = timestamp;
-			// unfold end AuditTrail
+			// end: AuditTrail
 
+			clone.projectId = new string(projectId.ToCharArray());
 
 			return clone;
 		}
-		#endregion Clone & Copy 
+		#endregion Clone 
+
+		#region Equals & HashCode 
+		public bool Equals( ProjectAuditTrail other )
+		{
+			if (other is null) return false;
+
+			// begin: Base
+			// end: Base
+
+			// begin: AuditTrail
+			if(trailOperation != other.trailOperation) return false;
+			if(entityType != other.entityType) return false;
+			if(entityId != other.entityId) return false;
+			if(userId != other.userId) return false;
+			if(userName != other.userName) return false;
+			if(payload != other.payload) return false;
+			if(previousTrailId != other.previousTrailId) return false;
+			if(deltaPayload != other.deltaPayload) return false;
+			if(timestamp != other.timestamp) return false;
+			// end: AuditTrail
+
+			if(projectId != other.projectId) return false;
+
+			return true;
+		}
+
+		public override bool Equals(object obj) => Equals(obj as ProjectAuditTrail);
+
+		public override int GetHashCode()
+		{
+			var hash = new HashCode();
+			// begin: Base
+			hash.Add(id);
+			hash.Add(etag);
+			hash.Add(LastUpdate);
+			// end: Base
+
+			// begin: AuditTrail
+			hash.Add(trailOperation);
+			hash.Add(entityType);
+			hash.Add(entityId);
+			hash.Add(userId);
+			hash.Add(userName);
+			hash.Add(payload);
+			hash.Add(previousTrailId);
+			hash.Add(deltaPayload);
+			hash.Add(timestamp);
+			// end: AuditTrail
+
+			hash.Add(projectId);
+
+			return hash.ToHashCode();
+		}
+		#endregion Equals & HashCode 
 	}
 
 }

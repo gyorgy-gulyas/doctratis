@@ -3,8 +3,11 @@
     context Projects {
 
         composite Base {
+            @system_field
             id:string
+            @system_field
             etag:string
+            @system_field
             LastUpdate:datetime
         }
 
@@ -31,11 +34,14 @@
                 Status:ProjectStatuses
                 SubFolders: List[ProjectFolder]
 
+                @system_field
                 CreatedAt:datetime
+                @system_field
                 CreatedBy:string
             }
 
             valueobject ProjectFolder {
+                @system_field
                 id:string
                 Name:string
                 Description:string
@@ -70,12 +76,15 @@
                 }
                 
                 ProjectId:string
+                ProjectName:string
                 IdentityId:string
+                IdentityName:string
                 Role:Roles
                 Status:Statuses
             }
 
             entity ProjectAuditTrail inherits Base, Core.Auditing.AuditTrail {
+                projectId: string
             }
         }
 
@@ -108,6 +117,7 @@
             }
 
             dto ProjectFolderDTO {
+                @system_field
                 id:string
                 Name:string
                 Description:string
@@ -140,14 +150,21 @@
             }
 
             dto ProjectAccessDTO {
+                @system_field
                 id:string
+                @system_field
+                etag:string
+
                 IdentityId:string
+                IdentityName:string
                 Role:ProjectAccessRoles
                 Status:ProjectAccessStatuses
             }
                 
             dto ProjectSummaryDTO {
+                @system_field
                 id:string
+
                 Name:string
                 Description:string
                 Tags:List[string]
@@ -156,8 +173,11 @@
             }
 
             dto ProjectDetailsDTO {
+                @system_field
                 id:string
+                @system_field
                 etag:string
+
                 Name:string
                 Description:string
                 Tags:List[string]
@@ -178,4 +198,5 @@
             command addProjectAccess( projectId:string, identityId:string, role:ProjectAccessRoles ) : ProjectAccessDTO
         }
     }
+  
 }

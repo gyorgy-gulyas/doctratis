@@ -65,6 +65,7 @@ namespace Core.Auditing.Worker
         protected abstract IEntity GetRootEntity();
         protected abstract string GetEntitySpecificPayloadJSON();
         protected abstract IColumnTable<T> GetTable();
+        protected abstract void FillAddtionalMembers( T trail );
     }
 
     public interface IAuditEntryContainer

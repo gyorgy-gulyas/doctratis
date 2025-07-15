@@ -16,7 +16,7 @@ namespace TemplateManagement.Projects
 		public Task<Response<Project.ProjectHeader>> createProject(CallingContext ctx, string name, string description, string createdBy);
 
 		/// <return>Project.ProjectHeader</return>
-		public Task<Response<Project.ProjectHeader>> updateProject(CallingContext ctx, Project.ProjectHeader project, List<Project.ProjectAccess> accesses);
+		public Task<Response<Project.ProjectHeader>> updateProject(CallingContext ctx, Project.ProjectHeader project, IList<Project.ProjectAccess> accesses);
 
 		/// <return>List<Project.ProjectHeader></return>
 		public Task<Response<List<Project.ProjectHeader>>> getAllProjectForUser(CallingContext ctx, string userId);
@@ -31,12 +31,12 @@ namespace TemplateManagement.Projects
 		public Task<Response<Project.ProjectAccess>> addProjectAccess(CallingContext ctx, string projectId, string identityId, Project.ProjectAccess.Roles role);
 
 
-		public partial class ProjectCreated_v1
+		public partial class ProjectCreated_v1 : IEquatable<ProjectCreated_v1>
 		{
 			public string projectId { get; set; }
 
-			#region Clone & Copy 
-			virtual public ProjectCreated_v1 Clone()
+			#region Clone 
+			public virtual ProjectCreated_v1 Clone()
 			{
 				ProjectCreated_v1 clone = new();
 
@@ -44,7 +44,28 @@ namespace TemplateManagement.Projects
 
 				return clone;
 			}
-			#endregion Clone & Copy 
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectCreated_v1 other )
+			{
+				if (other is null) return false;
+
+				if(projectId != other.projectId) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectCreated_v1);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(projectId);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
 		}
 
 	}
