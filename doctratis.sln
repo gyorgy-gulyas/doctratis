@@ -3,16 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "d3", "d3", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		src\doctratis.d3 = src\doctratis.d3
-		src\IdentityAccessManagement.d3 = src\IdentityAccessManagement.d3
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Files", ".Solution Files", "{41500286-EC99-4144-8C50-FA625976875B}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		src\doctratis.d3 = src\doctratis.d3
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -32,19 +27,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{8E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.InternalClient", "src\TemplateManagement\Projects\InternalClient\TemplateManagement.Projects.InternalClient.csproj", "{5ECF7476-A56A-D981-6AAE-2AF747E86520}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8D626EA8-CB54-BC41-363A-217881BEBA6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auditing", "Auditing", "{7EC4D6F1-B4B6-199C-8912-AB86C15D4947}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{E3C1CCCD-9265-F291-0E1D-DCF6FB704DB6}"
+	ProjectSection(SolutionItems) = preProject
+		src\Core\Auditing.d3 = src\Core\Auditing.d3
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Auditing.Models", "src\Core\Auditing\Models\Core.Auditing.Models.csproj", "{95D0A274-C906-47F5-A0A3-D83A9CACCF2E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Worker", "Worker", "{F38979E5-1A7C-EC62-0D4F-07372F17FEFD}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Auditing.Worker", "src\Core\Auditing\Worker\Core.Auditing.Worker.csproj", "{DB1B1ECE-3654-4C80-95E4-067C3530721D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IdentityAccessManagement", "IdentityAccessManagement", "{5E0D6EDE-3E6B-4C0C-B9E6-C5ACDC38817F}"
+	ProjectSection(SolutionItems) = preProject
+		src\Core\IdentityAccessManagement.d3 = src\Core\IdentityAccessManagement.d3
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,12 +135,9 @@ Global
 		{BB6A68B7-A018-BB9F-1E32-9FCEA2624890} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
 		{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD} = {65DBD68F-F13D-4F6A-919F-2D3E385359C3}
 		{5ECF7476-A56A-D981-6AAE-2AF747E86520} = {8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}
-		{8D626EA8-CB54-BC41-363A-217881BEBA6E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{7EC4D6F1-B4B6-199C-8912-AB86C15D4947} = {8D626EA8-CB54-BC41-363A-217881BEBA6E}
-		{E3C1CCCD-9265-F291-0E1D-DCF6FB704DB6} = {7EC4D6F1-B4B6-199C-8912-AB86C15D4947}
-		{95D0A274-C906-47F5-A0A3-D83A9CACCF2E} = {E3C1CCCD-9265-F291-0E1D-DCF6FB704DB6}
-		{F38979E5-1A7C-EC62-0D4F-07372F17FEFD} = {7EC4D6F1-B4B6-199C-8912-AB86C15D4947}
-		{DB1B1ECE-3654-4C80-95E4-067C3530721D} = {F38979E5-1A7C-EC62-0D4F-07372F17FEFD}
+		{95D0A274-C906-47F5-A0A3-D83A9CACCF2E} = {7EC4D6F1-B4B6-199C-8912-AB86C15D4947}
+		{DB1B1ECE-3654-4C80-95E4-067C3530721D} = {7EC4D6F1-B4B6-199C-8912-AB86C15D4947}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C074C67E-A13B-4F7B-A375-8EC8A5BDFC1F}

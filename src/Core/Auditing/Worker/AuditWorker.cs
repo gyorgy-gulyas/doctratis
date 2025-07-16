@@ -1,7 +1,6 @@
-using System.Threading;
-using System.Threading.Channels;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Threading.Channels;
 
 namespace Core.Auditing.Worker
 {
@@ -24,6 +23,7 @@ namespace Core.Auditing.Worker
         {
             return Task.Run(async () =>
             {
+                // the Channel.ReadAllAsync waits until a new message is arrived, so the Thread.Sleep is not neccesary
                 await foreach (var entry in _channel.Reader.ReadAllAsync(stoppingToken))
                 {
                     try

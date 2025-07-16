@@ -1,3 +1,4 @@
+using Core.Auditing.Worker;
 using PolyPersist;
 using PolyPersist.Net.BlobStore.GridFS;
 using PolyPersist.Net.Core;
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<IStoreProvider>(new ProjectStoreProvider());
 builder.Services.AddSingleton<ProjectStoreContext>();
+builder.Services.AddHostedService<AuditWorker>();
 
 var app = builder.Build();
 
