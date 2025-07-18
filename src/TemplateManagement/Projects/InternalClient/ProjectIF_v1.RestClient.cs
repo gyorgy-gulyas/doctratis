@@ -53,7 +53,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<IProjectIF_v1.ProjectSummaryDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_createProject'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_createProject'",
 					} );
 				}
 			}
@@ -107,7 +107,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_updateProject'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_updateProject'",
 					} );
 				}
 			}
@@ -158,7 +158,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjects'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_listAccessibleProjects'",
 					} );
 				}
 			}
@@ -209,7 +209,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
 					} );
 				}
 			}
@@ -260,7 +260,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<IProjectIF_v1.ProjectDetailsDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_getProject'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_getProject'",
 					} );
 				}
 			}
@@ -311,7 +311,7 @@ namespace TemplateManagement.Projects
 				{
 					return Response<IProjectIF_v1.ProjectAccessDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_addProjectAccess'",
+						MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_addProjectAccess'",
 					} );
 				}
 			}

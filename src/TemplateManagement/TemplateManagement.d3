@@ -101,7 +101,8 @@
             command addProjectAccess( projectId:string, identityId:string, role:Project.ProjectAccess.Roles ) : Project.ProjectAccess
         }
 
-        @publish(grpc,rest)
+        @internal_api(grpc,rest)
+        @public_api(grpc, rest, collection="BFF")
         interface ProjectIF version 1 {
             enum ProjectStatuses {
                 # A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.

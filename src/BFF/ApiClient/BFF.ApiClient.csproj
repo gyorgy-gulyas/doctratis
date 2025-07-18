@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\TemplateManagement\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SrvKit.General">
+      <HintPath>..\..\..\..\SrvKit\src\dotnet\SrvKit.General\bin\Debug\net8.0\SrvKit.General.dll</HintPath>
+    </Reference>
+    <Reference Include="PolyPersist.Net">
+      <HintPath>..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
