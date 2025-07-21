@@ -47,9 +47,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BFF", "BFF", "{B5512AA7-7B9B-1802-74DB-5DED17EB80F5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClient", "ApiClient", "{E2DAB033-3AB9-8128-5CF1-5FE8F30BD7F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClientKit", "ApiClientKit", "{E2DAB033-3AB9-8128-5CF1-5FE8F30BD7F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.ApiClient", "src\BFF\ApiClient\BFF.ApiClient.csproj", "{0F5A664F-276F-4F0B-885B-9E7D4C955EF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.ApiClientKit", "src\BFF\ApiClientKit\BFF.ApiClientKit.csproj", "{0F5A664F-276F-4F0B-885B-9E7D4C955EF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

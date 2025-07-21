@@ -38,7 +38,7 @@ namespace TemplateManagement.Projects
 				request.CreatedBy = createdBy;
 
 				// calling grpc client
-				var grpc_response = await _client.createProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "createProject" ))).ResponseAsync;
+				var grpc_response = await _client.createProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "createProject" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
@@ -91,7 +91,7 @@ namespace TemplateManagement.Projects
 				request.Project = project != null ? IProjectIF_v1.ProjectDetailsDTO.ToGrpc( project ) : null;
 
 				// calling grpc client
-				var grpc_response = await _client.updateProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "updateProject" ))).ResponseAsync;
+				var grpc_response = await _client.updateProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "updateProject" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
@@ -143,7 +143,7 @@ namespace TemplateManagement.Projects
 				var request = new Empty();
 
 				// calling grpc client
-				var grpc_response = await _client.listAccessibleProjectsAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjects" ))).ResponseAsync;
+				var grpc_response = await _client.listAccessibleProjectsAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "listAccessibleProjects" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
@@ -196,7 +196,7 @@ namespace TemplateManagement.Projects
 				request.UrseId = urseId;
 
 				// calling grpc client
-				var grpc_response = await _client.listAccessibleProjectsForUserAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjectsForUser" ))).ResponseAsync;
+				var grpc_response = await _client.listAccessibleProjectsForUserAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "listAccessibleProjectsForUser" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
@@ -249,7 +249,7 @@ namespace TemplateManagement.Projects
 				request.ProjectId = projectId;
 
 				// calling grpc client
-				var grpc_response = await _client.getProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "getProject" ))).ResponseAsync;
+				var grpc_response = await _client.getProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "getProject" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
@@ -304,7 +304,7 @@ namespace TemplateManagement.Projects
 				request.Role = IProjectIF_v1.ProjectAccessRolesMappings.ToGrpc( role );
 
 				// calling grpc client
-				var grpc_response = await _client.addProjectAccessAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagementProjectsProjectIF_v1", "addProjectAccess" ))).ResponseAsync;
+				var grpc_response = await _client.addProjectAccessAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "addProjectAccess" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )

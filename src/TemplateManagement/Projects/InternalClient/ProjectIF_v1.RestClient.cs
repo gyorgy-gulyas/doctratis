@@ -29,9 +29,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/createproject/{name}/{description}/{createdBy}" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "createProject" );
@@ -80,9 +77,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "updateProject" );
@@ -134,9 +128,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjects" );
@@ -185,9 +176,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojectsforuser/{urseId}" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjectsForUser" );
@@ -236,9 +224,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/getproject/{projectId}" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "getProject" );
@@ -287,9 +272,6 @@ namespace TemplateManagement.Projects
 		{
 			try
 			{
-				_httpClient.DefaultRequestHeaders.Remove("x-request-id");
-				_httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
-
 				// build request
 				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/addprojectaccess/{projectId}/{identityId}?_str_role={role.ToString()}" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "addProjectAccess" );
