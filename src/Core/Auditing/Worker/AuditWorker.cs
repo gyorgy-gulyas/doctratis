@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
@@ -36,6 +37,18 @@ namespace Core.Auditing.Worker
                     }
                 }
             }, stoppingToken);
+        }
+    }
+
+    public static class AuditWorkerExtensions
+    {
+
+        public static void AddAuditWorker(this IServiceCollection services)
+        {
+            // add for implenet the IAuditEntryContainer service
+            services.AddSingleton<IAuditEntryContainer>(sp => (IAuditEntryContainer)sp.GetRequiredService<AuditWorker>());
+            // add for backgund service
+            services.AddHostedService<AuditWorker>();
         }
     }
 }

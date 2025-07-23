@@ -52,7 +52,7 @@ namespace BFF.ApiClientKit
 
             merged.Add(ServiceConstans.const_call_stack, functionName);
 
-            return merged;   
+            return merged;
         }
     }
 }

@@ -1,19 +1,18 @@
 using Core.Auditing.Worker;
 using PolyPersist;
-using PolyPersist.Net.BlobStore.GridFS;
 using PolyPersist.Net.Core;
-using PolyPersist.Net.DocumentStore.MongoDB;
 using SrvKit.Net;
 using TemplateManagement.Projects.Service;
 using TemplateManagement.Projects.Service.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAuthentication("Bearer");
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<IStoreProvider>(new ProjectStoreProvider());
 builder.Services.AddSingleton<ProjectStoreContext>();
-builder.Services.AddHostedService<AuditWorker>();
+builder.Services.AddAuditWorker();
 
 var app = builder.Build();
 
@@ -21,11 +20,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRestControllers();
 app.MapGrpcControllers();
+app.MapGet("/", () => "Service is running!");
 
 app.Run();
 
 namespace TemplateManagement.Projects.Service
 {
+    using PolyPersist.Net.BlobStore.GridFS;
+    using PolyPersist.Net.DocumentStore.MongoDB;
+
     public class ProjectStoreProvider : StoreProvider
     {
         protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://127.0.0.1:27617/?directConnection=true");

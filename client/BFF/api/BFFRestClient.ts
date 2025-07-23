@@ -40,4 +40,25 @@ export class BFFRestClient {
   public get apiClient(): AxiosInstance {
     return this._apiClient;
   }
+
+  public mapApiError(error: any, operation: string): ApiError {
+    if (error.response) {
+        return {
+            status: error.response.status,
+            message: `API Error in ${operation}: ${error.response.data?.message || error.message}`,
+            additionalInformation: JSON.stringify(error.response.data),
+        };
+    } else if (error.request) {
+        return {
+            status: 500,
+            message: `No response received in ${operation}`,
+            additionalInformation: error.message,
+        };
+    } else {
+        return {
+            status: 500,
+            message: `Unexpected error in ${operation}: ${error.message}`,
+        };
+    }
+}
 }

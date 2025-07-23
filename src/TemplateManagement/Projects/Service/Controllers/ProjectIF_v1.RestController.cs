@@ -19,7 +19,7 @@ using TemplateManagement.Projects;
 namespace TemplateManagement.Projects
 {
 	[ApiController]
-	[Route( "templatemanagement/projects/projectif/v1" )]
+	[Route( "templatemanagement/projects/projectif/v1/" )]
 	public class ProjectIF_v1_RestController : ControllerBase 
 	{
 		private readonly ILogger<ProjectIF_v1_RestController> _logger;
