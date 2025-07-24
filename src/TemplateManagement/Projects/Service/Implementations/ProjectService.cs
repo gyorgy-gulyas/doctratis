@@ -109,7 +109,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                     toDelete.Select(delete => tx.Delete(_context.ProjectAccesses, delete )));
 
             if(operations.Any())
-                await Task.WhenAll(operations.Select(o => o.AsTask()));
+                await Task.WhenAll(operations);
 
             _context.Audit(Core.Auditing.TrailOperations.Update, ctx, project, accesses );
 

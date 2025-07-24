@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,26 +18,13 @@
     <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <Reference Include="PolyPersist.Net">
-      <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyPersist.Net.BlobStore.GridFS">
-      <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.BlobStore.GridFS\bin\Debug\net8.0\PolyPersist.Net.BlobStore.GridFS.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyPersist.Net.DocumentStore.MongoDB">
-      <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.DocumentStore.MongoDB.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyPersist.Net.Transactions">
-      <HintPath>..\..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.Transactions\bin\Debug\net8.0\PolyPersist.Net.Transactions.dll</HintPath>
-    </Reference>
-    <Reference Include="SrvKit.General">
-      <HintPath>..\..\..\..\..\SrvKit\src\dotnet\SrvKit.General\bin\Debug\net8.0\SrvKit.General.dll</HintPath>
-    </Reference>
-    <Reference Include="SrvKit.Service">
-      <HintPath>..\..\..\..\..\SrvKit\src\dotnet\SrvKit.Service\bin\Debug\net8.0\SrvKit.Service.dll</HintPath>
-    </Reference>
+    <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
+    <PackageReference Include="PolyPersist.Net.BlobStore.GridFS" />
+    <PackageReference Include="PolyPersist.Net.DocumentStore.MongoDB" />
+    <PackageReference Include="SrvKit.General" />
+    <PackageReference Include="SrvKit.Service" />
   </ItemGroup>
 
 </Project>

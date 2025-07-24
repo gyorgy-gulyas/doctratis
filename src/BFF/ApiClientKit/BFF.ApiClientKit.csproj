@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,11 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="SrvKit.General">
-      <HintPath>..\..\..\..\SrvKit\src\dotnet\SrvKit.General\bin\Debug\net8.0\SrvKit.General.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyPersist.Net">
-      <HintPath>..\..\..\..\PolyPersist\implementations\dotnet\src\PolyPersist.Net.DocumentStore.MongoDB\bin\Debug\net8.0\PolyPersist.Net.dll</HintPath>
-    </Reference>
+    <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
+    <PackageReference Include="SrvKit.General" />
   </ItemGroup>
 </Project>
