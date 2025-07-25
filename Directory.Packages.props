@@ -1,9 +1,9 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="PolyPersist.Net" Version="1.0.1" />
-    <PackageVersion Include="PolyPersist.Net.Transactions" Version="1.0.1"/>
-    <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.1"/>
-    <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.1"/>
+    <PackageVersion Include="PolyPersist.Net" Version="1.0.3" />
+    <PackageVersion Include="PolyPersist.Net.Transactions" Version="1.0.3"/>
+    <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.3"/>
+    <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.3"/>
 
     <PackageVersion Include="SrvKit.General" Version="1.0.1"/>
     <PackageVersion Include="SrvKit.Service" Version="1.0.1"/>

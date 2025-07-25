@@ -45,10 +45,12 @@ namespace Core.Auditing.Worker
 
         public static void AddAuditWorker(this IServiceCollection services)
         {
-            // add for implenet the IAuditEntryContainer service
-            services.AddSingleton<IAuditEntryContainer>(sp => (IAuditEntryContainer)sp.GetRequiredService<AuditWorker>());
-            // add for backgund service
-            services.AddHostedService<AuditWorker>();
+            // add audit worker itself
+            services.AddSingleton<AuditWorker>();
+            // add for implement the IAuditEntryContainer service
+            services.AddSingleton<IAuditEntryContainer>(sp => sp.GetRequiredService<AuditWorker>());
+            // add for background service
+            services.AddHostedService(sp => sp.GetRequiredService<AuditWorker>());            
         }
     }
 }

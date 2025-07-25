@@ -1,17 +1,19 @@
 <Project>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>NU1604,NU1602</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Update="*.g.cs">
       <DependentUpon>$([System.IO.Path]::GetFileNameWithoutExtension('%(Filename)'))</DependentUpon>
     </Compile>
   </ItemGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1604,NU1602</NoWarn>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
 
 </Project>
