@@ -19,12 +19,12 @@ namespace BFF.ApiClientKit
 		{
 			static class V1 
 			{
-				public static async Task<Response<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>> createProject(string name, string description, string createdBy)
+				public static async Task<Response<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>> createProject(string name, string description)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/createproject/{name}/{description}/{createdBy}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/createproject/{name}/{description}" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "TemplateManagement.Projects.ProjectIF.V1.createProject" );
@@ -70,7 +70,7 @@ namespace BFF.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
 
 						// build content
 						request.Content = new StringContent( JsonSerializer.Serialize<TemplateManagement.Projects.IProjectIF_v1.ProjectDetailsDTO>( project ));
@@ -119,7 +119,7 @@ namespace BFF.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "TemplateManagement.Projects.ProjectIF.V1.listAccessibleProjects" );

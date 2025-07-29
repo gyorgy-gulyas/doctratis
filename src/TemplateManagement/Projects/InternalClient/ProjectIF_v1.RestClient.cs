@@ -25,12 +25,12 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description, string createdBy)
+		async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/createproject/{name}/{description}/{createdBy}" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/createproject/{name}/{description}" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "createProject" );
 
 				// call http client 
@@ -78,7 +78,7 @@ namespace TemplateManagement.Projects
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "updateProject" );
 
 				// build content
@@ -129,7 +129,7 @@ namespace TemplateManagement.Projects
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjects" );
 
 				// call http client 

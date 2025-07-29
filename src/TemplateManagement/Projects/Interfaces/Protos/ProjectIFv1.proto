@@ -29,7 +29,6 @@ service ProjectIF_v1 {
 message ProjectIF_v1_createProjectRequest {
 	string name = 1;
 	string description = 2;
-	string createdBy = 3;
 }
 
 message ProjectIF_v1_createProjectResponse {

@@ -15,7 +15,7 @@ namespace TemplateManagement.Projects
 	public partial interface IProjectIF_v1
 	{
 		/// <return>ProjectSummaryDTO</return>
-		public Task<Response<ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description, string createdBy);
+		public Task<Response<ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description);
 
 		/// <return>ProjectDetailsDTO</return>
 		public Task<Response<ProjectDetailsDTO>> updateProject(CallingContext ctx, ProjectDetailsDTO project);

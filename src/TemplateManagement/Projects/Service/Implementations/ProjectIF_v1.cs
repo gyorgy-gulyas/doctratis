@@ -13,9 +13,9 @@ namespace TemplateManagement.Projects.Service.Implementations
             _logger = logger;
         }
 
-        async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description, string createdBy)
+        async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
         {
-            var header = await _service.createProject(ctx, name, description, createdBy).ConfigureAwait(false);
+            var header = await _service.createProject(ctx, name, description, ctx.ClientInfo?.CallingUserId, ctx.ClientInfo?.CallingUserName).ConfigureAwait(false);
             if (header.IsSuccess() == false)
                 return new(header.Error);
 
@@ -177,7 +177,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 Status = @this.Status.Convert(),
                 Tags = @this.Tags,
                 CreatedAt = @this.CreatedAt,
-                CreatedBy = @this.CreatedBy,
+                CreatedBy = @this.CreatedByUserName,
                 Accesses = accesses.Select(a => a.ConvertToDTO()).ToList()
             };
         }

@@ -13,7 +13,7 @@ namespace TemplateManagement.Projects
 	public partial interface IProjectService
 	{
 		/// <return>Project.ProjectHeader</return>
-		public Task<Response<Project.ProjectHeader>> createProject(CallingContext ctx, string name, string description, string createdBy);
+		public Task<Response<Project.ProjectHeader>> createProject(CallingContext ctx, string name, string description, string createdByUserId, string createdByUserName);
 
 		/// <return>Project.ProjectHeader</return>
 		public Task<Response<Project.ProjectHeader>> updateProject(CallingContext ctx, Project.ProjectHeader project, IList<Project.ProjectAccess> accesses);

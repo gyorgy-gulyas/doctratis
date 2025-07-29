@@ -19,7 +19,7 @@ using TemplateManagement.Projects;
 namespace TemplateManagement.Projects
 {
 	[ApiController]
-	[Route( "templatemanagement/projects/projectif/v1/" )]
+	[Route( "templatemanagement/projects/projectif/v1" )]
 	public class ProjectIF_v1_RestController : ControllerBase 
 	{
 		private readonly ILogger<ProjectIF_v1_RestController> _logger;
@@ -30,7 +30,7 @@ namespace TemplateManagement.Projects
 			_service = service; 
 		}
 
-		[HttpPost( "createproject/{name}/{description}/{createdBy}" )] 
+		[HttpPost( "createproject/{name}/{description}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectSummaryDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -39,7 +39,7 @@ namespace TemplateManagement.Projects
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> createProject( [FromRoute] string name,  [FromRoute] string description,  [FromRoute] string createdBy)
+		public async Task<IActionResult> createProject( [FromRoute] string name,  [FromRoute] string description)
 		{
 			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.createProject" ))
 			{
@@ -47,7 +47,7 @@ namespace TemplateManagement.Projects
 				try
 				{
 					// calling the service function itself
-					var response = await _service.createProject( ctx, name, description, createdBy );
+					var response = await _service.createProject( ctx, name, description );
 
 					if( response.IsSuccess() == true )
 					{
@@ -76,7 +76,7 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpPost( "updateproject" )] 
+		[HttpPost( "None" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectDetailsDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -122,7 +122,7 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpGet( "listaccessibleprojects" )] 
+		[HttpGet( "None" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]

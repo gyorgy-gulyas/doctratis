@@ -22,7 +22,7 @@ namespace BFF.ApiClientKit
 			static class V1 
 			{
 				private static ProjectIF_v1.ProjectIF_v1Client _client;
-				public static async Task<Response<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>> createProject(string name, string description, string createdBy)
+				public static async Task<Response<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>> createProject(string name, string description)
 				{
 					try
 					{
@@ -30,7 +30,6 @@ namespace BFF.ApiClientKit
 						var request = new ProjectIF_v1_createProjectRequest();
 						request.Name = name;
 						request.Description = description;
-						request.CreatedBy = createdBy;
 
 						// calling grpc client
 						_client ??= new ProjectIF_v1.ProjectIF_v1Client(GrpClient._channel);

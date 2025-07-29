@@ -37,7 +37,9 @@
                 @system_field
                 CreatedAt:datetime
                 @system_field
-                CreatedBy:string
+                CreatedByUserId:string
+                @system_field
+                CreatedByUserName:string
             }
 
             valueobject ProjectFolder {
@@ -93,7 +95,7 @@
                 projectId: string
             }
 
-            command createProject( name:string, description:string, createdBy:string ) : Project.ProjectHeader
+            command createProject( name:string, description:string, createdByUserId:string, createdByUserName: string ) : Project.ProjectHeader
             command updateProject( project:Project.ProjectHeader, accesses:List[Project.ProjectAccess] ) : Project.ProjectHeader
             query getAllProjectForUser( userId:string ) : List[Project.ProjectHeader]
             query getAllAccessForProject( projectId:string ) : List[Project.ProjectAccess]
@@ -191,7 +193,7 @@
                 CreatedBy:string
             }
 
-            command createProject( name:string, description:string, createdBy:string ) : ProjectSummaryDTO
+            command createProject( name:string, description:string ) : ProjectSummaryDTO
             command updateProject( project:ProjectDetailsDTO ) : ProjectDetailsDTO
             query listAccessibleProjects() : List[ProjectSummaryDTO]
             query listAccessibleProjectsForUser( urseId:string) : List[ProjectSummaryDTO]

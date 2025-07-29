@@ -37,11 +37,9 @@ namespace TemplateManagement.Projects
 					name = request.Name;
 					string description;
 					description = request.Description;
-					string createdBy;
-					createdBy = request.CreatedBy;
 
 					// calling the service function itself
-					var response = await _service.createProject( ctx , name, description, createdBy );
+					var response = await _service.createProject( ctx , name, description );
 
 					if( response.IsSuccess() == true )
 					{

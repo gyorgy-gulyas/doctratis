@@ -14,7 +14,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             _context = context;
         }
 
-        async Task<Response<ProjectHeader>> IProjectService.createProject(CallingContext ctx, string name, string description, string createdBy)
+        async Task<Response<ProjectHeader>> IProjectService.createProject(CallingContext ctx, string name, string description, string createdByUserId, string createdByUserName )
         {
             name = name.Trim();
 
@@ -24,27 +24,30 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .Where(ph => ph.Name == name)
                 .Any();
             if (already == true)
-                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Project name '{name}'is already exist" });
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Project name '{name}'is already exist" });
 
             await using var tx = new Transaction();
             ProjectHeader header = new()
             {
+                id = Guid.NewGuid().ToString(),
                 Name = name,
                 Description = description,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = createdBy,
+                CreatedByUserId = createdByUserId,
+                CreatedByUserName = createdByUserName,
                 Status = ProjectStatuses.Draft,
             };
             await tx.Insert(_context.ProjectHeaders, header).ConfigureAwait(false);
 
             ProjectAccess access = new()
             {
-                IdentityId = createdBy,
+                IdentityId = createdByUserId,
                 ProjectId = header.id,
                 Role = ProjectAccess.Roles.Owner,
                 Status = ProjectAccess.Statuses.Active,
             };
             await tx.Insert(_context.ProjectAccesses, access).ConfigureAwait(false);
+            await tx.Commit();
 
             _context.Audit(Core.Auditing.TrailOperations.Create, ctx, header, [access]);
 

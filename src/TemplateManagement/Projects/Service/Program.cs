@@ -14,11 +14,19 @@ builder.Services.AddGrpc();
 builder.Services.AddSingleton<IStoreProvider>(new ProjectStoreProvider());
 builder.Services.AddSingleton<ProjectStoreContext>();
 builder.Services.AddAuditWorker();
+// Swagger service registartion
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
+// and service specific services
 builder.Services.AddSingleton<IProjectIF_v1,ProjectIF_v1>();
 builder.Services.AddSingleton<IProjectService,ProjectService>();
 
 var app = builder.Build();
+
+// Swagger middleware bekapcsolása (csak dev-ben)
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseAuthentication();
 //app.UseAuthorization();
@@ -35,14 +43,18 @@ namespace TemplateManagement.Projects.Service
     using PolyPersist.Net.BlobStore.Memory;
     using PolyPersist.Net.DocumentStore.Memory;
     using PolyPersist.Net.DocumentStore.MongoDB;
+    using PolyPersist.Net.ColumnStore.Memory;
+    using PolyPersist.Net.ColumnStore.Cassandra;
 
     public class ProjectStoreProvider : StoreProvider
     {
-//        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://127.0.0.1:27617/?directConnection=true");
-//        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://127.0.0.1:27617/?directConnection=true");
+        //        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://127.0.0.1:27617/?directConnection=true");
+        //        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://127.0.0.1:27617/?directConnection=true");
 
         protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
         protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
+
+        protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
     }
 }
 

@@ -27,7 +27,7 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description, string createdBy)
+		async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
 		{
 			try
 			{
@@ -35,7 +35,6 @@ namespace TemplateManagement.Projects
 				var request = new ProjectIF_v1_createProjectRequest();
 				request.Name = name;
 				request.Description = description;
-				request.CreatedBy = createdBy;
 
 				// calling grpc client
 				var grpc_response = await _client.createProjectAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "createProject" ))).ResponseAsync;
