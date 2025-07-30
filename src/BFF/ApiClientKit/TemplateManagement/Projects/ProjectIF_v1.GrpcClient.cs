@@ -129,7 +129,7 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>> listAccessibleProjects()
+				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjects()
 				{
 					try
 					{
@@ -144,12 +144,12 @@ namespace BFF.ApiClientKit
 						switch( grpc_response.ResultCase )
 						{
 							case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.Value:
-								List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO> value = new();
-								value.AddRange( grpc_response.Value.Value.Select( v => TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO.FromGrpc(v) ));
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+								List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO> value = new();
+								value.AddRange( grpc_response.Value.Value.Select( v => TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO.FromGrpc(v) ));
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 
 							case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.Error:
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
 									MessageText = grpc_response.Error.MessageText,
 									AdditionalInformation = grpc_response.Error.AdditionalInformation,
@@ -157,7 +157,7 @@ namespace BFF.ApiClientKit
 
 							case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.None:
 							default:
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
 									MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjects'",
 								} );
@@ -165,7 +165,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (RpcException ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = ex.StatusCode.FromGrpc(),
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -173,7 +173,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (Exception ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -181,13 +181,13 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>> listAccessibleProjectsForUser(string urseId)
+				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjectsForUser(string userId)
 				{
 					try
 					{
 						// fill grpc request
 						var request = new ProjectIF_v1_listAccessibleProjectsForUserRequest();
-						request.UrseId = urseId;
+						request.UserId = userId;
 
 						// calling grpc client
 						_client ??= new ProjectIF_v1.ProjectIF_v1Client(GrpClient._channel);
@@ -197,12 +197,12 @@ namespace BFF.ApiClientKit
 						switch( grpc_response.ResultCase )
 						{
 							case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.Value:
-								List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO> value = new();
-								value.AddRange( grpc_response.Value.Value.Select( v => TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO.FromGrpc(v) ));
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+								List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO> value = new();
+								value.AddRange( grpc_response.Value.Value.Select( v => TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO.FromGrpc(v) ));
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 
 							case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.Error:
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
 									MessageText = grpc_response.Error.MessageText,
 									AdditionalInformation = grpc_response.Error.AdditionalInformation,
@@ -210,7 +210,7 @@ namespace BFF.ApiClientKit
 
 							case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.None:
 							default:
-								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+								return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
 									MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
 								} );
@@ -218,7 +218,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (RpcException ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = ex.StatusCode.FromGrpc(),
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -226,7 +226,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (Exception ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),

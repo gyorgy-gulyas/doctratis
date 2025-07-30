@@ -18,8 +18,8 @@
             trailOperation:TrailOperations
             entityType:string
             entityId:string
-            userId:string
-            userName:string
+            idenityId:string
+            idenityName:string
                 
             payload:string
             previousTrailId:string

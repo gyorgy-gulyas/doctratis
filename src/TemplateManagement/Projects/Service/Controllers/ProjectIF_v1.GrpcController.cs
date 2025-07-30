@@ -162,7 +162,7 @@ namespace TemplateManagement.Projects
 						if( response.HasValue() == true )
 						{
 							var result = new ProjectIF_v1_listAccessibleProjectsResponse();
-							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.ToGrpc( v ) ));
+							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectIdentityAssignmentDTO.ToGrpc( v ) ));
 							return result;
 						}
 						else
@@ -210,18 +210,18 @@ namespace TemplateManagement.Projects
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
-					string urseId;
-					urseId = request.UrseId;
+					string userId;
+					userId = request.UserId;
 
 					// calling the service function itself
-					var response = await _service.listAccessibleProjectsForUser( ctx , urseId );
+					var response = await _service.listAccessibleProjectsForUser( ctx , userId );
 
 					if( response.IsSuccess() == true )
 					{
 						if( response.HasValue() == true )
 						{
 							var result = new ProjectIF_v1_listAccessibleProjectsForUserResponse();
-							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.ToGrpc( v ) ));
+							result.Value.Value.AddRange( response.Value.Select( v => IProjectIF_v1.ProjectIdentityAssignmentDTO.ToGrpc( v ) ));
 							return result;
 						}
 						else

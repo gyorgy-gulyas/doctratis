@@ -17,8 +17,8 @@ namespace Core.Auditing
 		public TrailOperations trailOperation { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
-		public string userId { get; set; }
-		public string userName { get; set; }
+		public string idenityId { get; set; }
+		public string idenityName { get; set; }
 		public string payload { get; set; }
 		public string previousTrailId { get; set; }
 		public string deltaPayload { get; set; }

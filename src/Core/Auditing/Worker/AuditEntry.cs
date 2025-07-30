@@ -35,8 +35,8 @@ namespace Core.Auditing.Worker
                 payload = GetEntitySpecificPayloadJSON(),
                 timestamp = DateTime.UtcNow,
                 trailOperation = _operation,
-                userId = _callingContext.ClientInfo.CallingUserId,
-                userName = _callingContext.ClientInfo.CallingUserId,
+                idenityId = _callingContext.IdentityId,
+                idenityName = _callingContext.IdentityName,
             };
 
             var table = GetTable();

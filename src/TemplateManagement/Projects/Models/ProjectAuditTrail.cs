@@ -22,8 +22,8 @@ namespace TemplateManagement.Projects.Project
 		public TrailOperations trailOperation { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
-		public string userId { get; set; }
-		public string userName { get; set; }
+		public string idenityId { get; set; }
+		public string idenityName { get; set; }
 		public string payload { get; set; }
 		public string previousTrailId { get; set; }
 		public string deltaPayload { get; set; }
@@ -45,8 +45,8 @@ namespace TemplateManagement.Projects.Project
 			clone.trailOperation = trailOperation;
 			clone.entityType = new string(entityType.ToCharArray());
 			clone.entityId = new string(entityId.ToCharArray());
-			clone.userId = new string(userId.ToCharArray());
-			clone.userName = new string(userName.ToCharArray());
+			clone.idenityId = new string(idenityId.ToCharArray());
+			clone.idenityName = new string(idenityName.ToCharArray());
 			clone.payload = new string(payload.ToCharArray());
 			clone.previousTrailId = new string(previousTrailId.ToCharArray());
 			clone.deltaPayload = new string(deltaPayload.ToCharArray());
@@ -71,8 +71,8 @@ namespace TemplateManagement.Projects.Project
 			if(trailOperation != other.trailOperation) return false;
 			if(entityType != other.entityType) return false;
 			if(entityId != other.entityId) return false;
-			if(userId != other.userId) return false;
-			if(userName != other.userName) return false;
+			if(idenityId != other.idenityId) return false;
+			if(idenityName != other.idenityName) return false;
 			if(payload != other.payload) return false;
 			if(previousTrailId != other.previousTrailId) return false;
 			if(deltaPayload != other.deltaPayload) return false;
@@ -99,8 +99,8 @@ namespace TemplateManagement.Projects.Project
 			hash.Add(trailOperation);
 			hash.Add(entityType);
 			hash.Add(entityId);
-			hash.Add(userId);
-			hash.Add(userName);
+			hash.Add(idenityId);
+			hash.Add(idenityName);
 			hash.Add(payload);
 			hash.Add(previousTrailId);
 			hash.Add(deltaPayload);

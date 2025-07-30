@@ -13,22 +13,25 @@ namespace TemplateManagement.Projects
 	public partial interface IProjectService
 	{
 		/// <return>Project.ProjectHeader</return>
-		public Task<Response<Project.ProjectHeader>> createProject(CallingContext ctx, string name, string description, string createdByUserId, string createdByUserName);
+		public Task<Response<Project.ProjectHeader>> createProject(CallingContext ctx, string name, string description);
 
 		/// <return>Project.ProjectHeader</return>
 		public Task<Response<Project.ProjectHeader>> updateProject(CallingContext ctx, Project.ProjectHeader project, IList<Project.ProjectAccess> accesses);
 
-		/// <return>List<Project.ProjectHeader></return>
-		public Task<Response<List<Project.ProjectHeader>>> getAllProjectForUser(CallingContext ctx, string userId);
+		/// <return>Project.ProjectAccess</return>
+		public Task<Response<Project.ProjectAccess>> addProjectAccess(CallingContext ctx, string projectId, string identityId, string identityName, Project.ProjectAccess.Roles role);
+
+		/// <return>Project.ProjectHeader</return>
+		public Task<Response<Project.ProjectHeader>> getProject(CallingContext ctx, string projectId);
+
+		/// <return>List<Project.ProjectAccess></return>
+		public Task<Response<List<Project.ProjectAccess>>> getAllAccessForIdentity(CallingContext ctx, string identityId);
 
 		/// <return>List<Project.ProjectAccess></return>
 		public Task<Response<List<Project.ProjectAccess>>> getAllAccessForProject(CallingContext ctx, string projectId);
 
-		/// <return>Project.ProjectHeader</return>
-		public Task<Response<Project.ProjectHeader>> getProjectForUser(CallingContext ctx, string projectId, string userId);
-
-		/// <return>Project.ProjectAccess</return>
-		public Task<Response<Project.ProjectAccess>> addProjectAccess(CallingContext ctx, string projectId, string identityId, Project.ProjectAccess.Roles role);
+		/// <return>List<Project.ProjectHeader></return>
+		public Task<Response<List<Project.ProjectHeader>>> sys_getProjects(CallingContext ctx, IList<string> projectIds);
 
 
 		public partial class ProjectCreated_v1 : IEquatable<ProjectCreated_v1>

@@ -124,7 +124,7 @@ namespace TemplateManagement.Projects
 
 		[HttpGet( "None" )] 
 		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectIdentityAssignmentDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
@@ -168,16 +168,16 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpGet( "listaccessibleprojectsforuser/{urseId}" )] 
+		[HttpGet( "listaccessibleprojectsforuser/{userId}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectSummaryDTO>) )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectIdentityAssignmentDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> listAccessibleProjectsForUser( [FromRoute] string urseId)
+		public async Task<IActionResult> listAccessibleProjectsForUser( [FromRoute] string userId)
 		{
 			using(LogContext.PushProperty( "Scope", "ProjectIF_v1.listAccessibleProjectsForUser" ))
 			{
@@ -185,7 +185,7 @@ namespace TemplateManagement.Projects
 				try
 				{
 					// calling the service function itself
-					var response = await _service.listAccessibleProjectsForUser( ctx, urseId );
+					var response = await _service.listAccessibleProjectsForUser( ctx, userId );
 
 					if( response.IsSuccess() == true )
 					{

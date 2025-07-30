@@ -23,10 +23,10 @@ namespace BFF.ApiClientKit
         {
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
-            HttpClient.DefaultRequestHeaders.Remove(ServiceConstans.const_calling_user_id);
-            HttpClient.DefaultRequestHeaders.Add(ServiceConstans.const_calling_user_id, userId);
-            HttpClient.DefaultRequestHeaders.Remove(ServiceConstans.const_calling_user_name);
-            HttpClient.DefaultRequestHeaders.Add(ServiceConstans.const_calling_user_name, userName);
+            HttpClient.DefaultRequestHeaders.Remove(ServiceConstans.const_identity_id);
+            HttpClient.DefaultRequestHeaders.Add(ServiceConstans.const_identity_id, userId);
+            HttpClient.DefaultRequestHeaders.Remove(ServiceConstans.const_identity_name);
+            HttpClient.DefaultRequestHeaders.Add(ServiceConstans.const_identity_name, userName);
         }
 
         public static void SetAcceptedLanguage(string language)

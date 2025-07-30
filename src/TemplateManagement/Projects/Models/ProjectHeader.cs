@@ -23,8 +23,8 @@ namespace TemplateManagement.Projects.Project
 		public ProjectStatuses Status { get; set; }
 		public List<ProjectFolder> SubFolders { get; set; } = new();
 		public DateTime CreatedAt { get; set; }
-		public string CreatedByUserId { get; set; }
-		public string CreatedByUserName { get; set; }
+		public string CreatedById { get; set; }
+		public string CreatedByName { get; set; }
 
 		#region Clone 
 		public virtual ProjectHeader Clone()
@@ -92,8 +92,8 @@ namespace TemplateManagement.Projects.Project
 			foreach( var element_SubFolders in SubFolders)
 				hash.Add(element_SubFolders);
 			hash.Add(CreatedAt);
-			hash.Add(CreatedByUserId);
-			hash.Add(CreatedByUserName);
+			hash.Add(CreatedById);
+			hash.Add(CreatedByName);
 
 			return hash.ToHashCode();
 		}

@@ -14,7 +14,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             _context = context;
         }
 
-        async Task<Response<ProjectHeader>> IProjectService.createProject(CallingContext ctx, string name, string description, string createdByUserId, string createdByUserName )
+        async Task<Response<ProjectHeader>> IProjectService.createProject(CallingContext ctx, string name, string description, string createdById, string createdByName)
         {
             name = name.Trim();
 
@@ -33,15 +33,16 @@ namespace TemplateManagement.Projects.Service.Implementations
                 Name = name,
                 Description = description,
                 CreatedAt = DateTime.UtcNow,
-                CreatedByUserId = createdByUserId,
-                CreatedByUserName = createdByUserName,
+                CreatedById = createdById,
+                CreatedByName = createdByName,
                 Status = ProjectStatuses.Draft,
             };
             await tx.Insert(_context.ProjectHeaders, header).ConfigureAwait(false);
 
             ProjectAccess access = new()
             {
-                IdentityId = createdByUserId,
+                IdentityId = createdById,
+                IdentityName = createdByName,
                 ProjectId = header.id,
                 Role = ProjectAccess.Roles.Owner,
                 Status = ProjectAccess.Statuses.Active,
@@ -54,7 +55,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             return new(header);
         }
 
-        async Task<Response<ProjectHeader>> IProjectService.updateProject(CallingContext ctx, ProjectHeader project, IList<ProjectAccess> accesses)
+        async Task<Response<ProjectHeader>> IProjectService.updateProject(CallingContext ctx, ProjectHeader project, IList<ProjectAccess> accesses, string  )
         {
             var original = await _context.ProjectHeaders.Find(project.id, project.id).ConfigureAwait(false);
             if (original == null)
@@ -65,7 +66,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             ProjectAccess currentAccess = _context
                 .ProjectAccesses
                 .AsQueryable()
-                .Where(pa => pa.IdentityId == ctx.ClientInfo.CallingUserId && pa.ProjectId == project.id)
+                .Where(pa => pa.IdentityId == ctx.IdentityId && pa.ProjectId == project.id)
                 .FirstOrDefault();
             if (currentAccess == null)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"User with id '{ctx.ClientInfo.CallingUserId}' does not have an access for project '{project.id}'" });
@@ -137,7 +138,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             return Task.FromResult<Response<List<ProjectHeader>>>(new(result));
         }
 
-        async Task<Response<ProjectHeader>> IProjectService.getProjectForUser(CallingContext ctx, string projectId, string userId)
+        async Task<Response<ProjectHeader>> IProjectService.getProjectForIdentity(CallingContext ctx, string projectId, string identityId)
         {
             var project = await _context.ProjectHeaders.Find(projectId, projectId).ConfigureAwait(false);
             if (project == null)
@@ -146,10 +147,10 @@ namespace TemplateManagement.Projects.Service.Implementations
             ProjectAccess access = _context
                 .ProjectAccesses
                 .AsQueryable()
-                .Where(pa => pa.IdentityId == userId && pa.ProjectId == projectId)
+                .Where(pa => pa.IdentityId == identityId && pa.ProjectId == projectId)
                 .FirstOrDefault();
             if (access == null)
-                return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"User with id '{userId}' does not have an access for project '{projectId}'" });
+                return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"User with id '{identityId}' does not have an access for project '{projectId}'" });
 
             return new(project);
         }

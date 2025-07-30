@@ -50,18 +50,18 @@ message ProjectIF_v1_updateProjectResponse {
 }
 message ProjectIF_v1_listAccessibleProjectsResponse {
 	oneof result {
-		list_ProjectSummaryDTO Value = 1;
+		list_ProjectIdentityAssignmentDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
 
 message ProjectIF_v1_listAccessibleProjectsForUserRequest {
-	string urseId = 1;
+	string userId = 1;
 }
 
 message ProjectIF_v1_listAccessibleProjectsForUserResponse {
 	oneof result {
-		list_ProjectSummaryDTO Value = 1;
+		list_ProjectIdentityAssignmentDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
@@ -146,11 +146,30 @@ enum ProjectAccessStatuses {
 
 }
 
+message ProjectSummaryDTO {
+	string id = 1;
+	string Name = 2;
+	string Description = 3;
+	repeated string Tags = 4;
+	ProjectStatuses Status = 5;
+}
+
 message ProjectFolderDTO {
 	string id = 1;
 	string Name = 2;
 	string Description = 3;
 	repeated ProjectFolderDTO SubFolders = 4;
+}
+
+message ProjectIdentityAssignmentDTO {
+	string ProjectId = 1;
+	string ProjectName = 2;
+	string ProjectDescription = 3;
+	ProjectStatuses ProjectStatus = 4;
+	string IdentityId = 5;
+	string IdentityName = 6;
+	ProjectAccessRoles AccessRole = 7;
+	ProjectAccessStatuses AccessStatus = 8;
 }
 
 message ProjectAccessDTO {
@@ -160,14 +179,6 @@ message ProjectAccessDTO {
 	string IdentityName = 4;
 	ProjectAccessRoles Role = 5;
 	ProjectAccessStatuses Status = 6;
-}
-
-message ProjectSummaryDTO {
-	string id = 1;
-	string Name = 2;
-	string Description = 3;
-	repeated string Tags = 4;
-	ProjectStatuses Status = 5;
 }
 
 message ProjectDetailsDTO {
@@ -183,7 +194,7 @@ message ProjectDetailsDTO {
 	string CreatedBy = 10;
 }
 
-message list_ProjectSummaryDTO {
-	repeated ProjectSummaryDTO Value = 1;
+message list_ProjectIdentityAssignmentDTO {
+	repeated ProjectIdentityAssignmentDTO Value = 1;
 }
 

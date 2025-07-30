@@ -1,4 +1,5 @@
-﻿using ServiceKit.Net;
+﻿using Microsoft.AspNetCore.Identity;
+using ServiceKit.Net;
 
 namespace TemplateManagement.Projects.Service.Implementations
 {
@@ -15,7 +16,7 @@ namespace TemplateManagement.Projects.Service.Implementations
 
         async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
         {
-            var header = await _service.createProject(ctx, name, description, ctx.ClientInfo?.CallingUserId, ctx.ClientInfo?.CallingUserName).ConfigureAwait(false);
+            var header = await _service.createProject(ctx, name, description ).ConfigureAwait(false);
             if (header.IsSuccess() == false)
                 return new(header.Error);
 
@@ -33,18 +34,21 @@ namespace TemplateManagement.Projects.Service.Implementations
             return new(result.Value.ConvertToDetailsDTO(accesses));
         }
 
-        async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
+        async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
         {
-            var projects = await _service.getAllProjectForUser(ctx, ctx.ClientInfo.CallingUserId).ConfigureAwait(false);
-            if (projects.IsSuccess() == false)
-                return new(projects.Error);
+            var accceses = await _service.getAllAccessForIdentity(ctx, ctx.IdentityId).ConfigureAwait(false);
+            if (accceses.IsSuccess() == false)
+                return new(accceses.Error);
 
-            return new(projects.Value.Select(ph => ph.ConvertToSummaryDTO()).ToList());
+            ctx.Clone
+            var projects = await _service.sys_getProjects()
+
+            return new(projects.Value.Select(ph => ph.ConvertToDTO()).ToList());
         }
 
-        async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string urseId)
+        async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string userId)
         {
-            var projects = await _service.getAllProjectForUser(ctx, urseId).ConfigureAwait(false);
+            var projects = await _service.getAllAccessForIdentity(ctx, userId).ConfigureAwait(false);
             if (projects.IsSuccess() == false)
                 return new(projects.Error);
 
@@ -53,7 +57,7 @@ namespace TemplateManagement.Projects.Service.Implementations
 
         async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.getProject(CallingContext ctx, string projectId)
         {
-            var project = await _service.getProjectForUser(ctx, projectId, ctx.ClientInfo.CallingUserId).ConfigureAwait(false);
+            var project = await _service.getProject(ctx, projectId).ConfigureAwait(false);
             if (project.IsSuccess() == false)
                 return new(project.Error);
 
@@ -66,7 +70,7 @@ namespace TemplateManagement.Projects.Service.Implementations
 
         async Task<Response<IProjectIF_v1.ProjectAccessDTO>> IProjectIF_v1.addProjectAccess(CallingContext ctx, string projectId, string identityId, IProjectIF_v1.ProjectAccessRoles role)
         {
-            var access = await _service.addProjectAccess(ctx, projectId, identityId, role.Convert()).ConfigureAwait(false);
+            var access = await _service.addProjectAccess(ctx, projectId, identityId, identityId, role.Convert()).ConfigureAwait(false);
             if (access.IsSuccess() == false)
                 return new(access.Error);
 
@@ -177,7 +181,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 Status = @this.Status.Convert(),
                 Tags = @this.Tags,
                 CreatedAt = @this.CreatedAt,
-                CreatedBy = @this.CreatedByUserName,
+                CreatedBy = @this.CreatedByName,
                 Accesses = accesses.Select(a => a.ConvertToDTO()).ToList()
             };
         }

@@ -114,7 +114,7 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>> listAccessibleProjects()
+				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjects()
 				{
 					try
 					{
@@ -126,17 +126,17 @@ namespace BFF.ApiClientKit
 
 						if (response.IsSuccessStatusCode)
 						{
-							var value = await response.Content.ReadFromJsonAsync<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>();
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+							var value = await response.Content.ReadFromJsonAsync<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>();
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 						}
 						else if( response.Content != null )
 						{
 							var error = await response.Content.ReadFromJsonAsync<Error>();
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( error );
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( error );
 						}
 						else
 						{
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
 								MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_listAccessibleProjects'",
 							} );
@@ -144,7 +144,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (HttpRequestException ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -152,7 +152,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (Exception ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -160,29 +160,29 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>> listAccessibleProjectsForUser(string urseId)
+				public static async Task<Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjectsForUser(string userId)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojectsforuser/{urseId}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojectsforuser/{userId}" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "TemplateManagement.Projects.ProjectIF.V1.listAccessibleProjectsForUser" );
 
 						if (response.IsSuccessStatusCode)
 						{
-							var value = await response.Content.ReadFromJsonAsync<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>();
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+							var value = await response.Content.ReadFromJsonAsync<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>();
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 						}
 						else if( response.Content != null )
 						{
 							var error = await response.Content.ReadFromJsonAsync<Error>();
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( error );
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( error );
 						}
 						else
 						{
-							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+							return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
 								MessageText = "Not handled reponse in REST client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
 							} );
@@ -190,7 +190,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (HttpRequestException ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),
@@ -198,7 +198,7 @@ namespace BFF.ApiClientKit
 					}
 					catch (Exception ex)
 					{
-						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<TemplateManagement.Projects.IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),

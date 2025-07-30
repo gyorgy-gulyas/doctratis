@@ -24,15 +24,15 @@ namespace BFF.ApiClientKit
 
         public static void SetAuthorization(string userId, string userName)
         {
-            var entry = _defaultMetadata.FirstOrDefault( md => md.Key == ServiceConstans.const_calling_user_id);
+            var entry = _defaultMetadata.FirstOrDefault( md => md.Key == ServiceConstans.const_identity_id);
             if (entry != null)
                 _defaultMetadata.Remove(entry);
-            _defaultMetadata.Add(ServiceConstans.const_calling_user_id, userId);
+            _defaultMetadata.Add(ServiceConstans.const_identity_id, userId);
 
-            entry = _defaultMetadata.FirstOrDefault( md => md.Key == ServiceConstans.const_calling_user_name);
+            entry = _defaultMetadata.FirstOrDefault( md => md.Key == ServiceConstans.const_identity_name);
             if (entry != null)
                 _defaultMetadata.Remove(entry);
-            _defaultMetadata.Add(ServiceConstans.const_calling_user_name, userName);
+            _defaultMetadata.Add(ServiceConstans.const_identity_name, userName);
         }
 
         public static void SetAcceptedLanguage(string language)

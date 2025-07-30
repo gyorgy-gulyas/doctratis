@@ -134,7 +134,7 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
-		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
+		async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
 		{
 			try
 			{
@@ -148,12 +148,12 @@ namespace TemplateManagement.Projects
 				switch( grpc_response.ResultCase )
 				{
 					case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.Value:
-						List<IProjectIF_v1.ProjectSummaryDTO> value = new();
-						value.AddRange( grpc_response.Value.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.FromGrpc(v) ));
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+						List<IProjectIF_v1.ProjectIdentityAssignmentDTO> value = new();
+						value.AddRange( grpc_response.Value.Value.Select( v => IProjectIF_v1.ProjectIdentityAssignmentDTO.FromGrpc(v) ));
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 
 					case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.Error:
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = grpc_response.Error.MessageText,
 							AdditionalInformation = grpc_response.Error.AdditionalInformation,
@@ -161,7 +161,7 @@ namespace TemplateManagement.Projects
 
 					case ProjectIF_v1_listAccessibleProjectsResponse.ResultOneofCase.None:
 					default:
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjects'",
 						} );
@@ -169,7 +169,7 @@ namespace TemplateManagement.Projects
 			}
 			catch (RpcException ex)
 			{
-				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+				return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 					Status = ex.StatusCode.FromGrpc(),
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -177,7 +177,7 @@ namespace TemplateManagement.Projects
 			}
 			catch (Exception ex)
 			{
-				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+				return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -186,13 +186,13 @@ namespace TemplateManagement.Projects
 		}
 
 		/// <inheritdoc />
-		async Task<Response<List<IProjectIF_v1.ProjectSummaryDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string urseId)
+		async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string userId)
 		{
 			try
 			{
 				// fill grpc request
 				var request = new ProjectIF_v1_listAccessibleProjectsForUserRequest();
-				request.UrseId = urseId;
+				request.UserId = userId;
 
 				// calling grpc client
 				var grpc_response = await _client.listAccessibleProjectsForUserAsync( request, new CallOptions(ctx.ToGrpcMetadata( "TemplateManagement.ProjectsProjectIF_v1", "listAccessibleProjectsForUser" ))).ResponseAsync;
@@ -201,12 +201,12 @@ namespace TemplateManagement.Projects
 				switch( grpc_response.ResultCase )
 				{
 					case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.Value:
-						List<IProjectIF_v1.ProjectSummaryDTO> value = new();
-						value.AddRange( grpc_response.Value.Value.Select( v => IProjectIF_v1.ProjectSummaryDTO.FromGrpc(v) ));
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Success( value );
+						List<IProjectIF_v1.ProjectIdentityAssignmentDTO> value = new();
+						value.AddRange( grpc_response.Value.Value.Select( v => IProjectIF_v1.ProjectIdentityAssignmentDTO.FromGrpc(v) ));
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Success( value );
 
 					case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.Error:
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = grpc_response.Error.MessageText,
 							AdditionalInformation = grpc_response.Error.AdditionalInformation,
@@ -214,7 +214,7 @@ namespace TemplateManagement.Projects
 
 					case ProjectIF_v1_listAccessibleProjectsForUserResponse.ResultOneofCase.None:
 					default:
-						return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = "Not handled reponse in GRPC client when calling 'ProjectIF_v1_listAccessibleProjectsForUser'",
 						} );
@@ -222,7 +222,7 @@ namespace TemplateManagement.Projects
 			}
 			catch (RpcException ex)
 			{
-				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+				return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 					Status = ex.StatusCode.FromGrpc(),
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -230,7 +230,7 @@ namespace TemplateManagement.Projects
 			}
 			catch (Exception ex)
 			{
-				return Response<List<IProjectIF_v1.ProjectSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+				return Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),

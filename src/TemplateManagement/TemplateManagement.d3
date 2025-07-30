@@ -37,9 +37,9 @@
                 @system_field
                 CreatedAt:datetime
                 @system_field
-                CreatedByUserId:string
+                CreatedById:string
                 @system_field
-                CreatedByUserName:string
+                CreatedByName:string
             }
 
             valueobject ProjectFolder {
@@ -95,12 +95,15 @@
                 projectId: string
             }
 
-            command createProject( name:string, description:string, createdByUserId:string, createdByUserName: string ) : Project.ProjectHeader
+            command createProject( name:string, description:string ) : Project.ProjectHeader
             command updateProject( project:Project.ProjectHeader, accesses:List[Project.ProjectAccess] ) : Project.ProjectHeader
-            query getAllProjectForUser( userId:string ) : List[Project.ProjectHeader]
+            command addProjectAccess( projectId:string, identityId:string, identityName:string,  role:Project.ProjectAccess.Roles ) : Project.ProjectAccess
+
+            query getProject( projectId:string ) : Project.ProjectHeader
+            query getAllAccessForIdentity( identityId:string ) : List[Project.ProjectAccess]
             query getAllAccessForProject( projectId:string ) : List[Project.ProjectAccess]
-            query getProjectForUser( projectId:string, userId:string ) : Project.ProjectHeader
-            command addProjectAccess( projectId:string, identityId:string, role:Project.ProjectAccess.Roles ) : Project.ProjectAccess
+
+            query sys_getProjects( projectIds:List[string] ) : List[Project.ProjectHeader]
         }
 
         @internal_api(grpc,rest)
@@ -117,14 +120,6 @@
                 Archived,
                 # A projekt törlésre lett jelölve, de még nem véglegesen törölt audit miatt.
                 Deleted
-            }
-
-            dto ProjectFolderDTO {
-                @system_field
-                id:string
-                Name:string
-                Description:string
-                SubFolders: List[ProjectFolderDTO]
             }
 
             enum ProjectAccessRoles {
@@ -152,6 +147,37 @@
                 Deleted 
             }
 
+            dto ProjectSummaryDTO {
+                @system_field
+                id:string
+
+                Name:string
+                Description:string
+                Tags:List[string]
+
+                Status:ProjectStatuses
+            }
+
+            dto ProjectFolderDTO {
+                @system_field
+                id:string
+                Name:string
+                Description:string
+                SubFolders: List[ProjectFolderDTO]
+            }
+
+            dto ProjectIdentityAssignmentDTO {
+                ProjectId:string
+                ProjectName:string
+                ProjectDescription:string
+                ProjectStatus:ProjectStatuses
+
+                IdentityId:string
+                IdentityName:string
+                AccessRole:ProjectAccessRoles
+                AccessStatus:ProjectAccessStatuses
+            }
+
             dto ProjectAccessDTO {
                 @system_field
                 id:string
@@ -162,17 +188,6 @@
                 IdentityName:string
                 Role:ProjectAccessRoles
                 Status:ProjectAccessStatuses
-            }
-                
-            dto ProjectSummaryDTO {
-                @system_field
-                id:string
-
-                Name:string
-                Description:string
-                Tags:List[string]
-
-                Status:ProjectStatuses
             }
 
             dto ProjectDetailsDTO {
@@ -195,8 +210,8 @@
 
             command createProject( name:string, description:string ) : ProjectSummaryDTO
             command updateProject( project:ProjectDetailsDTO ) : ProjectDetailsDTO
-            query listAccessibleProjects() : List[ProjectSummaryDTO]
-            query listAccessibleProjectsForUser( urseId:string) : List[ProjectSummaryDTO]
+            query listAccessibleProjects() : List[ProjectIdentityAssignmentDTO]
+            query listAccessibleProjectsForUser( userId:string ) : List[ProjectIdentityAssignmentDTO]
             command getProject( projectId:string ) : ProjectDetailsDTO
             command addProjectAccess( projectId:string, identityId:string, role:ProjectAccessRoles ) : ProjectAccessDTO
         }

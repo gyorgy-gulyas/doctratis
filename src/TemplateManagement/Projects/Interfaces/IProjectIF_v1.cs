@@ -20,11 +20,11 @@ namespace TemplateManagement.Projects
 		/// <return>ProjectDetailsDTO</return>
 		public Task<Response<ProjectDetailsDTO>> updateProject(CallingContext ctx, ProjectDetailsDTO project);
 
-		/// <return>List<ProjectSummaryDTO></return>
-		public Task<Response<List<ProjectSummaryDTO>>> listAccessibleProjects(CallingContext ctx);
+		/// <return>List<ProjectIdentityAssignmentDTO></return>
+		public Task<Response<List<ProjectIdentityAssignmentDTO>>> listAccessibleProjects(CallingContext ctx);
 
-		/// <return>List<ProjectSummaryDTO></return>
-		public Task<Response<List<ProjectSummaryDTO>>> listAccessibleProjectsForUser(CallingContext ctx, string urseId);
+		/// <return>List<ProjectIdentityAssignmentDTO></return>
+		public Task<Response<List<ProjectIdentityAssignmentDTO>>> listAccessibleProjectsForUser(CallingContext ctx, string userId);
 
 		/// <return>ProjectDetailsDTO</return>
 		public Task<Response<ProjectDetailsDTO>> getProject(CallingContext ctx, string projectId);
@@ -180,6 +180,91 @@ namespace TemplateManagement.Projects
 
 		}
 		#endregion GrpcMapping
+		public partial class ProjectSummaryDTO : IEquatable<ProjectSummaryDTO>
+		{
+			public string id { get; set; }
+			public string Name { get; set; }
+			public string Description { get; set; }
+			public List<string> Tags { get; set; } = new();
+			public ProjectStatuses Status { get; set; }
+
+			#region Clone 
+			public virtual ProjectSummaryDTO Clone()
+			{
+				ProjectSummaryDTO clone = new();
+
+				clone.Name = new string(Name.ToCharArray());
+				clone.Description = new string(Description.ToCharArray());
+
+				// clone of Tags
+				clone.Tags.AddRange( Tags.Select( v => new string(v.ToCharArray()) ));
+				clone.Status = Status;
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectSummaryDTO other )
+			{
+				if (other is null) return false;
+
+				if(Name != other.Name) return false;
+				if(Description != other.Description) return false;
+
+				// equals of Tags
+				if(Tags.SequenceEqual(other.Tags) == false ) return false;
+				if(Status != other.Status) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectSummaryDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(Name);
+				hash.Add(Description);
+
+				// hash of Tags
+				foreach( var element_Tags in Tags)
+					hash.Add(element_Tags);
+				hash.Add(Status);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.ProjectIF_v1.ProjectSummaryDTO ToGrpc( IProjectIF_v1.ProjectSummaryDTO @this )
+			{
+				Protos.ProjectIF_v1.ProjectSummaryDTO result = new();
+
+				result.Id = @this.id;
+				result.Name = @this.Name;
+				result.Description = @this.Description;
+				result.Tags.AddRange( @this.Tags);
+				result.Status = IProjectIF_v1.ProjectStatusesMappings.ToGrpc( @this.Status );
+
+				return result;
+			}
+			public static IProjectIF_v1.ProjectSummaryDTO FromGrpc( Protos.ProjectIF_v1.ProjectSummaryDTO @from )
+			{
+				IProjectIF_v1.ProjectSummaryDTO result = new();
+
+				result.id = @from.Id;
+				result.Name = @from.Name;
+				result.Description = @from.Description;
+				result.Tags.AddRange( @from.Tags);
+				result.Status = IProjectIF_v1.ProjectStatusesMappings.FromGrpc( @from.Status) ;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
 		public partial class ProjectFolderDTO : IEquatable<ProjectFolderDTO>
 		{
 			public string id { get; set; }
@@ -253,6 +338,104 @@ namespace TemplateManagement.Projects
 				result.Name = @from.Name;
 				result.Description = @from.Description;
 				result.SubFolders.AddRange( @from.SubFolders.Select( v => IProjectIF_v1.ProjectFolderDTO.FromGrpc(v) ));
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		public partial class ProjectIdentityAssignmentDTO : IEquatable<ProjectIdentityAssignmentDTO>
+		{
+			public string ProjectId { get; set; }
+			public string ProjectName { get; set; }
+			public string ProjectDescription { get; set; }
+			public ProjectStatuses ProjectStatus { get; set; }
+			public string IdentityId { get; set; }
+			public string IdentityName { get; set; }
+			public ProjectAccessRoles AccessRole { get; set; }
+			public ProjectAccessStatuses AccessStatus { get; set; }
+
+			#region Clone 
+			public virtual ProjectIdentityAssignmentDTO Clone()
+			{
+				ProjectIdentityAssignmentDTO clone = new();
+
+				clone.ProjectId = new string(ProjectId.ToCharArray());
+				clone.ProjectName = new string(ProjectName.ToCharArray());
+				clone.ProjectDescription = new string(ProjectDescription.ToCharArray());
+				clone.ProjectStatus = ProjectStatus;
+				clone.IdentityId = new string(IdentityId.ToCharArray());
+				clone.IdentityName = new string(IdentityName.ToCharArray());
+				clone.AccessRole = AccessRole;
+				clone.AccessStatus = AccessStatus;
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ProjectIdentityAssignmentDTO other )
+			{
+				if (other is null) return false;
+
+				if(ProjectId != other.ProjectId) return false;
+				if(ProjectName != other.ProjectName) return false;
+				if(ProjectDescription != other.ProjectDescription) return false;
+				if(ProjectStatus != other.ProjectStatus) return false;
+				if(IdentityId != other.IdentityId) return false;
+				if(IdentityName != other.IdentityName) return false;
+				if(AccessRole != other.AccessRole) return false;
+				if(AccessStatus != other.AccessStatus) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ProjectIdentityAssignmentDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(ProjectId);
+				hash.Add(ProjectName);
+				hash.Add(ProjectDescription);
+				hash.Add(ProjectStatus);
+				hash.Add(IdentityId);
+				hash.Add(IdentityName);
+				hash.Add(AccessRole);
+				hash.Add(AccessStatus);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.ProjectIF_v1.ProjectIdentityAssignmentDTO ToGrpc( IProjectIF_v1.ProjectIdentityAssignmentDTO @this )
+			{
+				Protos.ProjectIF_v1.ProjectIdentityAssignmentDTO result = new();
+
+				result.ProjectId = @this.ProjectId;
+				result.ProjectName = @this.ProjectName;
+				result.ProjectDescription = @this.ProjectDescription;
+				result.ProjectStatus = IProjectIF_v1.ProjectStatusesMappings.ToGrpc( @this.ProjectStatus );
+				result.IdentityId = @this.IdentityId;
+				result.IdentityName = @this.IdentityName;
+				result.AccessRole = IProjectIF_v1.ProjectAccessRolesMappings.ToGrpc( @this.AccessRole );
+				result.AccessStatus = IProjectIF_v1.ProjectAccessStatusesMappings.ToGrpc( @this.AccessStatus );
+
+				return result;
+			}
+			public static IProjectIF_v1.ProjectIdentityAssignmentDTO FromGrpc( Protos.ProjectIF_v1.ProjectIdentityAssignmentDTO @from )
+			{
+				IProjectIF_v1.ProjectIdentityAssignmentDTO result = new();
+
+				result.ProjectId = @from.ProjectId;
+				result.ProjectName = @from.ProjectName;
+				result.ProjectDescription = @from.ProjectDescription;
+				result.ProjectStatus = IProjectIF_v1.ProjectStatusesMappings.FromGrpc( @from.ProjectStatus) ;
+				result.IdentityId = @from.IdentityId;
+				result.IdentityName = @from.IdentityName;
+				result.AccessRole = IProjectIF_v1.ProjectAccessRolesMappings.FromGrpc( @from.AccessRole) ;
+				result.AccessStatus = IProjectIF_v1.ProjectAccessStatusesMappings.FromGrpc( @from.AccessStatus) ;
 
 				return result;
 			}
@@ -335,91 +518,6 @@ namespace TemplateManagement.Projects
 				result.IdentityName = @from.IdentityName;
 				result.Role = IProjectIF_v1.ProjectAccessRolesMappings.FromGrpc( @from.Role) ;
 				result.Status = IProjectIF_v1.ProjectAccessStatusesMappings.FromGrpc( @from.Status) ;
-
-				return result;
-			}
-			#endregion GrpcMapping
-		}
-
-		public partial class ProjectSummaryDTO : IEquatable<ProjectSummaryDTO>
-		{
-			public string id { get; set; }
-			public string Name { get; set; }
-			public string Description { get; set; }
-			public List<string> Tags { get; set; } = new();
-			public ProjectStatuses Status { get; set; }
-
-			#region Clone 
-			public virtual ProjectSummaryDTO Clone()
-			{
-				ProjectSummaryDTO clone = new();
-
-				clone.Name = new string(Name.ToCharArray());
-				clone.Description = new string(Description.ToCharArray());
-
-				// clone of Tags
-				clone.Tags.AddRange( Tags.Select( v => new string(v.ToCharArray()) ));
-				clone.Status = Status;
-
-				return clone;
-			}
-			#endregion Clone 
-
-			#region Equals & HashCode 
-			public bool Equals( ProjectSummaryDTO other )
-			{
-				if (other is null) return false;
-
-				if(Name != other.Name) return false;
-				if(Description != other.Description) return false;
-
-				// equals of Tags
-				if(Tags.SequenceEqual(other.Tags) == false ) return false;
-				if(Status != other.Status) return false;
-
-				return true;
-			}
-
-			public override bool Equals(object obj) => Equals(obj as ProjectSummaryDTO);
-
-			public override int GetHashCode()
-			{
-				var hash = new HashCode();
-				hash.Add(id);
-				hash.Add(Name);
-				hash.Add(Description);
-
-				// hash of Tags
-				foreach( var element_Tags in Tags)
-					hash.Add(element_Tags);
-				hash.Add(Status);
-
-				return hash.ToHashCode();
-			}
-			#endregion Equals & HashCode 
-
-			#region GrpcMapping
-			public static Protos.ProjectIF_v1.ProjectSummaryDTO ToGrpc( IProjectIF_v1.ProjectSummaryDTO @this )
-			{
-				Protos.ProjectIF_v1.ProjectSummaryDTO result = new();
-
-				result.Id = @this.id;
-				result.Name = @this.Name;
-				result.Description = @this.Description;
-				result.Tags.AddRange( @this.Tags);
-				result.Status = IProjectIF_v1.ProjectStatusesMappings.ToGrpc( @this.Status );
-
-				return result;
-			}
-			public static IProjectIF_v1.ProjectSummaryDTO FromGrpc( Protos.ProjectIF_v1.ProjectSummaryDTO @from )
-			{
-				IProjectIF_v1.ProjectSummaryDTO result = new();
-
-				result.id = @from.Id;
-				result.Name = @from.Name;
-				result.Description = @from.Description;
-				result.Tags.AddRange( @from.Tags);
-				result.Status = IProjectIF_v1.ProjectStatusesMappings.FromGrpc( @from.Status) ;
 
 				return result;
 			}
