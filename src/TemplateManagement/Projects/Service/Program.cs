@@ -21,8 +21,20 @@ builder.Services.AddSwaggerGen();
 // and service specific services
 builder.Services.AddSingleton<IProjectIF_v1,ProjectIF_v1>();
 builder.Services.AddSingleton<IProjectService,ProjectService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
+
+app.UseCors("AllowReactApp"); // Middleware engedélyezés
 
 // Swagger middleware bekapcsolása (csak dev-ben)
 app.UseSwagger();

@@ -16,7 +16,7 @@ namespace TemplateManagement.Projects.Service.Implementations
 
         async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
         {
-            var header = await _service.createProject(ctx, name, description ).ConfigureAwait(false);
+            var header = await _service.createProject(ctx, name, description).ConfigureAwait(false);
             if (header.IsSuccess() == false)
                 return new(header.Error);
 
@@ -25,12 +25,12 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.updateProject(CallingContext ctx, IProjectIF_v1.ProjectDetailsDTO project)
         {
             var header = project.ConvertToHeader();
-            var accesses = project.Accesses.Select(a => a.ConvertToAccess( header )).ToList();
+            var accesses = project.Accesses.Select(a => a.ConvertToAccess(header)).ToList();
 
-            var result = await _service.updateProject(ctx, header, accesses ).ConfigureAwait(false);
+            var result = await _service.updateProject(ctx, header, accesses).ConfigureAwait(false);
             if (result.IsSuccess() == false)
                 return new(result.Error);
-            
+
             return new(result.Value.ConvertToDetailsDTO(accesses));
         }
 
@@ -40,19 +40,36 @@ namespace TemplateManagement.Projects.Service.Implementations
             if (accceses.IsSuccess() == false)
                 return new(accceses.Error);
 
-            ctx.Clone
-            var projects = await _service.sys_getProjects()
+            var projectIds = accceses
+                .Value
+                .Select(a => a.ProjectId)
+                .Distinct()
+                .ToArray();
+            var ctx_sys = ctx.CloneWithIdentity(nameof(ProjectIF_v1), nameof(ProjectIF_v1), CallingContext.IdentityTypes.Service);
+            var projectMap = await _service.sys_getProjects(ctx_sys, projectIds);
+            if (projectMap.IsSuccess() == false)
+                return new(projectMap.Error);
 
-            return new(projects.Value.Select(ph => ph.ConvertToDTO()).ToList());
+            return new(accceses.Value.Select(ph => ph.ConvertToAssignmentDTO(projectMap.Value)).ToList());
         }
 
         async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string userId)
         {
-            var projects = await _service.getAllAccessForIdentity(ctx, userId).ConfigureAwait(false);
-            if (projects.IsSuccess() == false)
-                return new(projects.Error);
+            var accceses = await _service.getAllAccessForIdentity(ctx, userId).ConfigureAwait(false);
+            if (accceses.IsSuccess() == false)
+                return new(accceses.Error);
 
-            return new(projects.Value.Select(ph => ph.ConvertToSummaryDTO()).ToList());
+            var projectIds = accceses
+                .Value
+                .Select(a => a.ProjectId)
+                .Distinct()
+                .ToArray();
+            var ctx_sys = ctx.CloneWithIdentity(nameof(ProjectIF_v1), nameof(ProjectIF_v1), CallingContext.IdentityTypes.Service);
+            var projectMap = await _service.sys_getProjects(ctx_sys, projectIds);
+            if (projectMap.IsSuccess() == false)
+                return new(projectMap.Error);
+
+            return new(accceses.Value.Select(ph => ph.ConvertToAssignmentDTO(projectMap.Value)).ToList());
         }
 
         async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.getProject(CallingContext ctx, string projectId)
@@ -221,14 +238,35 @@ namespace TemplateManagement.Projects.Service.Implementations
                 etag = @this.etag,
 
                 IdentityId = @this.IdentityId,
-                IdentityName =@this.IdentityName,
+                IdentityName = @this.IdentityName,
 
                 Role = @this.Role.Convert(),
                 Status = @this.Status.Convert(),
             };
         }
-        
-        internal static Project.ProjectAccess ConvertToAccess(this IProjectIF_v1.ProjectAccessDTO @this, Project.ProjectHeader header )
+
+        internal static IProjectIF_v1.ProjectIdentityAssignmentDTO ConvertToAssignmentDTO(this Project.ProjectAccess @this, IDictionary<string,Project.ProjectHeader> projectMap )
+        {
+            Project.ProjectHeader project = null;
+            projectMap.TryGetValue(@this.ProjectId, out project);
+
+            return new()
+            {
+                ProjectId = @this.ProjectId,
+                ProjectName = project?.Name,
+                ProjectDescription = project?.Description,
+                ProjectStatus = project != null 
+                    ? project.Status.Convert()
+                    : IProjectIF_v1.ProjectStatuses.Archived,
+
+                 AccessRole = @this.Role.Convert(),
+                 AccessStatus = @this.Status.Convert(),
+                 IdentityId = @this.IdentityId,
+                 IdentityName = @this.IdentityName,
+            };
+        }
+
+        internal static Project.ProjectAccess ConvertToAccess(this IProjectIF_v1.ProjectAccessDTO @this, Project.ProjectHeader header)
         {
             return new()
             {

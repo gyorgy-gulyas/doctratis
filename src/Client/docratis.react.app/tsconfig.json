@@ -1,0 +1,15 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "docratis.ts.api": [ "./../docratis.ts.api/app.ts" ]
+    }
+  },
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./../docratis.ts.api" }
+  ]
+}

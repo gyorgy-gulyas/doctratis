@@ -103,7 +103,7 @@
             query getAllAccessForIdentity( identityId:string ) : List[Project.ProjectAccess]
             query getAllAccessForProject( projectId:string ) : List[Project.ProjectAccess]
 
-            query sys_getProjects( projectIds:List[string] ) : List[Project.ProjectHeader]
+            query sys_getProjects( projectIds:List[string] ) : Map[string,Project.ProjectHeader]
         }
 
         @internal_api(grpc,rest)

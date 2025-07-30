@@ -30,8 +30,8 @@ namespace TemplateManagement.Projects
 		/// <return>List<Project.ProjectAccess></return>
 		public Task<Response<List<Project.ProjectAccess>>> getAllAccessForProject(CallingContext ctx, string projectId);
 
-		/// <return>List<Project.ProjectHeader></return>
-		public Task<Response<List<Project.ProjectHeader>>> sys_getProjects(CallingContext ctx, IList<string> projectIds);
+		/// <return>Dictionary<string,Project.ProjectHeader></return>
+		public Task<Response<Dictionary<string,Project.ProjectHeader>>> sys_getProjects(CallingContext ctx, IList<string> projectIds);
 
 
 		public partial class ProjectCreated_v1 : IEquatable<ProjectCreated_v1>
