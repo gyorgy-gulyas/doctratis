@@ -2,14 +2,6 @@
 
     context Projects {
 
-        composite Base {
-            @system_field
-            id:string
-            @system_field
-            etag:string
-            @system_field
-            LastUpdate:datetime
-        }
 
         // todo: datasource
         aggregate Project {
@@ -26,7 +18,7 @@
                 Deleted
             }
 
-            root entity ProjectHeader inherits Base {
+            root entity ProjectHeader inherits Core.Base.BaseEntity {
                 Name:string
                 Description:string
                 Tags:List[string]

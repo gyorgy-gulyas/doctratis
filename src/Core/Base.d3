@@ -1,0 +1,14 @@
+﻿domain Core {
+
+    context Base {
+
+        composite BaseEntity {
+            @system_field
+            id:string
+            @system_field
+            etag:string
+            @system_field
+            LastUpdate:datetime
+        }
+    }
+}

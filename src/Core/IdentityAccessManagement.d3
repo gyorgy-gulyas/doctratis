@@ -2,16 +2,23 @@ domain Core {
 
     context Identities {
 
-        aggregate Identity
+        aggregate Account 
         {
-            enum IdentityKindes {
+            enum IdentityTypes {
                 User,
                 ExternalSystem,
                 InternalService
             }
 
+            root entity Identity inherits Core.Base.BaseEntity {
+                Type:IdentityTypes
+                Name:string
+                isActive: boolean
+                authMethod:Auth
+            }
+
             # Base type for all authentication methods
-            valueobject AuthMethod {
+            valueobject Auth {
                 enum Kinds {
                     Password,
                     ActiveDirectory,
@@ -24,7 +31,7 @@ domain Core {
             }
 
             # Password-based authentication
-            valueobject PasswordAuth inherits AuthMethod {
+            valueobject PasswordAuth inherits Auth {
                 # Hashed password
                 passwordHash: string
                 # Salt used for hashing
@@ -32,7 +39,7 @@ domain Core {
             }
 
             # Active Directory-based authentication
-            valueobject ADAuth inherits AuthMethod {
+            valueobject ADAuth inherits Auth {
                 # Active Directory domain
                 adDomain: string
                 # Active Directory username
@@ -40,15 +47,15 @@ domain Core {
             }
 
             # Certificate-based authentication
-            valueobject CertificateAuth inherits AuthMethod {
+            valueobject CertificateAuth inherits Auth {
                 # Certificate thumbprint (unique identifier)
                 certificateThumbprint: string
             }
 
             # ClientGate (Ügyfélkapu) authentication
-            valueobject UgyfelkapuAuth inherits AuthMethod {
+            valueobject UgyfelkapuAuth inherits Auth {
                 # Government-issued unique identifier (Ügyfélkapu ID)
-                clientGateId: string
+                UgyfelkapuId: string
                 # User’s full legal name as returned by the service
                 legalName: string
                 # Email address verified by the service (optional)
