@@ -1,6 +1,60 @@
 domain Core {
 
-    context Identity {
+    context Identities {
+
+        aggregate Identity
+        {
+            enum IdentityKindes {
+                User,
+                ExternalSystem,
+                InternalService
+            }
+
+            # Base type for all authentication methods
+            valueobject AuthMethod {
+                enum Kinds {
+                    Password,
+                    ActiveDirectory,
+                    Certificate,
+                    Ugyfelkapu
+                }
+
+                # Defines the type of authentication method
+                kind: Kinds
+            }
+
+            # Password-based authentication
+            valueobject PasswordAuth inherits AuthMethod {
+                # Hashed password
+                passwordHash: string
+                # Salt used for hashing
+                passwordSalt: string
+            }
+
+            # Active Directory-based authentication
+            valueobject ADAuth inherits AuthMethod {
+                # Active Directory domain
+                adDomain: string
+                # Active Directory username
+                adUser: string
+            }
+
+            # Certificate-based authentication
+            valueobject CertificateAuth inherits AuthMethod {
+                # Certificate thumbprint (unique identifier)
+                certificateThumbprint: string
+            }
+
+            # ClientGate (Ügyfélkapu) authentication
+            valueobject UgyfelkapuAuth inherits AuthMethod {
+                # Government-issued unique identifier (Ügyfélkapu ID)
+                clientGateId: string
+                # User’s full legal name as returned by the service
+                legalName: string
+                # Email address verified by the service (optional)
+                email: string
+            }
+        }
     }
 
     context Access {
