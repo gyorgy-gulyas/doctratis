@@ -6,7 +6,7 @@ import { BFFRestClient } from 'docratis.ts.api'
 
 // Inicializálás az app indulásakor
 BFFRestClient.getInstance().init(
-    'https://localhost:52620/',
+    'http://localhost:52620/',
     'HU',
     'doctratis.react.app',
     '0.1'
