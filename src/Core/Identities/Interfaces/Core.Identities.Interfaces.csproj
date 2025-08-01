@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\..\</SolutionDir>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;..\..\..\..\..\SrvKit\src\dotnet\SrvKit.General\Protos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageReference Include="SrvKit.General" />
+    <PackageReference Include="SrvKit.Service" />
+  </ItemGroup>
+
+</Project>

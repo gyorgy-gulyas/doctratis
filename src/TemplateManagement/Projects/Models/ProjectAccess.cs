@@ -9,7 +9,7 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectAccess : IBase, IEquatable<ProjectAccess>
+	public partial class ProjectAccess : Core.Base.IBaseEntity, IEquatable<ProjectAccess>
 	{
 		public enum Roles
 		{
@@ -47,11 +47,11 @@ namespace TemplateManagement.Projects.Project
 			Deleted,
 
 		}
-		#region IBase
+		#region IBaseEntity
 		public string id { get; set; }
 		public string etag { get; set; }
 		public DateTime LastUpdate { get; set; }
-		#endregion IBase
+		#endregion IBaseEntity
 
 		public string ProjectId { get; set; }
 		public string ProjectName { get; set; }
@@ -65,8 +65,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			ProjectAccess clone = new();
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			clone.ProjectId = new string(ProjectId.ToCharArray());
 			clone.ProjectName = new string(ProjectName.ToCharArray());
@@ -84,8 +84,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			if (other is null) return false;
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			if(ProjectId != other.ProjectId) return false;
 			if(ProjectName != other.ProjectName) return false;
@@ -102,11 +102,11 @@ namespace TemplateManagement.Projects.Project
 		public override int GetHashCode()
 		{
 			var hash = new HashCode();
-			// begin: Base
+			// begin: BaseEntity
 			hash.Add(id);
 			hash.Add(etag);
 			hash.Add(LastUpdate);
-			// end: Base
+			// end: BaseEntity
 
 			hash.Add(ProjectId);
 			hash.Add(ProjectName);

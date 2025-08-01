@@ -10,13 +10,13 @@ using PolyPersist.Net.Attributes;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectAuditTrail : IBase, Core.Auditing.IAuditTrail, IEquatable<ProjectAuditTrail>
+	public partial class ProjectAuditTrail : Core.Base.IBaseEntity, Core.Auditing.IAuditTrail, IEquatable<ProjectAuditTrail>
 	{
-		#region IBase
+		#region IBaseEntity
 		public string id { get; set; }
 		public string etag { get; set; }
 		public DateTime LastUpdate { get; set; }
-		#endregion IBase
+		#endregion IBaseEntity
 
 		#region IAuditTrail
 		public TrailOperations trailOperation { get; set; }
@@ -38,8 +38,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			ProjectAuditTrail clone = new();
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			// begin: AuditTrail
 			clone.trailOperation = trailOperation;
@@ -64,8 +64,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			if (other is null) return false;
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			// begin: AuditTrail
 			if(trailOperation != other.trailOperation) return false;
@@ -89,11 +89,11 @@ namespace TemplateManagement.Projects.Project
 		public override int GetHashCode()
 		{
 			var hash = new HashCode();
-			// begin: Base
+			// begin: BaseEntity
 			hash.Add(id);
 			hash.Add(etag);
 			hash.Add(LastUpdate);
-			// end: Base
+			// end: BaseEntity
 
 			// begin: AuditTrail
 			hash.Add(trailOperation);

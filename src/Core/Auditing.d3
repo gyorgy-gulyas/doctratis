@@ -29,15 +29,10 @@
         }
 
         composite AuditEventLog {
-            id: string
-            etag:string
-            LastUpdate:datetime
-            partitionKey:string
-
             operation:string
             operationDescription:string
-            userId:string
-            userName:string
+            idenityId:string
+            idenityName:string
             serviceName:string
             requestId:string
             correlationId:string

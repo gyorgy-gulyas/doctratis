@@ -42,7 +42,7 @@
                 SubFolders: List[ProjectFolder]
             }
 
-            entity ProjectAccess inherits Base {
+            entity ProjectAccess inherits Core.Base.BaseEntity {
                 enum Roles {
                     # Csak olvasásra jogosult
                     Reader,
@@ -77,7 +77,7 @@
                 Status:Statuses
             }
 
-            entity ProjectAuditTrail inherits Base, Core.Auditing.AuditTrail {
+            entity ProjectAuditTrail inherits Core.Base.BaseEntity, Core.Auditing.AuditTrail {
                 projectId: string
             }
         }

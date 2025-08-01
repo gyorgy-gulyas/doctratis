@@ -2,40 +2,71 @@ domain Core {
 
     context Identities {
 
-        aggregate Account 
+        aggregate Identity 
         {
-            enum IdentityTypes {
+            enum AccountTypes {
                 User,
                 ExternalSystem,
                 InternalService
             }
 
-            root entity Identity inherits Core.Base.BaseEntity {
-                Type:IdentityTypes
+            root entity Account inherits Core.Base.BaseEntity {
+                Type:AccountTypes
                 Name:string
                 isActive: boolean
-                authMethod:Auth
+                authMethods: List[Auth]
+                contacts: List[ContactInfo]
+            }
+
+            valueobject ContactInfo
+            {
+                contactType: string
+                email: string
+                phoneNumber : string
             }
 
             # Base type for all authentication methods
             valueobject Auth {
-                enum Kinds {
-                    Password,
+                enum Methods {
+                    EmailAndPassword,
                     ActiveDirectory,
                     Certificate,
                     Ugyfelkapu
                 }
 
                 # Defines the type of authentication method
-                kind: Kinds
+                method: Methods
             }
 
+            # Two-factor authentication configuration
+            valueobject TwoFactorConfiguration {
+                enum Method {
+                    # Time-based One-Time Password (e.g. Google Authenticator)
+                    TOTP,           
+                    # SMS-based OTP
+                    SMS,
+                    # Email-based OTP
+                    Email
+                }                    
+                enabled: boolean
+                method: Method
+                totpSecret: string
+                phoneNumber: string
+            }
+            
             # Password-based authentication
-            valueobject PasswordAuth inherits Auth {
+            valueobject EmailAndPasswordAuth inherits Auth {
+                email: string
                 # Hashed password
                 passwordHash: string
                 # Salt used for hashing
                 passwordSalt: string
+                # old password hashes
+                passwordHistory: List[string] 
+                # password expiration time
+                passwordExpiresAt: date
+                # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfiguration
             }
 
             # Active Directory-based authentication
@@ -50,17 +81,62 @@ domain Core {
             valueobject CertificateAuth inherits Auth {
                 # Certificate thumbprint (unique identifier)
                 certificateThumbprint: string
+                validFrom: datetime
+                validUntil: datetime
             }
 
             # ClientGate (Ügyfélkapu) authentication
             valueobject UgyfelkapuAuth inherits Auth {
+                enum eIDAS {
+                    # low – gyengébb azonosítás (pl. sima jelszavas Ügyfélkapu)
+                    Low,
+                    # substantial – erősebb azonosítás (pl. kétfaktor + állami adatbázis validáció)
+                    Substantial,
+                    # high – a legmagasabb, pl. tanúsítvány alapú vagy személyi igazolvány chip-es azonosítás
+                    High
+                }
+
                 # Government-issued unique identifier (Ügyfélkapu ID)
                 UgyfelkapuId: string
                 # User’s full legal name as returned by the service
                 legalName: string
                 # Email address verified by the service (optional)
                 email: string
+                # magyar állam által nyújtott hitelesítési szolgáltatás: biztonsági szintek
+                assuranceLevel: eIDAS  
             }
+
+            entity LoginAuditEventLog inherits Core.Base.BaseEntity, Core.Auditing.AuditEventLog {
+                AccountType:AccountTypes
+                authMethod:Auth.Methods
+            }
+        }
+
+        service AccountService {
+            query findUserByEmail( email:string ) : Identity.Account
+
+            enum SingInResult {
+                InvalidPassword,
+                UserIsLocekdOut,
+                UserIsNotActive
+            }
+            query singIn( account:Identity.Account, password:string ) : SingInResult
+        }
+
+        @internal_api(grpc,rest)
+        @public_api(grpc, rest, collection="BFF")
+        interface LoginIF version 1 {
+            dto TokensDTO {
+		        AccessToken: string
+		        RefreshToken: string
+		        AccessTokenExpiredAt: datetime
+            }
+            dto LoginResultDTO {
+                tokens:TokensDTO
+                required2FA:boolean
+            }
+            command LoginWithEmailPassword( email:string, password:string ) : LoginResultDTO
+            command LoginTwoFactor( totp:string ) : TokensDTO
         }
     }
 

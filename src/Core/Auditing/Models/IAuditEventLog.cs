@@ -11,14 +11,10 @@ namespace Core.Auditing
 
 	public partial interface IAuditEventLog
 	{
-		public string id { get; set; }
-		public string etag { get; set; }
-		public DateTime LastUpdate { get; set; }
-		public string partitionKey { get; set; }
 		public string operation { get; set; }
 		public string operationDescription { get; set; }
-		public string userId { get; set; }
-		public string userName { get; set; }
+		public string idenityId { get; set; }
+		public string idenityName { get; set; }
 		public string serviceName { get; set; }
 		public string requestId { get; set; }
 		public string correlationId { get; set; }

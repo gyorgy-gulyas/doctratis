@@ -9,13 +9,13 @@ using TemplateManagement.Projects;
 
 namespace TemplateManagement.Projects.Project
 {
-	public partial class ProjectHeader : IBase, IEquatable<ProjectHeader>
+	public partial class ProjectHeader : Core.Base.IBaseEntity, IEquatable<ProjectHeader>
 	{
-		#region IBase
+		#region IBaseEntity
 		public string id { get; set; }
 		public string etag { get; set; }
 		public DateTime LastUpdate { get; set; }
-		#endregion IBase
+		#endregion IBaseEntity
 
 		public string Name { get; set; }
 		public string Description { get; set; }
@@ -31,8 +31,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			ProjectHeader clone = new();
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			clone.Name = new string(Name.ToCharArray());
 			clone.Description = new string(Description.ToCharArray());
@@ -53,8 +53,8 @@ namespace TemplateManagement.Projects.Project
 		{
 			if (other is null) return false;
 
-			// begin: Base
-			// end: Base
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			if(Name != other.Name) return false;
 			if(Description != other.Description) return false;
@@ -74,11 +74,11 @@ namespace TemplateManagement.Projects.Project
 		public override int GetHashCode()
 		{
 			var hash = new HashCode();
-			// begin: Base
+			// begin: BaseEntity
 			hash.Add(id);
 			hash.Add(etag);
 			hash.Add(LastUpdate);
-			// end: Base
+			// end: BaseEntity
 
 			hash.Add(Name);
 			hash.Add(Description);
