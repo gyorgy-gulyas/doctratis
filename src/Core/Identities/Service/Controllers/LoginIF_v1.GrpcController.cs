@@ -263,5 +263,64 @@ namespace Core.Identities
 				}
 			}
 		}
+
+		public override async Task<LoginIF_v1_GetKAULoginURLResponse> GetKAULoginURL( LoginIF_v1_GetKAULoginURLRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.GetKAULoginURL" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string redirectUrl;
+					redirectUrl = request.RedirectUrl;
+
+					// calling the service function itself
+					var response = await _service.GetKAULoginURL( ctx , redirectUrl );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new LoginIF_v1_GetKAULoginURLResponse();
+							result.Value = response.Value;
+							return result;
+						}
+						else
+						{
+							return new LoginIF_v1_GetKAULoginURLResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'LoginIF_v1.GetKAULoginURL'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new LoginIF_v1_GetKAULoginURLResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_GetKAULoginURLResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
 	}
 }

@@ -15,14 +15,21 @@ namespace Core.Identities.Service.Implementations
         private readonly IEmailService _emailService;
         private readonly TokenService _tokenService = new();
         private readonly LdapAuthenticator _ldapAuthenticator;
+        private readonly KAUAuthenticator _kauAuthenticator;
 
-        public LoginService(IdentityStoreContext context, IAccountService accountService, ISmsService smsService, IEmailService emailService, LdapAuthenticator ldapAuthenticator)
+        public LoginService(IdentityStoreContext context
+            , IAccountService accountService
+            , ISmsService smsService
+            , IEmailService emailService
+            , LdapAuthenticator ldapAuthenticator
+            , KAUAuthenticator kauAuthenticator)
         {
             _context = context;
             _accountService = accountService;
             _smsService = smsService;
             _emailService = emailService;
             _ldapAuthenticator = ldapAuthenticator;
+            _kauAuthenticator = kauAuthenticator;
         }
 
         async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginService.LoginWithEmailPassword(CallingContext ctx, string email, string password)
@@ -71,6 +78,20 @@ namespace Core.Identities.Service.Implementations
 
             return await _HandleSuccessSignIn(ctx, account, account.adAuth);
         }
+
+        Task<Response<string>> ILoginService.GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl)
+        {
+            var state = _kauAuthenticator.GenerateUniqueState(redirectUrl);
+
+            var loginUrl = _kauAuthenticator.GetLoginUrl(state, backendCallbackUrl);
+        }
+
+        Task<Response<string>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
+        {
+            if (!_kauAuthenticator.ValidateState(state, out var returnUrl))
+                return Unauthorized("Invalid or expired state");
+        }
+
 
         private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth auth)
         {

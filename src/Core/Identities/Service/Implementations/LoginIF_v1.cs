@@ -32,5 +32,14 @@ namespace Core.Identities.Service.Implementations
             return _loginService.RefreshTokens(ctx, refreshToken);
         }
 
+        Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginIF_v1.LoginWithAD(CallingContext ctx, string username, string password)
+        {
+            return _loginService.LoginWithAD(ctx, username, password);
+        }
+
+        Task<Response<string>> ILoginIF_v1.GetKAULoginURL(CallingContext ctx, string redirectUrl)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

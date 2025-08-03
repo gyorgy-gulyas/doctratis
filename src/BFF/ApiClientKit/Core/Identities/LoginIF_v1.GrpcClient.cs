@@ -185,6 +185,7 @@ namespace BFF.ApiClientKit
 					}
 				}
 
+			/// refresh bearer tokens
 				public static async Task<Response<Core.Identities.ILoginIF_v1.TokensDTO>> RefreshTokens(string refreshToken)
 				{
 					try
@@ -231,6 +232,70 @@ namespace BFF.ApiClientKit
 					catch (Exception ex)
 					{
 						return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+			/// getting the KAU url, expects the frontend url, where the frontend must be redirected
+			/// the redirect url format is: {redirectUrl}/?accessToken={string}&refreshToken={string&requires2FA={boolean}&accessTokenExpiresAt={string}&refreshTokenExpiresAt={string}
+			/// Generates the KAÜ login URL with a signed state containing the frontend returnUrl.
+			/// Flow:
+			/// 1. Browser calls this endpoint (GetKAULoginUrl) and passes the desired frontend returnUrl.
+			/// 2. Backend builds the KAÜ authorize URL with its own callback URL and the signed state.
+			/// 3. Browser is redirected to KAÜ login page.
+			/// 4. KAÜ authenticates the user and redirects the browser to the backend callback URL with code + state.
+			/// 5. Backend exchanges the code for tokens and finally redirects the browser to the original frontend returnUrl.
+			/// Note: For local development KAÜ must be able to call the backend callback URL (use ngrok/dev tunnel).
+			/// returns: the KAU url, where the browser must be redirected.
+				public static async Task<Response<string>> GetKAULoginURL(string redirectUrl)
+				{
+					try
+					{
+						// fill grpc request
+						var request = new LoginIF_v1_GetKAULoginURLRequest();
+						request.RedirectUrl = redirectUrl;
+
+						// calling grpc client
+						_client ??= new LoginIF_v1.LoginIF_v1Client(GrpClient._channel);
+						var grpc_response = await _client.GetKAULoginURLAsync( request, new CallOptions(GrpClient.GetMetadata( "Core.Identities.LoginIF_v1.GetKAULoginURL" ))).ResponseAsync;
+
+						// fill response
+						switch( grpc_response.ResultCase )
+						{
+							case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.Value:
+								string value;
+								value = grpc_response.Value;
+								return Response<string>.Success( value );
+
+							case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.Error:
+								return Response<string>.Failure( new ServiceKit.Net.Error() {
+									Status = grpc_response.Error.Status.FromGrpc(),
+									MessageText = grpc_response.Error.MessageText,
+									AdditionalInformation = grpc_response.Error.AdditionalInformation,
+								} );
+
+							case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.None:
+							default:
+								return Response<string>.Failure( new ServiceKit.Net.Error() {
+									Status = grpc_response.Error.Status.FromGrpc(),
+									MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_GetKAULoginURL'",
+								} );
+						}
+					}
+					catch (RpcException ex)
+					{
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.FromGrpc(),
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),

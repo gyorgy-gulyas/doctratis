@@ -10,7 +10,7 @@ using Core.Identities;
 namespace Core.Identities.Identity
 {
 	/// ClientGate (Ügyfélkapu) authentication
-	public partial class UgyfelkapuAuth : Auth, IEquatable<UgyfelkapuAuth>
+	public partial class KAUAuth : Auth, IEquatable<KAUAuth>
 	{
 		public enum eIDAS
 		{
@@ -25,7 +25,7 @@ namespace Core.Identities.Identity
 
 		}
 		/// Government-issued unique identifier (Ügyfélkapu ID)
-		public string UgyfelkapuId { get; set; }
+		public string KAUId { get; set; }
 		/// User’s full legal name as returned by the service
 		public string legalName { get; set; }
 		/// Email address verified by the service (optional)
@@ -34,15 +34,15 @@ namespace Core.Identities.Identity
 		public eIDAS assuranceLevel { get; set; }
 
 		#region Clone 
-		public override UgyfelkapuAuth Clone()
+		public override KAUAuth Clone()
 		{
-			UgyfelkapuAuth clone = new();
+			KAUAuth clone = new();
 
 			// begin: Auth
 			clone.method = method;
 			// end: Auth
 
-			clone.UgyfelkapuId = new string(UgyfelkapuId.ToCharArray());
+			clone.KAUId = new string(KAUId.ToCharArray());
 			clone.legalName = new string(legalName.ToCharArray());
 			clone.email = new string(email.ToCharArray());
 			clone.assuranceLevel = assuranceLevel;
@@ -52,7 +52,7 @@ namespace Core.Identities.Identity
 		#endregion Clone 
 
 		#region Equals & HashCode 
-		public bool Equals( UgyfelkapuAuth other )
+		public bool Equals( KAUAuth other )
 		{
 			if (other is null) return false;
 
@@ -60,7 +60,7 @@ namespace Core.Identities.Identity
 			if(method != other.method) return false;
 			// end: Auth
 
-			if(UgyfelkapuId != other.UgyfelkapuId) return false;
+			if(KAUId != other.KAUId) return false;
 			if(legalName != other.legalName) return false;
 			if(email != other.email) return false;
 			if(assuranceLevel != other.assuranceLevel) return false;
@@ -68,7 +68,7 @@ namespace Core.Identities.Identity
 			return true;
 		}
 
-		public override bool Equals(object obj) => Equals(obj as UgyfelkapuAuth);
+		public override bool Equals(object obj) => Equals(obj as KAUAuth);
 
 		public override int GetHashCode()
 		{
@@ -77,7 +77,7 @@ namespace Core.Identities.Identity
 			hash.Add(method);
 			// end: Auth
 
-			hash.Add(UgyfelkapuId);
+			hash.Add(KAUId);
 			hash.Add(legalName);
 			hash.Add(email);
 			hash.Add(assuranceLevel);

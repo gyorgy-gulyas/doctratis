@@ -18,7 +18,7 @@ domain Core {
                 emailAndPasswordAuth:EmailAndPasswordAuth
                 adAuth:ADAuth
                 certificateAuth:CertificateAuth
-                ugyfelkapuAuth:UgyfelkapuAuth
+                KAUAuth:KAUAuth
 
                 # Optional two-factor authentication settings (TOTP, SMS, Email)
                 twoFactor: TwoFactorConfiguration
@@ -38,7 +38,7 @@ domain Core {
                     EmailAndPassword,
                     ActiveDirectory,
                     Certificate,
-                    Ugyfelkapu
+                    KAU
                 }
 
                 # Defines the type of authentication method
@@ -94,7 +94,7 @@ domain Core {
             }
 
             # ClientGate (Ügyfélkapu) authentication
-            valueobject UgyfelkapuAuth inherits Auth {
+            valueobject KAUAuth inherits Auth {
                 enum eIDAS {
                     # low – gyengébb azonosítás (pl. sima jelszavas Ügyfélkapu)
                     Low,
@@ -105,7 +105,7 @@ domain Core {
                 }
 
                 # Government-issued unique identifier (Ügyfélkapu ID)
-                UgyfelkapuId: string
+                KAUId: string
                 # User’s full legal name as returned by the service
                 legalName: string
                 # Email address verified by the service (optional)
@@ -167,6 +167,9 @@ domain Core {
 
             command Login2FA( code:string ) : LoginIF.v1.TokensDTO
             command RefreshTokens( totp:string ) : LoginIF.v1.TokensDTO
+
+            query GetKAULoginURL( redirectUrl:string, backendCallbackUrl:string ) : string
+            command KAUCallback( code:string, state:string ) : string
         }
 
         @internal_api(grpc,rest)
@@ -221,7 +224,21 @@ domain Core {
             # Complete login with two-factor authentication (TOTP)
             command Login2FA( code:string ) : TokensDTO
 
+            # refresh bearer tokens
             command RefreshTokens( refreshToken:string ) : TokensDTO
+
+            # getting the KAU url, expects the frontend url, where the frontend must be redirected
+            # the redirect url format is: {redirectUrl}/?accessToken={string}&refreshToken={string&requires2FA={boolean}&accessTokenExpiresAt={string}&refreshTokenExpiresAt={string}
+            # Generates the KAÜ login URL with a signed state containing the frontend returnUrl.
+            # Flow:
+            # 1. Browser calls this endpoint (GetKAULoginUrl) and passes the desired frontend returnUrl.
+            # 2. Backend builds the KAÜ authorize URL with its own callback URL and the signed state.
+            # 3. Browser is redirected to KAÜ login page.
+            # 4. KAÜ authenticates the user and redirects the browser to the backend callback URL with code + state.
+            # 5. Backend exchanges the code for tokens and finally redirects the browser to the original frontend returnUrl.
+            # Note: For local development KAÜ must be able to call the backend callback URL (use ngrok/dev tunnel).
+            # returns: the KAU url, where the browser must be redirected.
+            query GetKAULoginURL( redirectUrl:string ) : string
         }
     }
 

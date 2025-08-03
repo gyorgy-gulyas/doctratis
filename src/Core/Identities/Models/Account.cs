@@ -23,7 +23,7 @@ namespace Core.Identities.Identity
 		public EmailAndPasswordAuth emailAndPasswordAuth { get; set; }
 		public ADAuth adAuth { get; set; }
 		public CertificateAuth certificateAuth { get; set; }
-		public UgyfelkapuAuth ugyfelkapuAuth { get; set; }
+		public KAUAuth KAUAuth { get; set; }
 		/// Optional two-factor authentication settings (TOTP, SMS, Email)
 		public TwoFactorConfiguration twoFactor { get; set; }
 		public List<ContactInfo> contacts { get; set; } = new();
@@ -49,8 +49,8 @@ namespace Core.Identities.Identity
 			// clone of certificateAuth
 			clone.certificateAuth = certificateAuth?.Clone();
 
-			// clone of ugyfelkapuAuth
-			clone.ugyfelkapuAuth = ugyfelkapuAuth?.Clone();
+			// clone of KAUAuth
+			clone.KAUAuth = KAUAuth?.Clone();
 
 			// clone of twoFactor
 			clone.twoFactor = twoFactor?.Clone();
@@ -86,9 +86,9 @@ namespace Core.Identities.Identity
 			if(certificateAuth == null && other.certificateAuth != null ) return false;
 			if(certificateAuth != null && certificateAuth.Equals(other.certificateAuth) == false ) return false;
 
-			// equals of ugyfelkapuAuth
-			if(ugyfelkapuAuth == null && other.ugyfelkapuAuth != null ) return false;
-			if(ugyfelkapuAuth != null && ugyfelkapuAuth.Equals(other.ugyfelkapuAuth) == false ) return false;
+			// equals of KAUAuth
+			if(KAUAuth == null && other.KAUAuth != null ) return false;
+			if(KAUAuth != null && KAUAuth.Equals(other.KAUAuth) == false ) return false;
 
 			// equals of twoFactor
 			if(twoFactor == null && other.twoFactor != null ) return false;
@@ -124,8 +124,8 @@ namespace Core.Identities.Identity
 			// hash of certificateAuth
 			if(certificateAuth != null ) hash.Add(certificateAuth);
 
-			// hash of ugyfelkapuAuth
-			if(ugyfelkapuAuth != null ) hash.Add(ugyfelkapuAuth);
+			// hash of KAUAuth
+			if(KAUAuth != null ) hash.Add(KAUAuth);
 
 			// hash of twoFactor
 			if(twoFactor != null ) hash.Add(twoFactor);

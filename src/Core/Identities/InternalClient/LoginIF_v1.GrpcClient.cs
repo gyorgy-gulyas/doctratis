@@ -239,5 +239,58 @@ namespace Core.Identities
 			}
 		}
 
+		/// <inheritdoc />
+		async Task<Response<string>> ILoginIF_v1.GetKAULoginURL(CallingContext ctx, string redirectUrl)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_GetKAULoginURLRequest();
+				request.RedirectUrl = redirectUrl;
+
+				// calling grpc client
+				var grpc_response = await _client.GetKAULoginURLAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesLoginIF_v1", "GetKAULoginURL" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.Value:
+						string value;
+						value = grpc_response.Value;
+						return Response<string>.Success( value );
+
+					case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.Error:
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_GetKAULoginURLResponse.ResultOneofCase.None:
+					default:
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_GetKAULoginURL'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<string>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<string>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
 	}
 }

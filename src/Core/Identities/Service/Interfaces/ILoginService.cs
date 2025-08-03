@@ -24,6 +24,12 @@ namespace Core.Identities
 		/// <return>ILoginIF_v1.TokensDTO</return>
 		public Task<Response<ILoginIF_v1.TokensDTO>> RefreshTokens(CallingContext ctx, string totp);
 
+		/// <return>string</return>
+		public Task<Response<string>> GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl);
+
+		/// <return>string</return>
+		public Task<Response<string>> KAUCallback(CallingContext ctx, string code, string state);
+
 
 	}
 }

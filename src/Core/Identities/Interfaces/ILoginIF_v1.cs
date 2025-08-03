@@ -31,8 +31,27 @@ namespace Core.Identities
 		/// <return>ILoginIF_v1.TokensDTO</return>
 		public Task<Response<ILoginIF_v1.TokensDTO>> Login2FA(CallingContext ctx, string code);
 
+		/// <summary>
+		///  refresh bearer tokens
+		/// </summary>
 		/// <return>ILoginIF_v1.TokensDTO</return>
 		public Task<Response<ILoginIF_v1.TokensDTO>> RefreshTokens(CallingContext ctx, string refreshToken);
+
+		/// <summary>
+		///  getting the KAU url, expects the frontend url, where the frontend must be redirected
+		///  the redirect url format is: {redirectUrl}/?accessToken={string}&refreshToken={string&requires2FA={boolean}&accessTokenExpiresAt={string}&refreshTokenExpiresAt={string}
+		///  Generates the KAÜ login URL with a signed state containing the frontend returnUrl.
+		///  Flow:
+		///  1. Browser calls this endpoint (GetKAULoginUrl) and passes the desired frontend returnUrl.
+		///  2. Backend builds the KAÜ authorize URL with its own callback URL and the signed state.
+		///  3. Browser is redirected to KAÜ login page.
+		///  4. KAÜ authenticates the user and redirects the browser to the backend callback URL with code + state.
+		///  5. Backend exchanges the code for tokens and finally redirects the browser to the original frontend returnUrl.
+		///  Note: For local development KAÜ must be able to call the backend callback URL (use ngrok/dev tunnel).
+		///  returns: the KAU url, where the browser must be redirected.
+		/// </summary>
+		/// <return>string</return>
+		public Task<Response<string>> GetKAULoginURL(CallingContext ctx, string redirectUrl);
 
 
 		public enum SignInResult

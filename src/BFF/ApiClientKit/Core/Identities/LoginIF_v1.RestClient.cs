@@ -159,6 +159,7 @@ namespace BFF.ApiClientKit
 					}
 				}
 
+			/// refresh bearer tokens
 				public static async Task<Response<Core.Identities.ILoginIF_v1.TokensDTO>> RefreshTokens(string refreshToken)
 				{
 					try
@@ -198,6 +199,63 @@ namespace BFF.ApiClientKit
 					catch (Exception ex)
 					{
 						return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+			/// getting the KAU url, expects the frontend url, where the frontend must be redirected
+			/// the redirect url format is: {redirectUrl}/?accessToken={string}&refreshToken={string&requires2FA={boolean}&accessTokenExpiresAt={string}&refreshTokenExpiresAt={string}
+			/// Generates the KAÜ login URL with a signed state containing the frontend returnUrl.
+			/// Flow:
+			/// 1. Browser calls this endpoint (GetKAULoginUrl) and passes the desired frontend returnUrl.
+			/// 2. Backend builds the KAÜ authorize URL with its own callback URL and the signed state.
+			/// 3. Browser is redirected to KAÜ login page.
+			/// 4. KAÜ authenticates the user and redirects the browser to the backend callback URL with code + state.
+			/// 5. Backend exchanges the code for tokens and finally redirects the browser to the original frontend returnUrl.
+			/// Note: For local development KAÜ must be able to call the backend callback URL (use ngrok/dev tunnel).
+			/// returns: the KAU url, where the browser must be redirected.
+				public static async Task<Response<string>> GetKAULoginURL(string redirectUrl)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/core/identities/loginif/v1/getkauloginurl/{redirectUrl}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "Core.Identities.LoginIF.V1.GetKAULoginURL" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							var value = await response.Content.ReadFromJsonAsync<string>();
+							return Response<string>.Success( value );
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response<string>.Failure( error );
+						}
+						else
+						{
+							return Response<string>.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_GetKAULoginURL'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response<string>.Failure( new ServiceKit.Net.Error() {
 							Status = Statuses.InternalError,
 							MessageText = ex.Message,
 							AdditionalInformation = ex.ToString(),

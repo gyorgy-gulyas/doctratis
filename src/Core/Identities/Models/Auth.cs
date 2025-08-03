@@ -17,7 +17,7 @@ namespace Core.Identities.Identity
 			EmailAndPassword,
 			ActiveDirectory,
 			Certificate,
-			Ugyfelkapu,
+			KAU,
 		}
 		/// Defines the type of authentication method
 		public Methods method { get; set; }

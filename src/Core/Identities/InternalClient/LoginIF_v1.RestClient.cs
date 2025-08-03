@@ -215,5 +215,53 @@ namespace Core.Identities
 			}
 		}
 
+		/// <inheritdoc />
+		async Task<Response<string>> ILoginIF_v1.GetKAULoginURL(CallingContext ctx, string redirectUrl)
+		{
+			try
+			{
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/core/identities/loginif/v1/getkauloginurl/{redirectUrl}" ) );
+				ctx.FillHttpRequest( request, "CoreIdentitiesLoginIF_v1", "GetKAULoginURL" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<string>();
+					return Response<string>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<string>.Failure( error );
+				}
+				else
+				{
+					return Response<string>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_GetKAULoginURL'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<string>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<string>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
 	}
 }
