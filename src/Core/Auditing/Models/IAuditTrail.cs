@@ -15,6 +15,8 @@ namespace Core.Auditing
 	public partial interface IAuditTrail
 	{
 		public TrailOperations trailOperation { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
 		public string idenityId { get; set; }
@@ -22,7 +24,5 @@ namespace Core.Auditing
 		public string payload { get; set; }
 		public string previousTrailId { get; set; }
 		public string deltaPayload { get; set; }
-		[ClusteringColumn(1)]
-		public DateTime timestamp { get; set; }
 	}
 }

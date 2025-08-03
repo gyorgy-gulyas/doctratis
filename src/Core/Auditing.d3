@@ -16,25 +16,26 @@
         # audit trail bázis osztély, ebben lehet egy entity (root entity) változásait követni
         composite AuditTrail {
             trailOperation:TrailOperations
+            @dotnet_code( namespace="PolyPersist.Net.Attributes", code="[ClusteringColumn(1)]")
+            timestamp:datetime
+
             entityType:string
             entityId:string
             idenityId:string
             idenityName:string
-                
+
             payload:string
             previousTrailId:string
             deltaPayload:string
-            @dotnet_code( namespace="PolyPersist.Net.Attributes", code="[ClusteringColumn(1)]")
-            timestamp:datetime
         }
 
-        composite AuditEventLog {
+        composite AuditLog {
             operation:string
-            operationDescription:string
+            @dotnet_code( namespace="PolyPersist.Net.Attributes", code="[ClusteringColumn(1)]")
+            timestamp:datetime
+
             idenityId:string
             idenityName:string
-            serviceName:string
-            requestId:string
             correlationId:string
             payload:string
         }

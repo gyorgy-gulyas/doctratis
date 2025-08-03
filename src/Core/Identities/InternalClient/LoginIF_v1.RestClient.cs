@@ -72,13 +72,61 @@ namespace Core.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.LoginTwoFactor(CallingContext ctx, string totp)
+		async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginIF_v1.LoginWithAD(CallingContext ctx, string username, string password)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/logintwofactor/{totp}" ) );
-				ctx.FillHttpRequest( request, "CoreIdentitiesLoginIF_v1", "LoginTwoFactor" );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/loginwithad/{username}/{password}" ) );
+				ctx.FillHttpRequest( request, "CoreIdentitiesLoginIF_v1", "LoginWithAD" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<ILoginIF_v1.LoginResultDTO>();
+					return Response<ILoginIF_v1.LoginResultDTO>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<ILoginIF_v1.LoginResultDTO>.Failure( error );
+				}
+				else
+				{
+					return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_LoginWithAD'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.Login2FA(CallingContext ctx, string code)
+		{
+			try
+			{
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/login2fa/{code}" ) );
+				ctx.FillHttpRequest( request, "CoreIdentitiesLoginIF_v1", "Login2FA" );
 
 				// call http client 
 				HttpResponseMessage response = await _httpClient.SendAsync( request );
@@ -97,7 +145,55 @@ namespace Core.Identities
 				{
 					return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_LoginTwoFactor'",
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_Login2FA'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.RefreshTokens(CallingContext ctx, string refreshToken)
+		{
+			try
+			{
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/refreshtokens/{refreshToken}" ) );
+				ctx.FillHttpRequest( request, "CoreIdentitiesLoginIF_v1", "RefreshTokens" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					var value = await response.Content.ReadFromJsonAsync<ILoginIF_v1.TokensDTO>();
+					return Response<ILoginIF_v1.TokensDTO>.Success( value );
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response<ILoginIF_v1.TokensDTO>.Failure( error );
+				}
+				else
+				{
+					return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_RefreshTokens'",
 					} );
 				}
 			}

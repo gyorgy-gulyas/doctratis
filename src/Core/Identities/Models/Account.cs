@@ -20,7 +20,12 @@ namespace Core.Identities.Identity
 		public AccountTypes Type { get; set; }
 		public string Name { get; set; }
 		public bool isActive { get; set; }
-		public List<Auth> authMethods { get; set; } = new();
+		public EmailAndPasswordAuth emailAndPasswordAuth { get; set; }
+		public ADAuth adAuth { get; set; }
+		public CertificateAuth certificateAuth { get; set; }
+		public UgyfelkapuAuth ugyfelkapuAuth { get; set; }
+		/// Optional two-factor authentication settings (TOTP, SMS, Email)
+		public TwoFactorConfiguration twoFactor { get; set; }
 		public List<ContactInfo> contacts { get; set; } = new();
 
 		#region Clone 
@@ -35,8 +40,20 @@ namespace Core.Identities.Identity
 			clone.Name = new string(Name.ToCharArray());
 			clone.isActive = isActive;
 
-			// clone of authMethods
-			clone.authMethods.AddRange( authMethods.Select( v => v.Clone() ));
+			// clone of emailAndPasswordAuth
+			clone.emailAndPasswordAuth = emailAndPasswordAuth?.Clone();
+
+			// clone of adAuth
+			clone.adAuth = adAuth?.Clone();
+
+			// clone of certificateAuth
+			clone.certificateAuth = certificateAuth?.Clone();
+
+			// clone of ugyfelkapuAuth
+			clone.ugyfelkapuAuth = ugyfelkapuAuth?.Clone();
+
+			// clone of twoFactor
+			clone.twoFactor = twoFactor?.Clone();
 
 			// clone of contacts
 			clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
@@ -57,8 +74,25 @@ namespace Core.Identities.Identity
 			if(Name != other.Name) return false;
 			if(isActive != other.isActive) return false;
 
-			// equals of authMethods
-			if(authMethods.SequenceEqual(other.authMethods) == false ) return false;
+			// equals of emailAndPasswordAuth
+			if(emailAndPasswordAuth == null && other.emailAndPasswordAuth != null ) return false;
+			if(emailAndPasswordAuth != null && emailAndPasswordAuth.Equals(other.emailAndPasswordAuth) == false ) return false;
+
+			// equals of adAuth
+			if(adAuth == null && other.adAuth != null ) return false;
+			if(adAuth != null && adAuth.Equals(other.adAuth) == false ) return false;
+
+			// equals of certificateAuth
+			if(certificateAuth == null && other.certificateAuth != null ) return false;
+			if(certificateAuth != null && certificateAuth.Equals(other.certificateAuth) == false ) return false;
+
+			// equals of ugyfelkapuAuth
+			if(ugyfelkapuAuth == null && other.ugyfelkapuAuth != null ) return false;
+			if(ugyfelkapuAuth != null && ugyfelkapuAuth.Equals(other.ugyfelkapuAuth) == false ) return false;
+
+			// equals of twoFactor
+			if(twoFactor == null && other.twoFactor != null ) return false;
+			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
 
 			// equals of contacts
 			if(contacts.SequenceEqual(other.contacts) == false ) return false;
@@ -81,9 +115,20 @@ namespace Core.Identities.Identity
 			hash.Add(Name);
 			hash.Add(isActive);
 
-			// hash of authMethods
-			foreach( var element_authMethods in authMethods)
-				hash.Add(element_authMethods);
+			// hash of emailAndPasswordAuth
+			if(emailAndPasswordAuth != null ) hash.Add(emailAndPasswordAuth);
+
+			// hash of adAuth
+			if(adAuth != null ) hash.Add(adAuth);
+
+			// hash of certificateAuth
+			if(certificateAuth != null ) hash.Add(certificateAuth);
+
+			// hash of ugyfelkapuAuth
+			if(ugyfelkapuAuth != null ) hash.Add(ugyfelkapuAuth);
+
+			// hash of twoFactor
+			if(twoFactor != null ) hash.Add(twoFactor);
 
 			// hash of contacts
 			foreach( var element_contacts in contacts)

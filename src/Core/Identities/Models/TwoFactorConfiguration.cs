@@ -28,6 +28,7 @@ namespace Core.Identities.Identity
 		public Method method { get; set; }
 		public string totpSecret { get; set; }
 		public string phoneNumber { get; set; }
+		public string email { get; set; }
 
 		#region Clone 
 		public virtual TwoFactorConfiguration Clone()
@@ -38,6 +39,7 @@ namespace Core.Identities.Identity
 			clone.method = method;
 			clone.totpSecret = new string(totpSecret.ToCharArray());
 			clone.phoneNumber = new string(phoneNumber.ToCharArray());
+			clone.email = new string(email.ToCharArray());
 
 			return clone;
 		}
@@ -52,6 +54,7 @@ namespace Core.Identities.Identity
 			if(method != other.method) return false;
 			if(totpSecret != other.totpSecret) return false;
 			if(phoneNumber != other.phoneNumber) return false;
+			if(email != other.email) return false;
 
 			return true;
 		}
@@ -65,6 +68,7 @@ namespace Core.Identities.Identity
 			hash.Add(method);
 			hash.Add(totpSecret);
 			hash.Add(phoneNumber);
+			hash.Add(email);
 
 			return hash.ToHashCode();
 		}

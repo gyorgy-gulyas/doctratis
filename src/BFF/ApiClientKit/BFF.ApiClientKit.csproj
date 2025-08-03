@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\Identities\Interfaces\Core.Identities.Interfaces.csproj" />
     <ProjectReference Include="..\..\TemplateManagement\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
   </ItemGroup>
 

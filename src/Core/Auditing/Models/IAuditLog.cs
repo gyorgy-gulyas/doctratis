@@ -5,18 +5,18 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+using PolyPersist.Net.Attributes;
 
 namespace Core.Auditing
 {
 
-	public partial interface IAuditEventLog
+	public partial interface IAuditLog
 	{
 		public string operation { get; set; }
-		public string operationDescription { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 		public string idenityId { get; set; }
 		public string idenityName { get; set; }
-		public string serviceName { get; set; }
-		public string requestId { get; set; }
 		public string correlationId { get; set; }
 		public string payload { get; set; }
 	}

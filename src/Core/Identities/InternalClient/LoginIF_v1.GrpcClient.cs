@@ -80,37 +80,144 @@ namespace Core.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.LoginTwoFactor(CallingContext ctx, string totp)
+		async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginIF_v1.LoginWithAD(CallingContext ctx, string username, string password)
 		{
 			try
 			{
 				// fill grpc request
-				var request = new LoginIF_v1_LoginTwoFactorRequest();
-				request.Totp = totp;
+				var request = new LoginIF_v1_LoginWithADRequest();
+				request.Username = username;
+				request.Password = password;
 
 				// calling grpc client
-				var grpc_response = await _client.LoginTwoFactorAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesLoginIF_v1", "LoginTwoFactor" ))).ResponseAsync;
+				var grpc_response = await _client.LoginWithADAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesLoginIF_v1", "LoginWithAD" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
 				{
-					case LoginIF_v1_LoginTwoFactorResponse.ResultOneofCase.Value:
+					case LoginIF_v1_LoginWithADResponse.ResultOneofCase.Value:
+						ILoginIF_v1.LoginResultDTO value;
+						value = grpc_response.Value != null ? ILoginIF_v1.LoginResultDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<ILoginIF_v1.LoginResultDTO>.Success( value );
+
+					case LoginIF_v1_LoginWithADResponse.ResultOneofCase.Error:
+						return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_LoginWithADResponse.ResultOneofCase.None:
+					default:
+						return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_LoginWithAD'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.Login2FA(CallingContext ctx, string code)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_Login2FARequest();
+				request.Code = code;
+
+				// calling grpc client
+				var grpc_response = await _client.Login2FAAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesLoginIF_v1", "Login2FA" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_Login2FAResponse.ResultOneofCase.Value:
 						ILoginIF_v1.TokensDTO value;
 						value = grpc_response.Value != null ? ILoginIF_v1.TokensDTO.FromGrpc( grpc_response.Value ) : null;
 						return Response<ILoginIF_v1.TokensDTO>.Success( value );
 
-					case LoginIF_v1_LoginTwoFactorResponse.ResultOneofCase.Error:
+					case LoginIF_v1_Login2FAResponse.ResultOneofCase.Error:
 						return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = grpc_response.Error.MessageText,
 							AdditionalInformation = grpc_response.Error.AdditionalInformation,
 						} );
 
-					case LoginIF_v1_LoginTwoFactorResponse.ResultOneofCase.None:
+					case LoginIF_v1_Login2FAResponse.ResultOneofCase.None:
 					default:
 						return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_LoginTwoFactor'",
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_Login2FA'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.RefreshTokens(CallingContext ctx, string refreshToken)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_RefreshTokensRequest();
+				request.RefreshToken = refreshToken;
+
+				// calling grpc client
+				var grpc_response = await _client.RefreshTokensAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesLoginIF_v1", "RefreshTokens" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_RefreshTokensResponse.ResultOneofCase.Value:
+						ILoginIF_v1.TokensDTO value;
+						value = grpc_response.Value != null ? ILoginIF_v1.TokensDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<ILoginIF_v1.TokensDTO>.Success( value );
+
+					case LoginIF_v1_RefreshTokensResponse.ResultOneofCase.Error:
+						return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_RefreshTokensResponse.ResultOneofCase.None:
+					default:
+						return Response<ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_RefreshTokens'",
 						} );
 				}
 			}

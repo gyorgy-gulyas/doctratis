@@ -6,10 +6,11 @@
 // </auto-generated>
 
 using Core.Identities;
+using PolyPersist.Net.Attributes;
 
 namespace Core.Identities.Identity
 {
-	public partial class LoginAuditEventLog : Core.Base.IBaseEntity, Core.Auditing.IAuditEventLog, IEquatable<LoginAuditEventLog>
+	public partial class LoginAuditEventLog : Core.Base.IBaseEntity, Core.Auditing.IAuditLog, IEquatable<LoginAuditEventLog>
 	{
 		#region IBaseEntity
 		public string id { get; set; }
@@ -17,16 +18,15 @@ namespace Core.Identities.Identity
 		public DateTime LastUpdate { get; set; }
 		#endregion IBaseEntity
 
-		#region IAuditEventLog
+		#region IAuditLog
 		public string operation { get; set; }
-		public string operationDescription { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 		public string idenityId { get; set; }
 		public string idenityName { get; set; }
-		public string serviceName { get; set; }
-		public string requestId { get; set; }
 		public string correlationId { get; set; }
 		public string payload { get; set; }
-		#endregion IAuditEventLog
+		#endregion IAuditLog
 
 		public AccountTypes AccountType { get; set; }
 		public Auth.Methods authMethod { get; set; }
@@ -39,16 +39,14 @@ namespace Core.Identities.Identity
 			// begin: BaseEntity
 			// end: BaseEntity
 
-			// begin: AuditEventLog
+			// begin: AuditLog
 			clone.operation = new string(operation.ToCharArray());
-			clone.operationDescription = new string(operationDescription.ToCharArray());
+			clone.timestamp = timestamp;
 			clone.idenityId = new string(idenityId.ToCharArray());
 			clone.idenityName = new string(idenityName.ToCharArray());
-			clone.serviceName = new string(serviceName.ToCharArray());
-			clone.requestId = new string(requestId.ToCharArray());
 			clone.correlationId = new string(correlationId.ToCharArray());
 			clone.payload = new string(payload.ToCharArray());
-			// end: AuditEventLog
+			// end: AuditLog
 
 			clone.AccountType = AccountType;
 			clone.authMethod = authMethod;
@@ -65,16 +63,14 @@ namespace Core.Identities.Identity
 			// begin: BaseEntity
 			// end: BaseEntity
 
-			// begin: AuditEventLog
+			// begin: AuditLog
 			if(operation != other.operation) return false;
-			if(operationDescription != other.operationDescription) return false;
+			if(timestamp != other.timestamp) return false;
 			if(idenityId != other.idenityId) return false;
 			if(idenityName != other.idenityName) return false;
-			if(serviceName != other.serviceName) return false;
-			if(requestId != other.requestId) return false;
 			if(correlationId != other.correlationId) return false;
 			if(payload != other.payload) return false;
-			// end: AuditEventLog
+			// end: AuditLog
 
 			if(AccountType != other.AccountType) return false;
 			if(authMethod != other.authMethod) return false;
@@ -93,16 +89,14 @@ namespace Core.Identities.Identity
 			hash.Add(LastUpdate);
 			// end: BaseEntity
 
-			// begin: AuditEventLog
+			// begin: AuditLog
 			hash.Add(operation);
-			hash.Add(operationDescription);
+			hash.Add(timestamp);
 			hash.Add(idenityId);
 			hash.Add(idenityName);
-			hash.Add(serviceName);
-			hash.Add(requestId);
 			hash.Add(correlationId);
 			hash.Add(payload);
-			// end: AuditEventLog
+			// end: AuditLog
 
 			hash.Add(AccountType);
 			hash.Add(authMethod);

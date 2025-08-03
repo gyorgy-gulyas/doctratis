@@ -17,7 +17,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<IProjectIF_v1.ProjectSummaryDTO>> IProjectIF_v1.createProject(CallingContext ctx, string name, string description)
         {
             var header = await _service.createProject(ctx, name, description).ConfigureAwait(false);
-            if (header.IsSuccess() == false)
+            if (header.IsFailed())
                 return new(header.Error);
 
             return new(header.Value.ConvertToSummaryDTO());
@@ -28,7 +28,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             var accesses = project.Accesses.Select(a => a.ConvertToAccess(header)).ToList();
 
             var result = await _service.updateProject(ctx, header, accesses).ConfigureAwait(false);
-            if (result.IsSuccess() == false)
+            if (result.IsFailed())
                 return new(result.Error);
 
             return new(result.Value.ConvertToDetailsDTO(accesses));
@@ -37,7 +37,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjects(CallingContext ctx)
         {
             var accceses = await _service.getAllAccessForIdentity(ctx, ctx.IdentityId).ConfigureAwait(false);
-            if (accceses.IsSuccess() == false)
+            if (accceses.IsFailed())
                 return new(accceses.Error);
 
             var projectIds = accceses
@@ -47,7 +47,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .ToArray();
             var ctx_sys = ctx.CloneWithIdentity(nameof(ProjectIF_v1), nameof(ProjectIF_v1), CallingContext.IdentityTypes.Service);
             var projectMap = await _service.sys_getProjects(ctx_sys, projectIds);
-            if (projectMap.IsSuccess() == false)
+            if (projectMap.IsFailed())
                 return new(projectMap.Error);
 
             return new(accceses.Value.Select(ph => ph.ConvertToAssignmentDTO(projectMap.Value)).ToList());
@@ -56,7 +56,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> IProjectIF_v1.listAccessibleProjectsForUser(CallingContext ctx, string userId)
         {
             var accceses = await _service.getAllAccessForIdentity(ctx, userId).ConfigureAwait(false);
-            if (accceses.IsSuccess() == false)
+            if (accceses.IsFailed())
                 return new(accceses.Error);
 
             var projectIds = accceses
@@ -66,7 +66,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .ToArray();
             var ctx_sys = ctx.CloneWithIdentity(nameof(ProjectIF_v1), nameof(ProjectIF_v1), CallingContext.IdentityTypes.Service);
             var projectMap = await _service.sys_getProjects(ctx_sys, projectIds);
-            if (projectMap.IsSuccess() == false)
+            if (projectMap.IsFailed())
                 return new(projectMap.Error);
 
             return new(accceses.Value.Select(ph => ph.ConvertToAssignmentDTO(projectMap.Value)).ToList());
@@ -75,11 +75,11 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<IProjectIF_v1.ProjectDetailsDTO>> IProjectIF_v1.getProject(CallingContext ctx, string projectId)
         {
             var project = await _service.getProject(ctx, projectId).ConfigureAwait(false);
-            if (project.IsSuccess() == false)
+            if (project.IsFailed())
                 return new(project.Error);
 
             var accesses = await _service.getAllAccessForProject(ctx, projectId).ConfigureAwait(false);
-            if (accesses.IsSuccess() == false)
+            if (accesses.IsFailed())
                 return new(accesses.Error);
 
             return new(project.Value.ConvertToDetailsDTO(accesses.Value));
@@ -88,7 +88,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         async Task<Response<IProjectIF_v1.ProjectAccessDTO>> IProjectIF_v1.addProjectAccess(CallingContext ctx, string projectId, string identityId, IProjectIF_v1.ProjectAccessRoles role)
         {
             var access = await _service.addProjectAccess(ctx, projectId, identityId, identityId, role.Convert()).ConfigureAwait(false);
-            if (access.IsSuccess() == false)
+            if (access.IsFailed())
                 return new(access.Error);
 
             return new(access.Value.ConvertToDTO());

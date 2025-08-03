@@ -13,18 +13,102 @@ namespace Core.Identities
 {
 	public partial interface ILoginIF_v1
 	{
-		/// <return>LoginResultDTO</return>
-		public Task<Response<LoginResultDTO>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
+		/// <summary>
+		///  Login using email and password credentials
+		/// </summary>
+		/// <return>ILoginIF_v1.LoginResultDTO</return>
+		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
 
-		/// <return>TokensDTO</return>
-		public Task<Response<TokensDTO>> LoginTwoFactor(CallingContext ctx, string totp);
+		/// <summary>
+		///  Complete login with Active Directory
+		/// </summary>
+		/// <return>ILoginIF_v1.LoginResultDTO</return>
+		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithAD(CallingContext ctx, string username, string password);
+
+		/// <summary>
+		///  Complete login with two-factor authentication (TOTP)
+		/// </summary>
+		/// <return>ILoginIF_v1.TokensDTO</return>
+		public Task<Response<ILoginIF_v1.TokensDTO>> Login2FA(CallingContext ctx, string code);
+
+		/// <return>ILoginIF_v1.TokensDTO</return>
+		public Task<Response<ILoginIF_v1.TokensDTO>> RefreshTokens(CallingContext ctx, string refreshToken);
 
 
+		public enum SignInResult
+		{
+			/// Login was successful
+			Ok,
+
+			/// Invalid username or password provided
+			InvalidUserNameOrPassword,
+
+			/// Email has not been confirmed by the user
+			EmailNotConfirmed,
+
+			/// The user account is deactivated or locked
+			UserIsNotActive,
+
+			/// The password has expired and needs to be changed
+			PasswordExpired,
+
+			/// for LDAP auththentication: when username does not contain the domainname
+			DomainNotSpecified,
+
+			/// for LDAP auththentication: when the domain is not alloed to use the system
+			DomainNotRegistered,
+
+			/// for LDAP auththentication: when the domain use is not added for the system
+			DomainUserNotRegistered,
+
+		}
+		#region GrpcMapping
+		public static class SignInResultMappings
+		{
+			public static Protos.LoginIF_v1.SignInResult ToGrpc( ILoginIF_v1.SignInResult @this )
+			{
+				return @this switch
+				{
+					ILoginIF_v1.SignInResult.Ok => Protos.LoginIF_v1.SignInResult.Ok,
+					ILoginIF_v1.SignInResult.InvalidUserNameOrPassword => Protos.LoginIF_v1.SignInResult.InvalidUserNameOrPassword,
+					ILoginIF_v1.SignInResult.EmailNotConfirmed => Protos.LoginIF_v1.SignInResult.EmailNotConfirmed,
+					ILoginIF_v1.SignInResult.UserIsNotActive => Protos.LoginIF_v1.SignInResult.UserIsNotActive,
+					ILoginIF_v1.SignInResult.PasswordExpired => Protos.LoginIF_v1.SignInResult.PasswordExpired,
+					ILoginIF_v1.SignInResult.DomainNotSpecified => Protos.LoginIF_v1.SignInResult.DomainNotSpecified,
+					ILoginIF_v1.SignInResult.DomainNotRegistered => Protos.LoginIF_v1.SignInResult.DomainNotRegistered,
+					ILoginIF_v1.SignInResult.DomainUserNotRegistered => Protos.LoginIF_v1.SignInResult.DomainUserNotRegistered,
+					_ => throw new NotImplementedException(), 
+				};
+			}
+
+			public static ILoginIF_v1.SignInResult FromGrpc( Protos.LoginIF_v1.SignInResult @this )
+			{
+				return @this switch
+				{
+					Protos.LoginIF_v1.SignInResult.Ok => ILoginIF_v1.SignInResult.Ok,
+					Protos.LoginIF_v1.SignInResult.InvalidUserNameOrPassword => ILoginIF_v1.SignInResult.InvalidUserNameOrPassword,
+					Protos.LoginIF_v1.SignInResult.EmailNotConfirmed => ILoginIF_v1.SignInResult.EmailNotConfirmed,
+					Protos.LoginIF_v1.SignInResult.UserIsNotActive => ILoginIF_v1.SignInResult.UserIsNotActive,
+					Protos.LoginIF_v1.SignInResult.PasswordExpired => ILoginIF_v1.SignInResult.PasswordExpired,
+					Protos.LoginIF_v1.SignInResult.DomainNotSpecified => ILoginIF_v1.SignInResult.DomainNotSpecified,
+					Protos.LoginIF_v1.SignInResult.DomainNotRegistered => ILoginIF_v1.SignInResult.DomainNotRegistered,
+					Protos.LoginIF_v1.SignInResult.DomainUserNotRegistered => ILoginIF_v1.SignInResult.DomainUserNotRegistered,
+					_ => throw new NotImplementedException(), 
+				};
+			}
+
+		}
+		#endregion GrpcMapping
 		public partial class TokensDTO : IEquatable<TokensDTO>
 		{
+			/// Access token used for authentication
 			public string AccessToken { get; set; }
+			/// Expiration date and time of the access token
+			public DateTime AccessTokenExpiresAt { get; set; }
+			/// Refresh token used to obtain a new access token
 			public string RefreshToken { get; set; }
-			public DateTime AccessTokenExpiredAt { get; set; }
+			/// Expiration date and time of the refresh token
+			public DateTime RefreshTokenExpiresAt { get; set; }
 
 			#region Clone 
 			public virtual TokensDTO Clone()
@@ -32,8 +116,9 @@ namespace Core.Identities
 				TokensDTO clone = new();
 
 				clone.AccessToken = new string(AccessToken.ToCharArray());
+				clone.AccessTokenExpiresAt = AccessTokenExpiresAt;
 				clone.RefreshToken = new string(RefreshToken.ToCharArray());
-				clone.AccessTokenExpiredAt = AccessTokenExpiredAt;
+				clone.RefreshTokenExpiresAt = RefreshTokenExpiresAt;
 
 				return clone;
 			}
@@ -45,8 +130,9 @@ namespace Core.Identities
 				if (other is null) return false;
 
 				if(AccessToken != other.AccessToken) return false;
+				if(AccessTokenExpiresAt != other.AccessTokenExpiresAt) return false;
 				if(RefreshToken != other.RefreshToken) return false;
-				if(AccessTokenExpiredAt != other.AccessTokenExpiredAt) return false;
+				if(RefreshTokenExpiresAt != other.RefreshTokenExpiresAt) return false;
 
 				return true;
 			}
@@ -57,8 +143,9 @@ namespace Core.Identities
 			{
 				var hash = new HashCode();
 				hash.Add(AccessToken);
+				hash.Add(AccessTokenExpiresAt);
 				hash.Add(RefreshToken);
-				hash.Add(AccessTokenExpiredAt);
+				hash.Add(RefreshTokenExpiresAt);
 
 				return hash.ToHashCode();
 			}
@@ -70,8 +157,9 @@ namespace Core.Identities
 				Protos.LoginIF_v1.TokensDTO result = new();
 
 				result.AccessToken = @this.AccessToken;
+				result.AccessTokenExpiresAt = Timestamp.FromDateTime(@this.AccessTokenExpiresAt);
 				result.RefreshToken = @this.RefreshToken;
-				result.AccessTokenExpiredAt = Timestamp.FromDateTime(@this.AccessTokenExpiredAt);
+				result.RefreshTokenExpiresAt = Timestamp.FromDateTime(@this.RefreshTokenExpiresAt);
 
 				return result;
 			}
@@ -80,8 +168,9 @@ namespace Core.Identities
 				ILoginIF_v1.TokensDTO result = new();
 
 				result.AccessToken = @from.AccessToken;
+				result.AccessTokenExpiresAt = @from.AccessTokenExpiresAt.ToDateTime();
 				result.RefreshToken = @from.RefreshToken;
-				result.AccessTokenExpiredAt = @from.AccessTokenExpiredAt.ToDateTime();
+				result.RefreshTokenExpiresAt = @from.RefreshTokenExpiresAt.ToDateTime();
 
 				return result;
 			}
@@ -90,18 +179,23 @@ namespace Core.Identities
 
 		public partial class LoginResultDTO : IEquatable<LoginResultDTO>
 		{
+			/// The result of the login attempt
+			public SignInResult result { get; set; }
+			/// Tokens returned when login is successful
 			public TokensDTO tokens { get; set; }
-			public bool required2FA { get; set; }
+			/// Indicates whether two-factor authentication is required
+			public bool requires2FA { get; set; }
 
 			#region Clone 
 			public virtual LoginResultDTO Clone()
 			{
 				LoginResultDTO clone = new();
 
+				clone.result = result;
 
 				// clone of tokens
 				clone.tokens = tokens?.Clone();
-				clone.required2FA = required2FA;
+				clone.requires2FA = requires2FA;
 
 				return clone;
 			}
@@ -112,11 +206,12 @@ namespace Core.Identities
 			{
 				if (other is null) return false;
 
+				if(result != other.result) return false;
 
 				// equals of tokens
 				if(tokens == null && other.tokens != null ) return false;
 				if(tokens != null && tokens.Equals(other.tokens) == false ) return false;
-				if(required2FA != other.required2FA) return false;
+				if(requires2FA != other.requires2FA) return false;
 
 				return true;
 			}
@@ -126,10 +221,11 @@ namespace Core.Identities
 			public override int GetHashCode()
 			{
 				var hash = new HashCode();
+				hash.Add(result);
 
 				// hash of tokens
 				if(tokens != null ) hash.Add(tokens);
-				hash.Add(required2FA);
+				hash.Add(requires2FA);
 
 				return hash.ToHashCode();
 			}
@@ -140,8 +236,9 @@ namespace Core.Identities
 			{
 				Protos.LoginIF_v1.LoginResultDTO result = new();
 
+				result.Result = ILoginIF_v1.SignInResultMappings.ToGrpc( @this.result );
 				result.Tokens = @this.tokens != null ? ILoginIF_v1.TokensDTO.ToGrpc( @this.tokens ) : null;
-				result.Required2FA = @this.required2FA;
+				result.Requires2FA = @this.requires2FA;
 
 				return result;
 			}
@@ -149,8 +246,9 @@ namespace Core.Identities
 			{
 				ILoginIF_v1.LoginResultDTO result = new();
 
+				result.result = ILoginIF_v1.SignInResultMappings.FromGrpc( @from.Result) ;
 				result.tokens = @from.Tokens != null ? ILoginIF_v1.TokensDTO.FromGrpc( @from.Tokens ) : null;
-				result.required2FA = @from.Required2FA;
+				result.requires2FA = @from.Requires2FA;
 
 				return result;
 			}

@@ -1,5 +1,5 @@
 import  Core.Base
-import  Core.IdentityAccessManagement
+import  Core.IdentityManagement
 import  Core.Auditing
 
 import  TemplateManagement.TemplateManagement

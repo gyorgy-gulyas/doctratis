@@ -13,7 +13,7 @@ using TemplateManagement.Projects;
 
 namespace BFF.ApiClientKit
 {
-	static class Rest 
+	static partial class Rest 
 	{
 		static class ProjectIF
 		{

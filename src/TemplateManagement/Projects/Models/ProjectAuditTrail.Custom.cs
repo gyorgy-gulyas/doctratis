@@ -1,5 +1,4 @@
 using PolyPersist;
-using PolyPersist.Net.Attributes;
 
 namespace TemplateManagement.Projects.Project
 {
@@ -7,5 +6,4 @@ namespace TemplateManagement.Projects.Project
 	{
 		string IEntity.PartitionKey { get => entityId; set => entityId = value; }
 	}
-
 }

@@ -85,40 +85,42 @@ namespace Core.Identities
 			}
 		}
 
-		public override async Task<LoginIF_v1_LoginTwoFactorResponse> LoginTwoFactor( LoginIF_v1_LoginTwoFactorRequest request, ServerCallContext grpcContext)
+		public override async Task<LoginIF_v1_LoginWithADResponse> LoginWithAD( LoginIF_v1_LoginWithADRequest request, ServerCallContext grpcContext)
 		{
-			using(LogContext.PushProperty( "Scope", "LoginIF_v1.LoginTwoFactor" ))
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.LoginWithAD" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
-					string totp;
-					totp = request.Totp;
+					string username;
+					username = request.Username;
+					string password;
+					password = request.Password;
 
 					// calling the service function itself
-					var response = await _service.LoginTwoFactor( ctx , totp );
+					var response = await _service.LoginWithAD( ctx , username, password );
 
 					if( response.IsSuccess() == true )
 					{
 						if( response.HasValue() == true )
 						{
-							var result = new LoginIF_v1_LoginTwoFactorResponse();
-							result.Value = response.Value != null ? ILoginIF_v1.TokensDTO.ToGrpc( response.Value ) : null;
+							var result = new LoginIF_v1_LoginWithADResponse();
+							result.Value = response.Value != null ? ILoginIF_v1.LoginResultDTO.ToGrpc( response.Value ) : null;
 							return result;
 						}
 						else
 						{
-							return new LoginIF_v1_LoginTwoFactorResponse {
+							return new LoginIF_v1_LoginWithADResponse {
 								Error = new () {
 									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'LoginIF_v1.LoginTwoFactor'",
+									MessageText = "Not handled reponse in GRPC Controller when calling 'LoginIF_v1.LoginWithAD'",
 								}
 							};
 						}
 					}
 					else
 					{
-						return new LoginIF_v1_LoginTwoFactorResponse {
+						return new LoginIF_v1_LoginWithADResponse {
 							Error = new () {
 								Status = response.Error.Status.ToGrpc(),
 								MessageText = response.Error.MessageText,
@@ -129,7 +131,125 @@ namespace Core.Identities
 				}
 				catch(Exception ex)
 				{
-					return new LoginIF_v1_LoginTwoFactorResponse {
+					return new LoginIF_v1_LoginWithADResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<LoginIF_v1_Login2FAResponse> Login2FA( LoginIF_v1_Login2FARequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.Login2FA" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string code;
+					code = request.Code;
+
+					// calling the service function itself
+					var response = await _service.Login2FA( ctx , code );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new LoginIF_v1_Login2FAResponse();
+							result.Value = response.Value != null ? ILoginIF_v1.TokensDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new LoginIF_v1_Login2FAResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'LoginIF_v1.Login2FA'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new LoginIF_v1_Login2FAResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_Login2FAResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<LoginIF_v1_RefreshTokensResponse> RefreshTokens( LoginIF_v1_RefreshTokensRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.RefreshTokens" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string refreshToken;
+					refreshToken = request.RefreshToken;
+
+					// calling the service function itself
+					var response = await _service.RefreshTokens( ctx , refreshToken );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new LoginIF_v1_RefreshTokensResponse();
+							result.Value = response.Value != null ? ILoginIF_v1.TokensDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new LoginIF_v1_RefreshTokensResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'LoginIF_v1.RefreshTokens'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new LoginIF_v1_RefreshTokensResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_RefreshTokensResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

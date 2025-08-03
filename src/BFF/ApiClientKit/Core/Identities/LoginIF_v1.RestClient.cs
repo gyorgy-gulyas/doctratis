@@ -12,12 +12,13 @@ using System.Net.Http.Json;
 
 namespace BFF.ApiClientKit
 {
-	static class Rest 
+	static partial class Rest 
 	{
 		static class LoginIF
 		{
 			static class V1 
 			{
+			/// Login using email and password credentials
 				public static async Task<Response<Core.Identities.ILoginIF_v1.LoginResultDTO>> LoginWithEmailPassword(string email, string password)
 				{
 					try
@@ -64,15 +65,63 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<Core.Identities.ILoginIF_v1.TokensDTO>> LoginTwoFactor(string totp)
+			/// Complete login with Active Directory
+				public static async Task<Response<Core.Identities.ILoginIF_v1.LoginResultDTO>> LoginWithAD(string username, string password)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/logintwofactor/{totp}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/loginwithad/{username}/{password}" ) );
 
 						// call rest client 
-						HttpResponseMessage response = await RestClient.Request( request, "Core.Identities.LoginIF.V1.LoginTwoFactor" );
+						HttpResponseMessage response = await RestClient.Request( request, "Core.Identities.LoginIF.V1.LoginWithAD" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							var value = await response.Content.ReadFromJsonAsync<Core.Identities.ILoginIF_v1.LoginResultDTO>();
+							return Response<Core.Identities.ILoginIF_v1.LoginResultDTO>.Success( value );
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response<Core.Identities.ILoginIF_v1.LoginResultDTO>.Failure( error );
+						}
+						else
+						{
+							return Response<Core.Identities.ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_LoginWithAD'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response<Core.Identities.ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response<Core.Identities.ILoginIF_v1.LoginResultDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+			/// Complete login with two-factor authentication (TOTP)
+				public static async Task<Response<Core.Identities.ILoginIF_v1.TokensDTO>> Login2FA(string code)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/login2fa/{code}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "Core.Identities.LoginIF.V1.Login2FA" );
 
 						if (response.IsSuccessStatusCode)
 						{
@@ -88,7 +137,53 @@ namespace BFF.ApiClientKit
 						{
 							return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
-								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_LoginTwoFactor'",
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_Login2FA'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+				public static async Task<Response<Core.Identities.ILoginIF_v1.TokensDTO>> RefreshTokens(string refreshToken)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/loginif/v1/refreshtokens/{refreshToken}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "Core.Identities.LoginIF.V1.RefreshTokens" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							var value = await response.Content.ReadFromJsonAsync<Core.Identities.ILoginIF_v1.TokensDTO>();
+							return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Success( value );
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( error );
+						}
+						else
+						{
+							return Response<Core.Identities.ILoginIF_v1.TokensDTO>.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_RefreshTokens'",
 							} );
 						}
 					}

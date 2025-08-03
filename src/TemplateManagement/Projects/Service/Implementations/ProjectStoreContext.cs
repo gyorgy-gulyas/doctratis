@@ -36,7 +36,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         }
     }
 
-    public class ProjectAuditEntry : AuditEntry<ProjectAuditTrail>
+    public class ProjectAuditEntry : AuditTrail<ProjectAuditTrail>
     {
         private readonly ProjectStoreContext _storeContext;
         public string projectId { get; set; }

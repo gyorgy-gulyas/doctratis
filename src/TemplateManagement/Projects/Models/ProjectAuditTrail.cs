@@ -20,6 +20,8 @@ namespace TemplateManagement.Projects.Project
 
 		#region IAuditTrail
 		public TrailOperations trailOperation { get; set; }
+		[ClusteringColumn(1)]
+		public DateTime timestamp { get; set; }
 		public string entityType { get; set; }
 		public string entityId { get; set; }
 		public string idenityId { get; set; }
@@ -27,8 +29,6 @@ namespace TemplateManagement.Projects.Project
 		public string payload { get; set; }
 		public string previousTrailId { get; set; }
 		public string deltaPayload { get; set; }
-		[ClusteringColumn(1)]
-		public DateTime timestamp { get; set; }
 		#endregion IAuditTrail
 
 		public string projectId { get; set; }
@@ -43,6 +43,7 @@ namespace TemplateManagement.Projects.Project
 
 			// begin: AuditTrail
 			clone.trailOperation = trailOperation;
+			clone.timestamp = timestamp;
 			clone.entityType = new string(entityType.ToCharArray());
 			clone.entityId = new string(entityId.ToCharArray());
 			clone.idenityId = new string(idenityId.ToCharArray());
@@ -50,7 +51,6 @@ namespace TemplateManagement.Projects.Project
 			clone.payload = new string(payload.ToCharArray());
 			clone.previousTrailId = new string(previousTrailId.ToCharArray());
 			clone.deltaPayload = new string(deltaPayload.ToCharArray());
-			clone.timestamp = timestamp;
 			// end: AuditTrail
 
 			clone.projectId = new string(projectId.ToCharArray());
@@ -69,6 +69,7 @@ namespace TemplateManagement.Projects.Project
 
 			// begin: AuditTrail
 			if(trailOperation != other.trailOperation) return false;
+			if(timestamp != other.timestamp) return false;
 			if(entityType != other.entityType) return false;
 			if(entityId != other.entityId) return false;
 			if(idenityId != other.idenityId) return false;
@@ -76,7 +77,6 @@ namespace TemplateManagement.Projects.Project
 			if(payload != other.payload) return false;
 			if(previousTrailId != other.previousTrailId) return false;
 			if(deltaPayload != other.deltaPayload) return false;
-			if(timestamp != other.timestamp) return false;
 			// end: AuditTrail
 
 			if(projectId != other.projectId) return false;
@@ -97,6 +97,7 @@ namespace TemplateManagement.Projects.Project
 
 			// begin: AuditTrail
 			hash.Add(trailOperation);
+			hash.Add(timestamp);
 			hash.Add(entityType);
 			hash.Add(entityId);
 			hash.Add(idenityId);
@@ -104,7 +105,6 @@ namespace TemplateManagement.Projects.Project
 			hash.Add(payload);
 			hash.Add(previousTrailId);
 			hash.Add(deltaPayload);
-			hash.Add(timestamp);
 			// end: AuditTrail
 
 			hash.Add(projectId);

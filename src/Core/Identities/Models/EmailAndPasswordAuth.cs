@@ -5,7 +5,6 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-using Core.Identities;
 
 namespace Core.Identities.Identity
 {
@@ -13,6 +12,7 @@ namespace Core.Identities.Identity
 	public partial class EmailAndPasswordAuth : Auth, IEquatable<EmailAndPasswordAuth>
 	{
 		public string email { get; set; }
+		public bool isEmailConfirmed { get; set; }
 		/// Hashed password
 		public string passwordHash { get; set; }
 		/// Salt used for hashing
@@ -21,8 +21,6 @@ namespace Core.Identities.Identity
 		public List<string> passwordHistory { get; set; } = new();
 		/// password expiration time
 		public DateOnly passwordExpiresAt { get; set; }
-		/// Optional two-factor authentication settings (TOTP, SMS, Email)
-		public TwoFactorConfiguration twoFactor { get; set; }
 
 		#region Clone 
 		public override EmailAndPasswordAuth Clone()
@@ -34,15 +32,13 @@ namespace Core.Identities.Identity
 			// end: Auth
 
 			clone.email = new string(email.ToCharArray());
+			clone.isEmailConfirmed = isEmailConfirmed;
 			clone.passwordHash = new string(passwordHash.ToCharArray());
 			clone.passwordSalt = new string(passwordSalt.ToCharArray());
 
 			// clone of passwordHistory
 			clone.passwordHistory.AddRange( passwordHistory.Select( v => new string(v.ToCharArray()) ));
 			clone.passwordExpiresAt = passwordExpiresAt;
-
-			// clone of twoFactor
-			clone.twoFactor = twoFactor?.Clone();
 
 			return clone;
 		}
@@ -58,16 +54,13 @@ namespace Core.Identities.Identity
 			// end: Auth
 
 			if(email != other.email) return false;
+			if(isEmailConfirmed != other.isEmailConfirmed) return false;
 			if(passwordHash != other.passwordHash) return false;
 			if(passwordSalt != other.passwordSalt) return false;
 
 			// equals of passwordHistory
 			if(passwordHistory.SequenceEqual(other.passwordHistory) == false ) return false;
 			if(passwordExpiresAt != other.passwordExpiresAt) return false;
-
-			// equals of twoFactor
-			if(twoFactor == null && other.twoFactor != null ) return false;
-			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
 
 			return true;
 		}
@@ -82,6 +75,7 @@ namespace Core.Identities.Identity
 			// end: Auth
 
 			hash.Add(email);
+			hash.Add(isEmailConfirmed);
 			hash.Add(passwordHash);
 			hash.Add(passwordSalt);
 
@@ -89,9 +83,6 @@ namespace Core.Identities.Identity
 			foreach( var element_passwordHistory in passwordHistory)
 				hash.Add(element_passwordHistory);
 			hash.Add(passwordExpiresAt);
-
-			// hash of twoFactor
-			if(twoFactor != null ) hash.Add(twoFactor);
 
 			return hash.ToHashCode();
 		}

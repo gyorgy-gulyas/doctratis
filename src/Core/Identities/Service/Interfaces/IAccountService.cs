@@ -12,18 +12,18 @@ namespace Core.Identities
 {
 	public partial interface IAccountService
 	{
+		/// <summary>
+		///  Finds a user account by email address
+		/// </summary>
 		/// <return>Identity.Account</return>
 		public Task<Response<Identity.Account>> findUserByEmail(CallingContext ctx, string email);
 
-		/// <return>SingInResult</return>
-		public Task<Response<SingInResult>> singIn(CallingContext ctx, Identity.Account account, string password);
+		/// <summary>
+		///  Finds a user account by email address
+		/// </summary>
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> findUserByADCredentrials(CallingContext ctx, Ldap.LdapDomain ldapDomain, string username);
 
 
-		public enum SingInResult
-		{
-			InvalidPassword,
-			UserIsLocekdOut,
-			UserIsNotActive,
-		}
 	}
 }

@@ -12,9 +12,9 @@ namespace Core.Identities.Identity
 	public partial class ADAuth : Auth, IEquatable<ADAuth>
 	{
 		/// Active Directory domain
-		public string adDomain { get; set; }
+		public string LdapDomainId { get; set; }
 		/// Active Directory username
-		public string adUser { get; set; }
+		public string userName { get; set; }
 
 		#region Clone 
 		public override ADAuth Clone()
@@ -25,8 +25,8 @@ namespace Core.Identities.Identity
 			clone.method = method;
 			// end: Auth
 
-			clone.adDomain = new string(adDomain.ToCharArray());
-			clone.adUser = new string(adUser.ToCharArray());
+			clone.LdapDomainId = new string(LdapDomainId.ToCharArray());
+			clone.userName = new string(userName.ToCharArray());
 
 			return clone;
 		}
@@ -41,8 +41,8 @@ namespace Core.Identities.Identity
 			if(method != other.method) return false;
 			// end: Auth
 
-			if(adDomain != other.adDomain) return false;
-			if(adUser != other.adUser) return false;
+			if(LdapDomainId != other.LdapDomainId) return false;
+			if(userName != other.userName) return false;
 
 			return true;
 		}
@@ -56,8 +56,8 @@ namespace Core.Identities.Identity
 			hash.Add(method);
 			// end: Auth
 
-			hash.Add(adDomain);
-			hash.Add(adUser);
+			hash.Add(LdapDomainId);
+			hash.Add(userName);
 
 			return hash.ToHashCode();
 		}

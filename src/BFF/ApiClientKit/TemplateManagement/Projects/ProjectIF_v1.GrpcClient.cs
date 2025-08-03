@@ -15,7 +15,7 @@ using TemplateManagement.Projects.Protos.ProjectIF_v1;
 
 namespace BFF.ApiClientKit
 {
-	static class Grpc 
+	static partial class Grpc 
 	{
 		static class ProjectIF
 		{

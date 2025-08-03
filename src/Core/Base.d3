@@ -10,5 +10,13 @@
             @system_field
             LastUpdate:datetime
         }
+
+        service SmsService {
+            command SendOTP( phoneNumber:string, otp:string )
+        }
+
+        service EmailService {
+            command SendOTP( phoneNumber:string, otp:string )
+        }
     }
 }

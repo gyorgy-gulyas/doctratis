@@ -17,8 +17,13 @@ import "google/protobuf/timestamp.proto";
 import "servicekit_error.proto";
 
 service LoginIF_v1 {
+	/// Login using email and password credentials
 	rpc LoginWithEmailPassword(LoginIF_v1_LoginWithEmailPasswordRequest) returns (LoginIF_v1_LoginWithEmailPasswordResponse);
-	rpc LoginTwoFactor(LoginIF_v1_LoginTwoFactorRequest) returns (LoginIF_v1_LoginTwoFactorResponse);
+	/// Complete login with Active Directory
+	rpc LoginWithAD(LoginIF_v1_LoginWithADRequest) returns (LoginIF_v1_LoginWithADResponse);
+	/// Complete login with two-factor authentication (TOTP)
+	rpc Login2FA(LoginIF_v1_Login2FARequest) returns (LoginIF_v1_Login2FAResponse);
+	rpc RefreshTokens(LoginIF_v1_RefreshTokensRequest) returns (LoginIF_v1_RefreshTokensResponse);
 }
 
 message LoginIF_v1_LoginWithEmailPasswordRequest {
@@ -33,24 +38,84 @@ message LoginIF_v1_LoginWithEmailPasswordResponse {
 	}
 }
 
-message LoginIF_v1_LoginTwoFactorRequest {
-	string totp = 1;
+message LoginIF_v1_LoginWithADRequest {
+	string username = 1;
+	string password = 2;
 }
 
-message LoginIF_v1_LoginTwoFactorResponse {
+message LoginIF_v1_LoginWithADResponse {
+	oneof result {
+		LoginResultDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message LoginIF_v1_Login2FARequest {
+	string code = 1;
+}
+
+message LoginIF_v1_Login2FAResponse {
 	oneof result {
 		TokensDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
+
+message LoginIF_v1_RefreshTokensRequest {
+	string refreshToken = 1;
+}
+
+message LoginIF_v1_RefreshTokensResponse {
+	oneof result {
+		TokensDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+enum SignInResult {
+	/// Login was successful
+	SignInResult_Ok = 0;
+
+	/// Invalid username or password provided
+	SignInResult_InvalidUserNameOrPassword = 1;
+
+	/// Email has not been confirmed by the user
+	SignInResult_EmailNotConfirmed = 2;
+
+	/// The user account is deactivated or locked
+	SignInResult_UserIsNotActive = 3;
+
+	/// The password has expired and needs to be changed
+	SignInResult_PasswordExpired = 4;
+
+	/// for LDAP auththentication: when username does not contain the domainname
+	SignInResult_DomainNotSpecified = 5;
+
+	/// for LDAP auththentication: when the domain is not alloed to use the system
+	SignInResult_DomainNotRegistered = 6;
+
+	/// for LDAP auththentication: when the domain use is not added for the system
+	SignInResult_DomainUserNotRegistered = 7;
+
+}
+
 message TokensDTO {
+	/// Access token used for authentication
 	string AccessToken = 1;
-	string RefreshToken = 2;
-	google.protobuf.Timestamp AccessTokenExpiredAt = 3;
+	/// Expiration date and time of the access token
+	google.protobuf.Timestamp AccessTokenExpiresAt = 2;
+	/// Refresh token used to obtain a new access token
+	string RefreshToken = 3;
+	/// Expiration date and time of the refresh token
+	google.protobuf.Timestamp RefreshTokenExpiresAt = 4;
 }
 
 message LoginResultDTO {
-	TokensDTO tokens = 1;
-	bool required2FA = 2;
+	/// The result of the login attempt
+	SignInResult result = 1;
+	/// Tokens returned when login is successful
+	TokensDTO tokens = 2;
+	/// Indicates whether two-factor authentication is required
+	bool requires2FA = 3;
 }
 

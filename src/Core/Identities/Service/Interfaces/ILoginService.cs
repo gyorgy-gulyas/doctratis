@@ -12,112 +12,18 @@ namespace Core.Identities
 {
 	public partial interface ILoginService
 	{
-		/// <return>LoginResult</return>
-		public Task<Response<LoginResult>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
+		/// <return>ILoginIF_v1.LoginResultDTO</return>
+		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
 
-		/// <return>LoginResult</return>
-		public Task<Response<LoginResult>> LoginTwoFactor(CallingContext ctx, string totp);
+		/// <return>ILoginIF_v1.LoginResultDTO</return>
+		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithAD(CallingContext ctx, string username, string password);
 
+		/// <return>ILoginIF_v1.TokensDTO</return>
+		public Task<Response<ILoginIF_v1.TokensDTO>> Login2FA(CallingContext ctx, string code);
 
-		public partial class Tokens : IEquatable<Tokens>
-		{
-			public string AccessToken { get; set; }
-			public string RefreshToken { get; set; }
-			public DateTime AccessTokenExpiredAt { get; set; }
+		/// <return>ILoginIF_v1.TokensDTO</return>
+		public Task<Response<ILoginIF_v1.TokensDTO>> RefreshTokens(CallingContext ctx, string totp);
 
-			#region Clone 
-			public virtual Tokens Clone()
-			{
-				Tokens clone = new();
-
-				clone.AccessToken = new string(AccessToken.ToCharArray());
-				clone.RefreshToken = new string(RefreshToken.ToCharArray());
-				clone.AccessTokenExpiredAt = AccessTokenExpiredAt;
-
-				return clone;
-			}
-			#endregion Clone 
-
-			#region Equals & HashCode 
-			public bool Equals( Tokens other )
-			{
-				if (other is null) return false;
-
-				if(AccessToken != other.AccessToken) return false;
-				if(RefreshToken != other.RefreshToken) return false;
-				if(AccessTokenExpiredAt != other.AccessTokenExpiredAt) return false;
-
-				return true;
-			}
-
-			public override bool Equals(object obj) => Equals(obj as Tokens);
-
-			public override int GetHashCode()
-			{
-				var hash = new HashCode();
-				hash.Add(AccessToken);
-				hash.Add(RefreshToken);
-				hash.Add(AccessTokenExpiredAt);
-
-				return hash.ToHashCode();
-			}
-			#endregion Equals & HashCode 
-		}
-
-		public partial class LoginResult : IEquatable<LoginResult>
-		{
-			public Tokens tokens { get; set; }
-			public Identity.TwoFactorConfiguration twoFactor { get; set; }
-
-			#region Clone 
-			public virtual LoginResult Clone()
-			{
-				LoginResult clone = new();
-
-
-				// clone of tokens
-				clone.tokens = tokens?.Clone();
-
-				// clone of twoFactor
-				clone.twoFactor = twoFactor?.Clone();
-
-				return clone;
-			}
-			#endregion Clone 
-
-			#region Equals & HashCode 
-			public bool Equals( LoginResult other )
-			{
-				if (other is null) return false;
-
-
-				// equals of tokens
-				if(tokens == null && other.tokens != null ) return false;
-				if(tokens != null && tokens.Equals(other.tokens) == false ) return false;
-
-				// equals of twoFactor
-				if(twoFactor == null && other.twoFactor != null ) return false;
-				if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
-
-				return true;
-			}
-
-			public override bool Equals(object obj) => Equals(obj as LoginResult);
-
-			public override int GetHashCode()
-			{
-				var hash = new HashCode();
-
-				// hash of tokens
-				if(tokens != null ) hash.Add(tokens);
-
-				// hash of twoFactor
-				if(twoFactor != null ) hash.Add(twoFactor);
-
-				return hash.ToHashCode();
-			}
-			#endregion Equals & HashCode 
-		}
 
 	}
 }

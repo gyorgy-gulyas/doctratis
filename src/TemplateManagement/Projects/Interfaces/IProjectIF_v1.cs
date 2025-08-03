@@ -14,23 +14,23 @@ namespace TemplateManagement.Projects
 {
 	public partial interface IProjectIF_v1
 	{
-		/// <return>ProjectSummaryDTO</return>
-		public Task<Response<ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description);
+		/// <return>IProjectIF_v1.ProjectSummaryDTO</return>
+		public Task<Response<IProjectIF_v1.ProjectSummaryDTO>> createProject(CallingContext ctx, string name, string description);
 
-		/// <return>ProjectDetailsDTO</return>
-		public Task<Response<ProjectDetailsDTO>> updateProject(CallingContext ctx, ProjectDetailsDTO project);
+		/// <return>IProjectIF_v1.ProjectDetailsDTO</return>
+		public Task<Response<IProjectIF_v1.ProjectDetailsDTO>> updateProject(CallingContext ctx, ProjectDetailsDTO project);
 
-		/// <return>List<ProjectIdentityAssignmentDTO></return>
-		public Task<Response<List<ProjectIdentityAssignmentDTO>>> listAccessibleProjects(CallingContext ctx);
+		/// <return>List<IProjectIF_v1.ProjectIdentityAssignmentDTO></return>
+		public Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjects(CallingContext ctx);
 
-		/// <return>List<ProjectIdentityAssignmentDTO></return>
-		public Task<Response<List<ProjectIdentityAssignmentDTO>>> listAccessibleProjectsForUser(CallingContext ctx, string userId);
+		/// <return>List<IProjectIF_v1.ProjectIdentityAssignmentDTO></return>
+		public Task<Response<List<IProjectIF_v1.ProjectIdentityAssignmentDTO>>> listAccessibleProjectsForUser(CallingContext ctx, string userId);
 
-		/// <return>ProjectDetailsDTO</return>
-		public Task<Response<ProjectDetailsDTO>> getProject(CallingContext ctx, string projectId);
+		/// <return>IProjectIF_v1.ProjectDetailsDTO</return>
+		public Task<Response<IProjectIF_v1.ProjectDetailsDTO>> getProject(CallingContext ctx, string projectId);
 
-		/// <return>ProjectAccessDTO</return>
-		public Task<Response<ProjectAccessDTO>> addProjectAccess(CallingContext ctx, string projectId, string identityId, ProjectAccessRoles role);
+		/// <return>IProjectIF_v1.ProjectAccessDTO</return>
+		public Task<Response<IProjectIF_v1.ProjectAccessDTO>> addProjectAccess(CallingContext ctx, string projectId, string identityId, ProjectAccessRoles role);
 
 
 		public enum ProjectStatuses

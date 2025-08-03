@@ -5,14 +5,14 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+using ServiceKit.Net;
 
 namespace Core.Base
 {
-
-	public partial interface IBaseEntity
+	public partial interface IEmailService
 	{
-		public string id { get; set; }
-		public string etag { get; set; }
-		public DateTime LastUpdate { get; set; }
+		public Task<Response> SendOTP(CallingContext ctx, string phoneNumber, string otp);
+
+
 	}
 }
