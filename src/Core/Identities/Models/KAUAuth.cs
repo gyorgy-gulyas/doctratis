@@ -9,29 +9,17 @@ using Core.Identities;
 
 namespace Core.Identities.Identity
 {
-	/// ClientGate (Ügyfélkapu) authentication
+	/// KAU Ügyfélkapu authentication
 	public partial class KAUAuth : Auth, IEquatable<KAUAuth>
 	{
-		public enum eIDAS
-		{
-			/// low – gyengébb azonosítás (pl. sima jelszavas Ügyfélkapu)
-			Low,
-
-			/// substantial – erősebb azonosítás (pl. kétfaktor + állami adatbázis validáció)
-			Substantial,
-
-			/// high – a legmagasabb, pl. tanúsítvány alapú vagy személyi igazolvány chip-es azonosítás
-			High,
-
-		}
 		/// Government-issued unique identifier (Ügyfélkapu ID)
 		public string KAUUserId { get; set; }
 		/// User’s full legal name as returned by the service
 		public string legalName { get; set; }
 		/// Email address verified by the service (optional)
 		public string email { get; set; }
-		/// magyar állam által nyújtott hitelesítési szolgáltatás: biztonsági szintek
-		public KAUAuth.eIDAS assuranceLevel { get; set; }
+		/// Optional two-factor authentication settings (TOTP, SMS, Email)
+		public TwoFactorConfiguration twoFactor { get; set; }
 
 		#region Clone 
 		public override KAUAuth Clone()
@@ -49,7 +37,9 @@ namespace Core.Identities.Identity
 			clone.KAUUserId = new string(KAUUserId.ToCharArray());
 			clone.legalName = new string(legalName.ToCharArray());
 			clone.email = new string(email.ToCharArray());
-			clone.assuranceLevel = assuranceLevel;
+
+			// clone of twoFactor
+			clone.twoFactor = twoFactor?.Clone();
 
 			return clone;
 		}
@@ -71,7 +61,10 @@ namespace Core.Identities.Identity
 			if(KAUUserId != other.KAUUserId) return false;
 			if(legalName != other.legalName) return false;
 			if(email != other.email) return false;
-			if(assuranceLevel != other.assuranceLevel) return false;
+
+			// equals of twoFactor
+			if(twoFactor == null && other.twoFactor != null ) return false;
+			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
 
 			return true;
 		}
@@ -95,7 +88,9 @@ namespace Core.Identities.Identity
 			hash.Add(KAUUserId);
 			hash.Add(legalName);
 			hash.Add(email);
-			hash.Add(assuranceLevel);
+
+			// hash of twoFactor
+			if(twoFactor != null ) hash.Add(twoFactor);
 
 			return hash.ToHashCode();
 		}

@@ -5,6 +5,7 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+using Core.Identities;
 
 namespace Core.Identities.Identity
 {
@@ -15,6 +16,8 @@ namespace Core.Identities.Identity
 		public string LdapDomainId { get; set; }
 		/// Active Directory username
 		public string userName { get; set; }
+		/// Optional two-factor authentication settings (TOTP, SMS, Email)
+		public TwoFactorConfiguration twoFactor { get; set; }
 
 		#region Clone 
 		public override ADAuth Clone()
@@ -31,6 +34,9 @@ namespace Core.Identities.Identity
 
 			clone.LdapDomainId = new string(LdapDomainId.ToCharArray());
 			clone.userName = new string(userName.ToCharArray());
+
+			// clone of twoFactor
+			clone.twoFactor = twoFactor?.Clone();
 
 			return clone;
 		}
@@ -51,6 +57,10 @@ namespace Core.Identities.Identity
 
 			if(LdapDomainId != other.LdapDomainId) return false;
 			if(userName != other.userName) return false;
+
+			// equals of twoFactor
+			if(twoFactor == null && other.twoFactor != null ) return false;
+			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
 
 			return true;
 		}
@@ -73,6 +83,9 @@ namespace Core.Identities.Identity
 
 			hash.Add(LdapDomainId);
 			hash.Add(userName);
+
+			// hash of twoFactor
+			if(twoFactor != null ) hash.Add(twoFactor);
 
 			return hash.ToHashCode();
 		}

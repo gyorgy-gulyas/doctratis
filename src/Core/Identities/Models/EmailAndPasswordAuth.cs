@@ -5,6 +5,7 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+using Core.Identities;
 
 namespace Core.Identities.Identity
 {
@@ -21,6 +22,8 @@ namespace Core.Identities.Identity
 		public List<string> passwordHistory { get; set; } = new();
 		/// password expiration time
 		public DateOnly passwordExpiresAt { get; set; }
+		/// Optional two-factor authentication settings (TOTP, SMS, Email)
+		public TwoFactorConfiguration twoFactor { get; set; }
 
 		#region Clone 
 		public override EmailAndPasswordAuth Clone()
@@ -43,6 +46,9 @@ namespace Core.Identities.Identity
 			// clone of passwordHistory
 			clone.passwordHistory.AddRange( passwordHistory.Select( v => new string(v.ToCharArray()) ));
 			clone.passwordExpiresAt = passwordExpiresAt;
+
+			// clone of twoFactor
+			clone.twoFactor = twoFactor?.Clone();
 
 			return clone;
 		}
@@ -69,6 +75,10 @@ namespace Core.Identities.Identity
 			// equals of passwordHistory
 			if(passwordHistory.SequenceEqual(other.passwordHistory) == false ) return false;
 			if(passwordExpiresAt != other.passwordExpiresAt) return false;
+
+			// equals of twoFactor
+			if(twoFactor == null && other.twoFactor != null ) return false;
+			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
 
 			return true;
 		}
@@ -98,6 +108,9 @@ namespace Core.Identities.Identity
 			foreach( var element_passwordHistory in passwordHistory)
 				hash.Add(element_passwordHistory);
 			hash.Add(passwordExpiresAt);
+
+			// hash of twoFactor
+			if(twoFactor != null ) hash.Add(twoFactor);
 
 			return hash.ToHashCode();
 		}

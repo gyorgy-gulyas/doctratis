@@ -20,9 +20,9 @@ namespace Core.Identities.Identity
 		public AccountTypes Type { get; set; }
 		public string Name { get; set; }
 		public bool isActive { get; set; }
-		/// Optional two-factor authentication settings (TOTP, SMS, Email)
-		public TwoFactorConfiguration twoFactor { get; set; }
 		public List<ContactInfo> contacts { get; set; } = new();
+		/// account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
+		public string accountSecret { get; set; }
 
 		#region Clone 
 		public virtual Account Clone()
@@ -36,11 +36,9 @@ namespace Core.Identities.Identity
 			clone.Name = new string(Name.ToCharArray());
 			clone.isActive = isActive;
 
-			// clone of twoFactor
-			clone.twoFactor = twoFactor?.Clone();
-
 			// clone of contacts
 			clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
+			clone.accountSecret = new string(accountSecret.ToCharArray());
 
 			return clone;
 		}
@@ -58,12 +56,9 @@ namespace Core.Identities.Identity
 			if(Name != other.Name) return false;
 			if(isActive != other.isActive) return false;
 
-			// equals of twoFactor
-			if(twoFactor == null && other.twoFactor != null ) return false;
-			if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
-
 			// equals of contacts
 			if(contacts.SequenceEqual(other.contacts) == false ) return false;
+			if(accountSecret != other.accountSecret) return false;
 
 			return true;
 		}
@@ -83,12 +78,10 @@ namespace Core.Identities.Identity
 			hash.Add(Name);
 			hash.Add(isActive);
 
-			// hash of twoFactor
-			if(twoFactor != null ) hash.Add(twoFactor);
-
 			// hash of contacts
 			foreach( var element_contacts in contacts)
 				hash.Add(element_contacts);
+			hash.Add(accountSecret);
 
 			return hash.ToHashCode();
 		}

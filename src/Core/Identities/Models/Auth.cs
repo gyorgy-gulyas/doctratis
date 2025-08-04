@@ -16,8 +16,8 @@ namespace Core.Identities.Identity
 		{
 			EmailAndPassword,
 			ActiveDirectory,
-			Certificate,
 			KAU,
+			Certificate,
 		}
 		#region IBaseEntity
 		public string id { get; set; }

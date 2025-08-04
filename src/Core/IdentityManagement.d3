@@ -15,9 +15,10 @@ domain Core {
                 Name:string
                 isActive: boolean
 
-                # Optional two-factor authentication settings (TOTP, SMS, Email)
-                twoFactor: TwoFactorConfiguration
                 contacts: List[ContactInfo]
+
+                # account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
+                accountSecret: string
             }
 
             valueobject ContactInfo
@@ -39,7 +40,6 @@ domain Core {
                 }
                 enabled: boolean
                 method: Method
-                totpSecret: string
                 phoneNumber: string
                 email:string
             }
@@ -49,8 +49,8 @@ domain Core {
                 enum Methods {
                     EmailAndPassword,
                     ActiveDirectory,
-                    Certificate,
-                    KAU
+                    KAU,
+                    Certificate
                 }
                 # Defines the type of authentication method
                 method: Methods
@@ -70,6 +70,9 @@ domain Core {
                 passwordHistory: List[string] 
                 # password expiration time
                 passwordExpiresAt: date
+
+                 # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfiguration
             }
 
             # Active Directory-based authentication
@@ -78,6 +81,9 @@ domain Core {
                 LdapDomainId: string
                 # Active Directory username
                 userName: string
+
+                 # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfiguration
             }
 
             # Certificate-based authentication
@@ -88,25 +94,16 @@ domain Core {
                 validUntil: datetime
             }
 
-            # ClientGate (Ügyfélkapu) authentication
+            # KAU Ügyfélkapu authentication
             entity KAUAuth inherits Auth {
-                enum eIDAS {
-                    # low – gyengébb azonosítás (pl. sima jelszavas Ügyfélkapu)
-                    Low,
-                    # substantial – erősebb azonosítás (pl. kétfaktor + állami adatbázis validáció)
-                    Substantial,
-                    # high – a legmagasabb, pl. tanúsítvány alapú vagy személyi igazolvány chip-es azonosítás
-                    High
-                }
-
                 # Government-issued unique identifier (Ügyfélkapu ID)
                 KAUUserId: string
                 # User’s full legal name as returned by the service
                 legalName: string
                 # Email address verified by the service (optional)
                 email: string
-                # magyar állam által nyújtott hitelesítési szolgáltatás: biztonsági szintek
-                assuranceLevel: eIDAS
+                # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfiguration            
             }
 
             entity LoginAuditEventLog inherits Core.Base.BaseEntity, Core.Auditing.AuditLog {

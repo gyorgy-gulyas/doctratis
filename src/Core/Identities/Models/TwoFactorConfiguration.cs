@@ -26,7 +26,6 @@ namespace Core.Identities.Identity
 		}
 		public bool enabled { get; set; }
 		public TwoFactorConfiguration.Method method { get; set; }
-		public string totpSecret { get; set; }
 		public string phoneNumber { get; set; }
 		public string email { get; set; }
 
@@ -37,7 +36,6 @@ namespace Core.Identities.Identity
 
 			clone.enabled = enabled;
 			clone.method = method;
-			clone.totpSecret = new string(totpSecret.ToCharArray());
 			clone.phoneNumber = new string(phoneNumber.ToCharArray());
 			clone.email = new string(email.ToCharArray());
 
@@ -52,7 +50,6 @@ namespace Core.Identities.Identity
 
 			if(enabled != other.enabled) return false;
 			if(method != other.method) return false;
-			if(totpSecret != other.totpSecret) return false;
 			if(phoneNumber != other.phoneNumber) return false;
 			if(email != other.email) return false;
 
@@ -66,7 +63,6 @@ namespace Core.Identities.Identity
 			var hash = new HashCode();
 			hash.Add(enabled);
 			hash.Add(method);
-			hash.Add(totpSecret);
 			hash.Add(phoneNumber);
 			hash.Add(email);
 

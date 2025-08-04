@@ -16,7 +16,7 @@ namespace Core.Identities.Service.Implementations.Helpers
         /// <summary>
         /// Access token generálása rövid lejárati idővel (pl. 15 perc)
         /// </summary>
-        public (string accessToken, DateTime expiresAt) GenerateAccessToken(string userId, string userName, string[] roles, int customTokenValidityInMinutes = default)
+        public (string accessToken, DateTime expiresAt) GenerateAccessToken(string userId, string userName, string[] roles, List<Claim> additioinalClaims = default, int customTokenValidityInMinutes = default)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -27,9 +27,11 @@ namespace Core.Identities.Service.Implementations.Helpers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            // Szerepek
             foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
+
+            foreach (var claim in additioinalClaims ?? Enumerable.Empty<Claim>())
+                claims.Add(claim);
 
             var tokenValidityInMinutes = customTokenValidityInMinutes != default
                 ? customTokenValidityInMinutes

@@ -3,6 +3,7 @@ using Core.Identities.Identity;
 using Core.Identities.Service.Implementations.Helpers;
 using OtpNet;
 using ServiceKit.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace Core.Identities.Service.Implementations
@@ -43,7 +44,7 @@ namespace Core.Identities.Service.Implementations
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.InvalidUserNameOrPassword });
 
             var account = result.Value.account;
-            var auth = result.Value.auth;
+            var auth = result.Value.auth as EmailAndPasswordAuth;
 
             var signIn = _trySignInWithPassword(account, auth as EmailAndPasswordAuth, password);
             if (signIn != ILoginIF_v1.SignInResult.Ok)
@@ -52,7 +53,7 @@ namespace Core.Identities.Service.Implementations
                 return new(new ILoginIF_v1.LoginResultDTO() { result = signIn });
             }
 
-            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.EmailAndPassword);
+            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.EmailAndPassword, auth.twoFactor);
         }
 
         async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginService.LoginWithAD(CallingContext ctx, string username, string password)
@@ -76,9 +77,9 @@ namespace Core.Identities.Service.Implementations
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.DomainUserNotRegistered });
 
             var account = result.Value.account;
-            var auth = result.Value.auth;
+            var auth = result.Value.auth as ADAuth;
 
-            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.ActiveDirectory);
+            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.ActiveDirectory, auth.twoFactor);
         }
 
         Task<Response<string>> ILoginService.GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl)
@@ -108,13 +109,12 @@ namespace Core.Identities.Service.Implementations
                 return UserNotFound(returnUrl);
 
             var account = result.Value.account;
-            var auth = result.Value.auth;
+            var auth = result.Value.auth as KAUAuth;
 
             _context.AuditLog_LoggedIn(ctx, account, Auth.Methods.KAU);
 
             var tokens = _Login(ctx, account);
-            return Success(returnUrl, tokens, account.twoFactor?.enabled ?? false);
-
+            return Success(returnUrl, tokens, auth.twoFactor?.enabled ?? false);
 
             // Lokális segédfüggvények a válaszok egyszerűsítésére:
             static Response<ILoginService.KAUCallbackResponse> Unauthorized(string message) =>
@@ -157,11 +157,11 @@ namespace Core.Identities.Service.Implementations
                 });
         }
 
-        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth.Methods authMethod)
+        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth.Methods authMethod, TwoFactorConfiguration twoFactor )
         {
-            if (account.twoFactor?.enabled == true)
+            if (twoFactor?.enabled == true)
             {
-                return await _Generate2FaTokensAndSendCode(ctx, account);
+                return await _Generate2FaTokensAndSendCode(ctx, account, twoFactor);
             }
             else
             {
@@ -204,15 +204,16 @@ namespace Core.Identities.Service.Implementations
             if (account == null)
                 return new(new Error() { Status = Statuses.NotFound, MessageText = $"User with account id:'{ctx.IdentityId}:{ctx.IdentityName}' not found" });
 
+            if( ctx.Claims.TryGetValue("2faMethod", out var methodClaim) == false )
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"'2faMethod' not found in claims" });
 
-            if (account.twoFactor == null || account.twoFactor.enabled == false)
-                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"User with account id:'{ctx.IdentityId}:{ctx.IdentityName}' does not have two factor auth enabled" });
+            if (Enum.TryParse<TwoFactorConfiguration.Method>(methodClaim, out var method) == false)
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Unknown 2fa method: '{method}'" });
 
+            var secretBytes = Base32Encoding.ToBytes(account.accountSecret);
             code = code.Trim().Replace(" ", "");
 
-            var secretBytes = Base32Encoding.ToBytes(account.twoFactor.totpSecret);
-
-            switch (account.twoFactor.method)
+            switch (method)
             {
                 case TwoFactorConfiguration.Method.SMS:
                 case TwoFactorConfiguration.Method.Email:
@@ -238,7 +239,7 @@ namespace Core.Identities.Service.Implementations
 
             Response<ILoginIF_v1.TokensDTO> Fail2FA()
             {
-                _context.AuditLog_2FAFailed(ctx, account, account.twoFactor.method);
+                _context.AuditLog_2FAFailed(ctx, account, method);
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"Invalid TOTP code" });
             }
         }
@@ -258,18 +259,21 @@ namespace Core.Identities.Service.Implementations
             return new(_Login(ctx, account));
         }
 
-        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _Generate2FaTokensAndSendCode(CallingContext ctx, Account account)
+        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _Generate2FaTokensAndSendCode(CallingContext ctx, Account account, TwoFactorConfiguration twoFactor)
         {
             // Access token for 2FA verification (valid only for 5 minutes)
             var (accessToken, expiresAt) = _tokenService.GenerateAccessToken(
                 userId: account.id,
                 userName: account.Name,
                 roles: ["User"],
+                additioinalClaims: new List<Claim>() {
+                    new Claim("2faMethod", twoFactor.method.ToString()),
+                },
                 customTokenValidityInMinutes: 5
             );
 
             // Send 2FA code if needed
-            await SendTwoFactorCode(account.twoFactor);
+            await SendTwoFactorCode(account.accountSecret);
 
             // Build and return the response
             return new(new ILoginIF_v1.LoginResultDTO
@@ -286,9 +290,9 @@ namespace Core.Identities.Service.Implementations
             });
 
             // --- Local helper function ---
-            async Task SendTwoFactorCode(TwoFactorConfiguration twoFactor)
+            async Task SendTwoFactorCode(string secret)
             {
-                var secretBytes = Base32Encoding.ToBytes(twoFactor.totpSecret);
+                var secretBytes = Base32Encoding.ToBytes(secret);
 
                 string code;
 
