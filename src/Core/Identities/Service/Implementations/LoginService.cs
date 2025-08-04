@@ -1,8 +1,6 @@
 ﻿using Core.Base;
 using Core.Identities.Identity;
-using Core.Identities.Service.Controllers;
 using Core.Identities.Service.Implementations.Helpers;
-using Microsoft.AspNetCore.WebUtilities;
 using OtpNet;
 using ServiceKit.Net;
 using System.Security.Cryptography;
@@ -36,7 +34,7 @@ namespace Core.Identities.Service.Implementations
 
         async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginService.LoginWithEmailPassword(CallingContext ctx, string email, string password)
         {
-            var result = await _accountService.findUserByEmail(ctx, email).ConfigureAwait(false);
+            var result = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -44,16 +42,17 @@ namespace Core.Identities.Service.Implementations
             if (result.HasValue() == false)
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.InvalidUserNameOrPassword });
 
-            var account = result.Value;
+            var account = result.Value.account;
+            var auth = result.Value.auth;
 
-            var signIn = _trySignInWithPassword(account, password);
+            var signIn = _trySignInWithPassword(account, auth as EmailAndPasswordAuth, password);
             if (signIn != ILoginIF_v1.SignInResult.Ok)
             {
-                _context.AuditLog_SignInFailed(ctx, account, account.emailAndPasswordAuth, signIn);
+                _context.AuditLog_SignInFailed(ctx, account, Auth.Methods.EmailAndPassword, signIn);
                 return new(new ILoginIF_v1.LoginResultDTO() { result = signIn });
             }
 
-            return await _HandleSuccessSignIn(ctx, account, account.emailAndPasswordAuth);
+            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.EmailAndPassword);
         }
 
         async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginService.LoginWithAD(CallingContext ctx, string username, string password)
@@ -70,15 +69,16 @@ namespace Core.Identities.Service.Implementations
             if (sucess == false)
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.InvalidUserNameOrPassword });
 
-            var result = await _accountService.findUserByADCredentrials(ctx, domain, userName).ConfigureAwait(false);
+            var result = await _accountService.findAccountByADCredentrials(ctx, domain, userName).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
             if (result.HasValue() == false)
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.DomainUserNotRegistered });
 
-            var account = result.Value;
+            var account = result.Value.account;
+            var auth = result.Value.auth;
 
-            return await _HandleSuccessSignIn(ctx, account, account.adAuth);
+            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.ActiveDirectory);
         }
 
         Task<Response<string>> ILoginService.GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl)
@@ -103,12 +103,17 @@ namespace Core.Identities.Service.Implementations
             if (kauUserInfo == null)
                 return TokenError(returnUrl);
 
-            var account = await _accountService.findUserKAUUserId(ctx, kauUserInfo.UserId);
-            if (!account.HasValue())
+            var result = await _accountService.findAccountKAUUserId(ctx, kauUserInfo.UserId);
+            if (!result.HasValue())
                 return UserNotFound(returnUrl);
 
-            var tokens = _Login(ctx, account.Value);
-            return Success(returnUrl, tokens, account.Value.twoFactor?.enabled ?? false);
+            var account = result.Value.account;
+            var auth = result.Value.auth;
+
+            _context.AuditLog_LoggedIn(ctx, account, Auth.Methods.KAU);
+
+            var tokens = _Login(ctx, account);
+            return Success(returnUrl, tokens, account.twoFactor?.enabled ?? false);
 
 
             // Lokális segédfüggvények a válaszok egyszerűsítésére:
@@ -152,7 +157,7 @@ namespace Core.Identities.Service.Implementations
                 });
         }
 
-        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth auth)
+        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth.Methods authMethod)
         {
             if (account.twoFactor?.enabled == true)
             {
@@ -160,7 +165,7 @@ namespace Core.Identities.Service.Implementations
             }
             else
             {
-                _context.AuditLog_LoggedIn(ctx, account, auth);
+                _context.AuditLog_LoggedIn(ctx, account, authMethod);
 
                 var tokens = _Login(ctx, account);
                 return new(new ILoginIF_v1.LoginResultDTO()
@@ -312,28 +317,23 @@ namespace Core.Identities.Service.Implementations
 
         /// Attempts to sign in with the given account and password
         /// Returns a SignInResult indicating success or failure reason
-        private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, string password)
+        private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, EmailAndPasswordAuth auth, string password)
         {
-            // If the account doesn't support email + password authentication,
-            // return a generic InvalidUserNameOrPassword to avoid leaking username validity
-            if (account.emailAndPasswordAuth == null)
-                return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
-
             // If the account is not active, explicitly return UserIsNotActive
             if (!account.isActive)
                 return ILoginIF_v1.SignInResult.UserIsNotActive;
 
             // If the email is not confirmed, explicitly return EmailNotConfirmed
-            if (!account.emailAndPasswordAuth.isEmailConfirmed)
+            if (!auth.isEmailConfirmed)
                 return ILoginIF_v1.SignInResult.EmailNotConfirmed;
 
             // If the password has expired, explicitly return PasswordExpired
-            if (account.emailAndPasswordAuth.passwordExpiresAt < DateOnly.FromDateTime(DateTime.UtcNow))
+            if (auth.passwordExpiresAt < DateOnly.FromDateTime(DateTime.UtcNow))
                 return ILoginIF_v1.SignInResult.PasswordExpired;
 
             // If password does not match, return InvalidUserNameOrPassword
             // to avoid leaking information about valid usernames
-            if (!IsPasswordValid(password, account.emailAndPasswordAuth))
+            if (!IsPasswordValid(password, auth))
                 return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
 
             // Successful sign-in

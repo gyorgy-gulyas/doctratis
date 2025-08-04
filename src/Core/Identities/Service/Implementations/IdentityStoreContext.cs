@@ -12,6 +12,7 @@ namespace Core.Identities.Service.Implementations
     {
         private readonly IAuditEntryContainer _auditEntryContainer;
         public readonly IDocumentCollection<Account> Accounts;
+        public readonly IDocumentCollection<Auth> Auths;
         public readonly IDocumentCollection<LdapDomain> LdapDomains;
         public readonly IColumnTable<LoginAuditEventLog> LoginAuditEventLogs;
 
@@ -21,26 +22,27 @@ namespace Core.Identities.Service.Implementations
             _auditEntryContainer = auditEntryContainer;
 
             Accounts = base.GetOrCreateDocumentCollection<Account>().Result;
+            Auths = base.GetOrCreateDocumentCollection<Auth>().Result;
             LdapDomains = base.GetOrCreateDocumentCollection<LdapDomain>().Result;
 
             LoginAuditEventLogs = base.GetOrCreateColumnTable<LoginAuditEventLog>().Result;
         }
 
-        internal void AuditLog_LoggedIn(CallingContext ctx, Account loginedAccount, Auth usedAuth  )
+        internal void AuditLog_LoggedIn(CallingContext ctx, Account loginedAccount, Auth.Methods usedAuthMetod  )
         {
             _auditEntryContainer.AddEntryForBackgrondSave(new LoginEventLog(this, ctx, "logged_in" )
             {
                 _account = loginedAccount,
-                _authMethod = usedAuth.method,
+                _authMethod = usedAuthMetod,
             });
         }
 
-        internal void AuditLog_SignInFailed(CallingContext ctx, Account account, Auth usedAuth, ILoginIF_v1.SignInResult result)
+        internal void AuditLog_SignInFailed(CallingContext ctx, Account account, Auth.Methods usedAuthMethod, ILoginIF_v1.SignInResult result)
         {
             _auditEntryContainer.AddEntryForBackgrondSave(new LoginEventLog(this, ctx, "singin_failed")
             {
                 _account = account,
-                _authMethod = usedAuth.method,
+                _authMethod = usedAuthMethod,
                 _jsonData = new { result }
             });
         }

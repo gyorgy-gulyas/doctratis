@@ -15,18 +15,73 @@ namespace Core.Identities
 		/// <summary>
 		///  Finds a user account by email address
 		/// </summary>
-		/// <return>Identity.Account</return>
-		public Task<Response<Identity.Account>> findUserByEmail(CallingContext ctx, string email);
+		/// <return>IAccountService.AccountWithAuth</return>
+		public Task<Response<IAccountService.AccountWithAuth>> findAccountByEmailAuth(CallingContext ctx, string email);
 
 		/// <summary>
 		///  Finds a user account by email address
 		/// </summary>
-		/// <return>Identity.Account</return>
-		public Task<Response<Identity.Account>> findUserByADCredentrials(CallingContext ctx, Ldap.LdapDomain ldapDomain, string username);
+		/// <return>IAccountService.AccountWithAuth</return>
+		public Task<Response<IAccountService.AccountWithAuth>> findAccountByADCredentrials(CallingContext ctx, Ldap.LdapDomain ldapDomain, string username);
 
-		/// <return>Identity.Account</return>
-		public Task<Response<Identity.Account>> findUserKAUUserId(CallingContext ctx, string kauUserId);
+		/// <return>IAccountService.AccountWithAuth</return>
+		public Task<Response<IAccountService.AccountWithAuth>> findAccountKAUUserId(CallingContext ctx, string kauUserId);
 
+
+		public partial class AccountWithAuth : IEquatable<AccountWithAuth>
+		{
+			public Identity.Account account { get; set; }
+			public Identity.Auth auth { get; set; }
+
+			#region Clone 
+			public virtual AccountWithAuth Clone()
+			{
+				AccountWithAuth clone = new();
+
+
+				// clone of account
+				clone.account = account?.Clone();
+
+				// clone of auth
+				clone.auth = auth?.Clone();
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( AccountWithAuth other )
+			{
+				if (other is null) return false;
+
+
+				// equals of account
+				if(account == null && other.account != null ) return false;
+				if(account != null && account.Equals(other.account) == false ) return false;
+
+				// equals of auth
+				if(auth == null && other.auth != null ) return false;
+				if(auth != null && auth.Equals(other.auth) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as AccountWithAuth);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+
+				// hash of account
+				if(account != null ) hash.Add(account);
+
+				// hash of auth
+				if(auth != null ) hash.Add(auth);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+		}
 
 	}
 }

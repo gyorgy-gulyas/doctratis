@@ -10,7 +10,7 @@ using Core.Identities;
 namespace Core.Identities.Identity
 {
 	/// Base type for all authentication methods
-	public partial class Auth : IEquatable<Auth>
+	public partial class Auth : Core.Base.IBaseEntity, IEquatable<Auth>
 	{
 		public enum Methods
 		{
@@ -19,15 +19,26 @@ namespace Core.Identities.Identity
 			Certificate,
 			KAU,
 		}
+		#region IBaseEntity
+		public string id { get; set; }
+		public string etag { get; set; }
+		public DateTime LastUpdate { get; set; }
+		#endregion IBaseEntity
+
 		/// Defines the type of authentication method
 		public Auth.Methods method { get; set; }
+		public string accountId { get; set; }
 
 		#region Clone 
 		public virtual Auth Clone()
 		{
 			Auth clone = new();
 
+			// begin: BaseEntity
+			// end: BaseEntity
+
 			clone.method = method;
+			clone.accountId = new string(accountId.ToCharArray());
 
 			return clone;
 		}
@@ -38,7 +49,11 @@ namespace Core.Identities.Identity
 		{
 			if (other is null) return false;
 
+			// begin: BaseEntity
+			// end: BaseEntity
+
 			if(method != other.method) return false;
+			if(accountId != other.accountId) return false;
 
 			return true;
 		}
@@ -48,7 +63,14 @@ namespace Core.Identities.Identity
 		public override int GetHashCode()
 		{
 			var hash = new HashCode();
+			// begin: BaseEntity
+			hash.Add(id);
+			hash.Add(etag);
+			hash.Add(LastUpdate);
+			// end: BaseEntity
+
 			hash.Add(method);
+			hash.Add(accountId);
 
 			return hash.ToHashCode();
 		}

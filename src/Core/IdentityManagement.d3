@@ -15,11 +15,6 @@ domain Core {
                 Name:string
                 isActive: boolean
 
-                emailAndPasswordAuth:EmailAndPasswordAuth
-                adAuth:ADAuth
-                certificateAuth:CertificateAuth
-                kauAuth:KAUAuth
-
                 # Optional two-factor authentication settings (TOTP, SMS, Email)
                 twoFactor: TwoFactorConfiguration
                 contacts: List[ContactInfo]
@@ -30,34 +25,6 @@ domain Core {
                 contactType: string
                 email: string
                 phoneNumber : string
-            }
-
-            # Base type for all authentication methods
-            valueobject Auth {
-                enum Methods {
-                    EmailAndPassword,
-                    ActiveDirectory,
-                    Certificate,
-                    KAU
-                }
-
-                # Defines the type of authentication method
-                method: Methods
-            }
-
-            # Password-based authentication
-            valueobject EmailAndPasswordAuth inherits Auth {
-                email: string
-                isEmailConfirmed: boolean
-
-                # Hashed password
-                passwordHash: string
-                # Salt used for hashing
-                passwordSalt: string
-                # old password hashes
-                passwordHistory: List[string] 
-                # password expiration time
-                passwordExpiresAt: date
             }
 
             # Two-factor authentication configuration
@@ -77,8 +44,36 @@ domain Core {
                 email:string
             }
 
+            # Base type for all authentication methods
+            entity Auth inherits Core.Base.BaseEntity {
+                enum Methods {
+                    EmailAndPassword,
+                    ActiveDirectory,
+                    Certificate,
+                    KAU
+                }
+                # Defines the type of authentication method
+                method: Methods
+                accountId: string
+            }
+
+            # Password-based authentication
+            entity EmailAndPasswordAuth inherits Auth {
+                email: string
+                isEmailConfirmed: boolean
+
+                # Hashed password
+                passwordHash: string
+                # Salt used for hashing
+                passwordSalt: string
+                # old password hashes
+                passwordHistory: List[string] 
+                # password expiration time
+                passwordExpiresAt: date
+            }
+
             # Active Directory-based authentication
-            valueobject ADAuth inherits Auth {
+            entity ADAuth inherits Auth {
                 # Active Directory domain
                 LdapDomainId: string
                 # Active Directory username
@@ -86,7 +81,7 @@ domain Core {
             }
 
             # Certificate-based authentication
-            valueobject CertificateAuth inherits Auth {
+            entity CertificateAuth inherits Auth {
                 # Certificate thumbprint (unique identifier)
                 certificateThumbprint: string
                 validFrom: datetime
@@ -94,7 +89,7 @@ domain Core {
             }
 
             # ClientGate (Ügyfélkapu) authentication
-            valueobject KAUAuth inherits Auth {
+            entity KAUAuth inherits Auth {
                 enum eIDAS {
                     # low – gyengébb azonosítás (pl. sima jelszavas Ügyfélkapu)
                     Low,
@@ -154,11 +149,17 @@ domain Core {
         }
 
         service AccountService {
+            valueobject AccountWithAuth
+            {
+                account:Identity.Account
+                auth:Identity.Auth
+            }
+
             # Finds a user account by email address
-            query findUserByEmail( email:string ) : Identity.Account
+            query findAccountByEmailAuth( email:string ) : AccountWithAuth
             # Finds a user account by email address
-            query findUserByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : Identity.Account
-            query findUserKAUUserId( kauUserId:string ) : Identity.Account
+            query findAccountByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : AccountWithAuth
+            query findAccountKAUUserId( kauUserId:string ) : AccountWithAuth
         }
 
         service LoginService {

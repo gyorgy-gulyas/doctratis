@@ -29,7 +29,11 @@ namespace Core.Identities.Identity
 
 			// begin: Auth
 			clone.method = method;
+			clone.accountId = new string(accountId.ToCharArray());
 			// end: Auth
+
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			clone.email = new string(email.ToCharArray());
 			clone.isEmailConfirmed = isEmailConfirmed;
@@ -51,7 +55,11 @@ namespace Core.Identities.Identity
 
 			// begin: Auth
 			if(method != other.method) return false;
+			if(accountId != other.accountId) return false;
 			// end: Auth
+
+			// begin: BaseEntity
+			// end: BaseEntity
 
 			if(email != other.email) return false;
 			if(isEmailConfirmed != other.isEmailConfirmed) return false;
@@ -72,7 +80,14 @@ namespace Core.Identities.Identity
 			var hash = new HashCode();
 			// begin: Auth
 			hash.Add(method);
+			hash.Add(accountId);
 			// end: Auth
+
+			// begin: BaseEntity
+			hash.Add(id);
+			hash.Add(etag);
+			hash.Add(LastUpdate);
+			// end: BaseEntity
 
 			hash.Add(email);
 			hash.Add(isEmailConfirmed);
