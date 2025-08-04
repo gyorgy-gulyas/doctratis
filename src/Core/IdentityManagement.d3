@@ -18,7 +18,7 @@ domain Core {
                 emailAndPasswordAuth:EmailAndPasswordAuth
                 adAuth:ADAuth
                 certificateAuth:CertificateAuth
-                KAUAuth:KAUAuth
+                kauAuth:KAUAuth
 
                 # Optional two-factor authentication settings (TOTP, SMS, Email)
                 twoFactor: TwoFactorConfiguration
@@ -105,7 +105,7 @@ domain Core {
                 }
 
                 # Government-issued unique identifier (Ügyfélkapu ID)
-                KAUId: string
+                KAUUserId: string
                 # User’s full legal name as returned by the service
                 legalName: string
                 # Email address verified by the service (optional)
@@ -158,7 +158,7 @@ domain Core {
             query findUserByEmail( email:string ) : Identity.Account
             # Finds a user account by email address
             query findUserByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : Identity.Account
-            
+            query findUserKAUUserId( kauUserId:string ) : Identity.Account
         }
 
         service LoginService {
@@ -169,7 +169,13 @@ domain Core {
             command RefreshTokens( totp:string ) : LoginIF.v1.TokensDTO
 
             query GetKAULoginURL( redirectUrl:string, backendCallbackUrl:string ) : string
-            command KAUCallback( code:string, state:string ) : string
+
+            valueobject KAUCallbackResponse
+            {
+                returnUrl:string
+                tokens:LoginIF.v1.LoginResultDTO
+            }
+            command KAUCallback( code:string, state:string ) : KAUCallbackResponse
         }
 
         @internal_api(grpc,rest)

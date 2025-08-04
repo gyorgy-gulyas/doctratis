@@ -26,7 +26,8 @@ namespace Core.Identities.Service.Controllers
             CallingContext ctx = CallingContext.PoolFromHttpContext(HttpContext, _logger);
             var clone = ctx.CloneWithIdentity("KAU", "KAU", CallingContext.IdentityTypes.Service);
 
-            var url = _loginService.KAUCallback(clone, code, state);
+            var response = _loginService.KAUCallback(clone, code, state);
+            if(response.)
 
 
             return Redirect($"{url}?accessToken={result.Value.tokens.AccessToken}&refreshToken={result.Value.tokens.RefreshToken}");

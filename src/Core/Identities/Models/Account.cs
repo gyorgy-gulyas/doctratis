@@ -23,7 +23,7 @@ namespace Core.Identities.Identity
 		public EmailAndPasswordAuth emailAndPasswordAuth { get; set; }
 		public ADAuth adAuth { get; set; }
 		public CertificateAuth certificateAuth { get; set; }
-		public KAUAuth KAUAuth { get; set; }
+		public KAUAuth kauAuth { get; set; }
 		/// Optional two-factor authentication settings (TOTP, SMS, Email)
 		public TwoFactorConfiguration twoFactor { get; set; }
 		public List<ContactInfo> contacts { get; set; } = new();
@@ -49,8 +49,8 @@ namespace Core.Identities.Identity
 			// clone of certificateAuth
 			clone.certificateAuth = certificateAuth?.Clone();
 
-			// clone of KAUAuth
-			clone.KAUAuth = KAUAuth?.Clone();
+			// clone of kauAuth
+			clone.kauAuth = kauAuth?.Clone();
 
 			// clone of twoFactor
 			clone.twoFactor = twoFactor?.Clone();
@@ -86,9 +86,9 @@ namespace Core.Identities.Identity
 			if(certificateAuth == null && other.certificateAuth != null ) return false;
 			if(certificateAuth != null && certificateAuth.Equals(other.certificateAuth) == false ) return false;
 
-			// equals of KAUAuth
-			if(KAUAuth == null && other.KAUAuth != null ) return false;
-			if(KAUAuth != null && KAUAuth.Equals(other.KAUAuth) == false ) return false;
+			// equals of kauAuth
+			if(kauAuth == null && other.kauAuth != null ) return false;
+			if(kauAuth != null && kauAuth.Equals(other.kauAuth) == false ) return false;
 
 			// equals of twoFactor
 			if(twoFactor == null && other.twoFactor != null ) return false;
@@ -124,8 +124,8 @@ namespace Core.Identities.Identity
 			// hash of certificateAuth
 			if(certificateAuth != null ) hash.Add(certificateAuth);
 
-			// hash of KAUAuth
-			if(KAUAuth != null ) hash.Add(KAUAuth);
+			// hash of kauAuth
+			if(kauAuth != null ) hash.Add(kauAuth);
 
 			// hash of twoFactor
 			if(twoFactor != null ) hash.Add(twoFactor);

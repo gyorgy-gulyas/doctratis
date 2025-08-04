@@ -1,6 +1,8 @@
 ﻿using Core.Base;
 using Core.Identities.Identity;
+using Core.Identities.Service.Controllers;
 using Core.Identities.Service.Implementations.Helpers;
+using Microsoft.AspNetCore.WebUtilities;
 using OtpNet;
 using ServiceKit.Net;
 using System.Security.Cryptography;
@@ -84,14 +86,44 @@ namespace Core.Identities.Service.Implementations
             var state = _kauAuthenticator.GenerateUniqueState(redirectUrl);
 
             var loginUrl = _kauAuthenticator.GetLoginUrl(state, backendCallbackUrl);
+
+            return Response<string>.Success(loginUrl).AsTask();
         }
 
-        Task<Response<string>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
+        async Task<Response<KAUCallbackResponse>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
         {
             if (!_kauAuthenticator.ValidateState(state, out var returnUrl))
-                return Unauthorized("Invalid or expired state");
-        }
+                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Invalid or expired state" });
 
+            // Token lekérése a KAÜ token endpointjától
+            var tokenResponse = await _kauAuthenticator.ExchangeCodeForToken(code, "https://backend.hu/callback");
+            if (tokenResponse == null)
+                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Token exchange failed with KAÜ" });
+
+            var kauUserInfo = _kauAuthenticator.ParseToken(tokenResponse.id_token);
+            if (kauUserInfo == null)
+                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Invalid KAU Token" });
+
+            var account = await _accountService.findUserKAUUserId(ctx, kauUserInfo.UserId);
+            if (account.IsFailed())
+                return new(account.Error);
+            if (account.HasValue())
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"No user found with KAÜ: '{kauUserInfo.UserId}:{kauUserInfo.Name}'" });
+
+            var tokens = _Login(ctx, account.Value);
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                ["status"] = Statuses.Ok.ToString(),
+                ["message"] = "ok",
+                ["accessToken"] = tokens.AccessToken,
+                ["refreshToken"] = tokens.RefreshToken,
+                ["requires2FA"] = (account.Value.twoFactor?.enabled == true).ToString(),
+                ["accessTokenExpiresAt"] = tokens.AccessTokenExpiresAt.ToString("yyyyMMddHHmmss"),
+                ["refreshTokenExpiresAt"] = tokens.RefreshTokenExpiresAt.ToString("yyyyMMddHHmmss")
+            };
+            return new Response<string>(QueryHelpers.AddQueryString(returnUrl, queryParams));
+        }
 
         private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth auth)
         {

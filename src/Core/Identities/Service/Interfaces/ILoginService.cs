@@ -27,9 +27,57 @@ namespace Core.Identities
 		/// <return>string</return>
 		public Task<Response<string>> GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl);
 
-		/// <return>string</return>
-		public Task<Response<string>> KAUCallback(CallingContext ctx, string code, string state);
+		/// <return>ILoginService.KAUCallbackResponse</return>
+		public Task<Response<ILoginService.KAUCallbackResponse>> KAUCallback(CallingContext ctx, string code, string state);
 
+
+		public partial class KAUCallbackResponse : IEquatable<KAUCallbackResponse>
+		{
+			public string returnUrl { get; set; }
+			public LoginIF.v1.LoginResultDTO tokens { get; set; }
+
+			#region Clone 
+			public virtual KAUCallbackResponse Clone()
+			{
+				KAUCallbackResponse clone = new();
+
+				clone.returnUrl = new string(returnUrl.ToCharArray());
+
+				// clone of tokens
+				clone.tokens = tokens?.Clone();
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( KAUCallbackResponse other )
+			{
+				if (other is null) return false;
+
+				if(returnUrl != other.returnUrl) return false;
+
+				// equals of tokens
+				if(tokens == null && other.tokens != null ) return false;
+				if(tokens != null && tokens.Equals(other.tokens) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as KAUCallbackResponse);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(returnUrl);
+
+				// hash of tokens
+				if(tokens != null ) hash.Add(tokens);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+		}
 
 	}
 }

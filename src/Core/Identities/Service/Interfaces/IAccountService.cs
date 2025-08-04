@@ -24,6 +24,9 @@ namespace Core.Identities
 		/// <return>Identity.Account</return>
 		public Task<Response<Identity.Account>> findUserByADCredentrials(CallingContext ctx, Ldap.LdapDomain ldapDomain, string username);
 
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> findUserKAUUserId(CallingContext ctx, string kauUserId);
+
 
 	}
 }

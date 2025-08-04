@@ -25,7 +25,7 @@ namespace Core.Identities.Identity
 
 		}
 		/// Government-issued unique identifier (Ügyfélkapu ID)
-		public string KAUId { get; set; }
+		public string KAUUserId { get; set; }
 		/// User’s full legal name as returned by the service
 		public string legalName { get; set; }
 		/// Email address verified by the service (optional)
@@ -42,7 +42,7 @@ namespace Core.Identities.Identity
 			clone.method = method;
 			// end: Auth
 
-			clone.KAUId = new string(KAUId.ToCharArray());
+			clone.KAUUserId = new string(KAUUserId.ToCharArray());
 			clone.legalName = new string(legalName.ToCharArray());
 			clone.email = new string(email.ToCharArray());
 			clone.assuranceLevel = assuranceLevel;
@@ -60,7 +60,7 @@ namespace Core.Identities.Identity
 			if(method != other.method) return false;
 			// end: Auth
 
-			if(KAUId != other.KAUId) return false;
+			if(KAUUserId != other.KAUUserId) return false;
 			if(legalName != other.legalName) return false;
 			if(email != other.email) return false;
 			if(assuranceLevel != other.assuranceLevel) return false;
@@ -77,7 +77,7 @@ namespace Core.Identities.Identity
 			hash.Add(method);
 			// end: Auth
 
-			hash.Add(KAUId);
+			hash.Add(KAUUserId);
 			hash.Add(legalName);
 			hash.Add(email);
 			hash.Add(assuranceLevel);

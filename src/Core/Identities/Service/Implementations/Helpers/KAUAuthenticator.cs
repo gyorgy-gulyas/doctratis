@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Core.Identities.Service.Implementations.Helpers
 {
@@ -8,14 +9,14 @@ namespace Core.Identities.Service.Implementations.Helpers
         private readonly string _tokenEndpoint = "https://idp.ka.gov.hu/token";
         private readonly string _kauClientId;
         private readonly string _kauClientSecret;
-        private readonly string _secretKey;
+        private readonly string _privateSecret;
         private readonly HttpClient _httpClient;
 
         public KAUAuthenticator(HttpClient http, IConfiguration config)
         {
             _kauClientId = config["KAU:ClientId"];
             _kauClientSecret = config["KAU:ClientSecret"];
-            _secretKey = config["KAU:StateSecret"];
+            _privateSecret = config["KAU:PrivateSecret"];
             _httpClient = http;
         }
 
@@ -25,13 +26,14 @@ namespace Core.Identities.Service.Implementations.Helpers
             {
                 ReturnUrl = returnUrl,
                 Nonce = Guid.NewGuid().ToString(),
+                TimestampUTC = DateTime.UtcNow,
             };
 
             var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
             var payloadBase64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(payloadJson));
 
             // HMAC-SHA256 aláírás
-            using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(_secretKey));
+            using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(_privateSecret));
             var signature = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(payloadBase64));
             var signatureBase64 = Convert.ToBase64String(signature);
 
@@ -51,7 +53,7 @@ namespace Core.Identities.Service.Implementations.Helpers
             var signatureBase64 = parts[1];
 
             // újra számoljuk a HMAC-et
-            using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(_secretKey));
+            using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(_privateSecret));
             var expectedSignature = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(payloadBase64));
             var expectedSignatureBase64 = Convert.ToBase64String(expectedSignature);
 
@@ -77,23 +79,44 @@ namespace Core.Identities.Service.Implementations.Helpers
                    $"state={state}";
         }
 
-        public async Task<KauTokenResponse?> ExchangeCodeForTokenAsync(string code, string backendCallbackUrl)
+        public async Task<KauTokenResponse> ExchangeCodeForToken(string code, string backendCallbackUrl)
         {
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["grant_type"] = "authorization_code",
                 ["code"] = code,
-                ["redirect_uri"] = backendCallbackUrl,
                 ["client_id"] = _kauClientId,
-                ["client_secret"] = _kauClientSecret
+                ["client_secret"] = _kauClientSecret,
+                ["redirect_uri"] = backendCallbackUrl,
             });
 
-            var response = await _httpClient.PostAsync(_tokenEndpoint, content);
-            if (!response.IsSuccessStatusCode)
-                return null;
+            try
+            {
+                var response = await _httpClient.PostAsync(_tokenEndpoint, content);
+                if (!response.IsSuccessStatusCode)
+                    return null;
 
-            var json = await response.Content.ReadAsStringAsync();
-            return System.Text.Json.JsonSerializer.Deserialize<KauTokenResponse>(json);
+                var json = await response.Content.ReadAsStringAsync();
+                return System.Text.Json.JsonSerializer.Deserialize<KauTokenResponse>(json);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public KauUserInfo ParseToken(string token)
+        { 
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+
+            return new KauUserInfo
+            {
+                UserId = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
+                Name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value,
+                Email = jwt.Claims.FirstOrDefault(c => c.Type == "email")?.Value,
+                // akár több claim is kiszedhető, pl. birthdate, given_name stb.
+            };            
         }
 
         public class KauTokenResponse
@@ -108,14 +131,15 @@ namespace Core.Identities.Service.Implementations.Helpers
         public class KauUserInfo
         {
             public string UserId { get; set; }
-            public string? Name { get; set; }
-            public string? Email { get; set; }
+            public string Name { get; set; }
+            public string Email { get; set; }
         }
 
         internal class StatePayload
         {
             public string ReturnUrl { get; set; }
             public string Nonce { get; set; }
+            public DateTime TimestampUTC { get; set; }
         }
     }
 }
