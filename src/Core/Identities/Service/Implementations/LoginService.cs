@@ -90,39 +90,66 @@ namespace Core.Identities.Service.Implementations
             return Response<string>.Success(loginUrl).AsTask();
         }
 
-        async Task<Response<KAUCallbackResponse>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
+        async Task<Response<ILoginService.KAUCallbackResponse>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
         {
             if (!_kauAuthenticator.ValidateState(state, out var returnUrl))
-                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Invalid or expired state" });
+                return Unauthorized("Invalid or expired state");
 
-            // Token lekérése a KAÜ token endpointjától
             var tokenResponse = await _kauAuthenticator.ExchangeCodeForToken(code, "https://backend.hu/callback");
-            if (tokenResponse == null)
-                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Token exchange failed with KAÜ" });
+            if (tokenResponse?.id_token == null)
+                return TokenError(returnUrl);
 
             var kauUserInfo = _kauAuthenticator.ParseToken(tokenResponse.id_token);
             if (kauUserInfo == null)
-                return new(new Error() { Status = Statuses.Unauthorized, MessageText = "Invalid KAU Token" });
+                return TokenError(returnUrl);
 
             var account = await _accountService.findUserKAUUserId(ctx, kauUserInfo.UserId);
-            if (account.IsFailed())
-                return new(account.Error);
-            if (account.HasValue())
-                return new(new Error() { Status = Statuses.NotFound, MessageText = $"No user found with KAÜ: '{kauUserInfo.UserId}:{kauUserInfo.Name}'" });
+            if (!account.HasValue())
+                return UserNotFound(returnUrl);
 
             var tokens = _Login(ctx, account.Value);
+            return Success(returnUrl, tokens, account.Value.twoFactor?.enabled ?? false);
 
-            var queryParams = new Dictionary<string, string?>
-            {
-                ["status"] = Statuses.Ok.ToString(),
-                ["message"] = "ok",
-                ["accessToken"] = tokens.AccessToken,
-                ["refreshToken"] = tokens.RefreshToken,
-                ["requires2FA"] = (account.Value.twoFactor?.enabled == true).ToString(),
-                ["accessTokenExpiresAt"] = tokens.AccessTokenExpiresAt.ToString("yyyyMMddHHmmss"),
-                ["refreshTokenExpiresAt"] = tokens.RefreshTokenExpiresAt.ToString("yyyyMMddHHmmss")
-            };
-            return new Response<string>(QueryHelpers.AddQueryString(returnUrl, queryParams));
+
+            // Lokális segédfüggvények a válaszok egyszerűsítésére:
+            static Response<ILoginService.KAUCallbackResponse> Unauthorized(string message) =>
+                new(new Error { Status = Statuses.Unauthorized, MessageText = message });
+
+            static Response<ILoginService.KAUCallbackResponse> TokenError(string returnUrl) =>
+                new(new ILoginService.KAUCallbackResponse
+                {
+                    returnUrl = returnUrl,
+                    result = new ILoginIF_v1.LoginResultDTO
+                    {
+                        result = ILoginIF_v1.SignInResult.KAUTokenError,
+                        requires2FA = false,
+                        tokens = null
+                    }
+                });
+
+            static Response<ILoginService.KAUCallbackResponse> UserNotFound(string returnUrl) =>
+                new(new ILoginService.KAUCallbackResponse
+                {
+                    returnUrl = returnUrl,
+                    result = new ILoginIF_v1.LoginResultDTO
+                    {
+                        result = ILoginIF_v1.SignInResult.KAUUserNotFound,
+                        requires2FA = false,
+                        tokens = null
+                    }
+                });
+
+            static Response<ILoginService.KAUCallbackResponse> Success(string returnUrl, ILoginIF_v1.TokensDTO tokens, bool requires2FA) =>
+                new(new ILoginService.KAUCallbackResponse
+                {
+                    returnUrl = returnUrl,
+                    result = new ILoginIF_v1.LoginResultDTO
+                    {
+                        result = ILoginIF_v1.SignInResult.Ok,
+                        requires2FA = requires2FA,
+                        tokens = tokens
+                    }
+                });
         }
 
         private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth auth)

@@ -57,8 +57,8 @@ namespace TemplateManagement.Projects.Project
 		public string ProjectName { get; set; }
 		public string IdentityId { get; set; }
 		public string IdentityName { get; set; }
-		public Roles Role { get; set; }
-		public Statuses Status { get; set; }
+		public ProjectAccess.Roles Role { get; set; }
+		public ProjectAccess.Statuses Status { get; set; }
 
 		#region Clone 
 		public virtual ProjectAccess Clone()

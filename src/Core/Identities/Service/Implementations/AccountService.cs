@@ -49,5 +49,21 @@ namespace Core.Identities.Service.Implementations
 
             return Response<Account>.Success(account).AsTask();
         }
+
+        Task<Response<Account>> IAccountService.findUserKAUUserId(CallingContext ctx, string kauUserId)
+        {
+            if (string.IsNullOrEmpty(kauUserId) == true)
+                return Response<Account>.Failure(new Error() { Status = Statuses.BadRequest, MessageText = $"KAU user id cannot be empty" }).AsTask();
+
+            var account = _context.Accounts
+                .AsQueryable()
+                .Where(ac =>
+                    ac.Type == AccountTypes.User &&
+                    ac.kauAuth != null &&
+                    ac.kauAuth.KAUUserId == kauUserId )
+                .FirstOrDefault();
+
+            return Response<Account>.Success(account).AsTask();
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace Core.Identities.Identity
 		/// Email address verified by the service (optional)
 		public string email { get; set; }
 		/// magyar állam által nyújtott hitelesítési szolgáltatás: biztonsági szintek
-		public eIDAS assuranceLevel { get; set; }
+		public KAUAuth.eIDAS assuranceLevel { get; set; }
 
 		#region Clone 
 		public override KAUAuth Clone()

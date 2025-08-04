@@ -19,7 +19,7 @@ namespace TemplateManagement.Projects.Project
 		#endregion IBaseEntity
 
 		#region IAuditTrail
-		public TrailOperations trailOperation { get; set; }
+		public Core.Auditing.TrailOperations trailOperation { get; set; }
 		[ClusteringColumn(1)]
 		public DateTime timestamp { get; set; }
 		public string entityType { get; set; }

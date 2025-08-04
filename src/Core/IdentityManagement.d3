@@ -173,7 +173,7 @@ domain Core {
             valueobject KAUCallbackResponse
             {
                 returnUrl:string
-                tokens:LoginIF.v1.LoginResultDTO
+                result:LoginIF.v1.LoginResultDTO
             }
             command KAUCallback( code:string, state:string ) : KAUCallbackResponse
         }
@@ -211,6 +211,11 @@ domain Core {
                 DomainNotRegistered,
                 # for LDAP auththentication: when the domain use is not added for the system
                 DomainUserNotRegistered,
+
+                # for KAÜ auththentication: When token exchange is failed, or invalid token
+                KAUTokenError,
+                # for KAÜ auththentication: when no user registered in the system with given KAÜ user
+                KAUUserNotFound,
             }
 
             dto LoginResultDTO {

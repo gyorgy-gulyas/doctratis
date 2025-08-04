@@ -121,6 +121,12 @@ enum SignInResult {
 	/// for LDAP auththentication: when the domain use is not added for the system
 	SignInResult_DomainUserNotRegistered = 7;
 
+	/// for KAÜ auththentication: When token exchange is failed, or invalid token
+	SignInResult_KAUTokenError = 8;
+
+	/// for KAÜ auththentication: when no user registered in the system with given KAÜ user
+	SignInResult_KAUUserNotFound = 9;
+
 }
 
 message TokensDTO {

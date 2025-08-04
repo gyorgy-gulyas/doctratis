@@ -20,7 +20,7 @@ namespace Core.Identities.Identity
 			KAU,
 		}
 		/// Defines the type of authentication method
-		public Methods method { get; set; }
+		public Auth.Methods method { get; set; }
 
 		#region Clone 
 		public virtual Auth Clone()

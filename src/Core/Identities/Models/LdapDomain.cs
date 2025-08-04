@@ -67,7 +67,7 @@ namespace Core.Identities.Ldap
 		/// NetBIOS name (e.g. YOURDOMAIN)
 		public string netbiosName { get; set; }
 		/// List of Domain Controller hostnames or IP addresses
-		public List<DomainController> domainControllers { get; set; } = new();
+		public List<LdapDomain.DomainController> domainControllers { get; set; } = new();
 		/// Base Distinguished Name (where LDAP queries start, e.g. DC=yourdomain,DC=local)
 		public string baseDn { get; set; }
 		/// Whether to use secure LDAP (LDAPS)

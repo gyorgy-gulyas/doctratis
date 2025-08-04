@@ -34,7 +34,7 @@ namespace Core.Identities
 		public partial class KAUCallbackResponse : IEquatable<KAUCallbackResponse>
 		{
 			public string returnUrl { get; set; }
-			public LoginIF.v1.LoginResultDTO tokens { get; set; }
+			public ILoginIF_v1.LoginResultDTO result { get; set; }
 
 			#region Clone 
 			public virtual KAUCallbackResponse Clone()
@@ -43,8 +43,8 @@ namespace Core.Identities
 
 				clone.returnUrl = new string(returnUrl.ToCharArray());
 
-				// clone of tokens
-				clone.tokens = tokens?.Clone();
+				// clone of result
+				clone.result = result?.Clone();
 
 				return clone;
 			}
@@ -57,9 +57,9 @@ namespace Core.Identities
 
 				if(returnUrl != other.returnUrl) return false;
 
-				// equals of tokens
-				if(tokens == null && other.tokens != null ) return false;
-				if(tokens != null && tokens.Equals(other.tokens) == false ) return false;
+				// equals of result
+				if(result == null && other.result != null ) return false;
+				if(result != null && result.Equals(other.result) == false ) return false;
 
 				return true;
 			}
@@ -71,8 +71,8 @@ namespace Core.Identities
 				var hash = new HashCode();
 				hash.Add(returnUrl);
 
-				// hash of tokens
-				if(tokens != null ) hash.Add(tokens);
+				// hash of result
+				if(result != null ) hash.Add(result);
 
 				return hash.ToHashCode();
 			}

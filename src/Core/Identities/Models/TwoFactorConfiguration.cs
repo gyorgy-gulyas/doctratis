@@ -25,7 +25,7 @@ namespace Core.Identities.Identity
 
 		}
 		public bool enabled { get; set; }
-		public Method method { get; set; }
+		public TwoFactorConfiguration.Method method { get; set; }
 		public string totpSecret { get; set; }
 		public string phoneNumber { get; set; }
 		public string email { get; set; }

@@ -186,7 +186,7 @@ namespace TemplateManagement.Projects
 			public string Name { get; set; }
 			public string Description { get; set; }
 			public List<string> Tags { get; set; } = new();
-			public ProjectStatuses Status { get; set; }
+			public IProjectIF_v1.ProjectStatuses Status { get; set; }
 
 			#region Clone 
 			public virtual ProjectSummaryDTO Clone()
@@ -270,7 +270,7 @@ namespace TemplateManagement.Projects
 			public string id { get; set; }
 			public string Name { get; set; }
 			public string Description { get; set; }
-			public List<ProjectFolderDTO> SubFolders { get; set; } = new();
+			public List<IProjectIF_v1.ProjectFolderDTO> SubFolders { get; set; } = new();
 
 			#region Clone 
 			public virtual ProjectFolderDTO Clone()
@@ -349,11 +349,11 @@ namespace TemplateManagement.Projects
 			public string ProjectId { get; set; }
 			public string ProjectName { get; set; }
 			public string ProjectDescription { get; set; }
-			public ProjectStatuses ProjectStatus { get; set; }
+			public IProjectIF_v1.ProjectStatuses ProjectStatus { get; set; }
 			public string IdentityId { get; set; }
 			public string IdentityName { get; set; }
-			public ProjectAccessRoles AccessRole { get; set; }
-			public ProjectAccessStatuses AccessStatus { get; set; }
+			public IProjectIF_v1.ProjectAccessRoles AccessRole { get; set; }
+			public IProjectIF_v1.ProjectAccessStatuses AccessStatus { get; set; }
 
 			#region Clone 
 			public virtual ProjectIdentityAssignmentDTO Clone()
@@ -448,8 +448,8 @@ namespace TemplateManagement.Projects
 			public string etag { get; set; }
 			public string IdentityId { get; set; }
 			public string IdentityName { get; set; }
-			public ProjectAccessRoles Role { get; set; }
-			public ProjectAccessStatuses Status { get; set; }
+			public IProjectIF_v1.ProjectAccessRoles Role { get; set; }
+			public IProjectIF_v1.ProjectAccessStatuses Status { get; set; }
 
 			#region Clone 
 			public virtual ProjectAccessDTO Clone()
@@ -531,9 +531,9 @@ namespace TemplateManagement.Projects
 			public string Name { get; set; }
 			public string Description { get; set; }
 			public List<string> Tags { get; set; } = new();
-			public ProjectStatuses Status { get; set; }
-			public List<ProjectFolderDTO> SubFolders { get; set; } = new();
-			public List<ProjectAccessDTO> Accesses { get; set; } = new();
+			public IProjectIF_v1.ProjectStatuses Status { get; set; }
+			public List<IProjectIF_v1.ProjectFolderDTO> SubFolders { get; set; } = new();
+			public List<IProjectIF_v1.ProjectAccessDTO> Accesses { get; set; } = new();
 			public DateTime CreatedAt { get; set; }
 			public string CreatedBy { get; set; }
 

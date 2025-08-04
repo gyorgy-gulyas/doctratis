@@ -80,6 +80,12 @@ namespace Core.Identities
 			/// for LDAP auththentication: when the domain use is not added for the system
 			DomainUserNotRegistered,
 
+			/// for KAÜ auththentication: When token exchange is failed, or invalid token
+			KAUTokenError,
+
+			/// for KAÜ auththentication: when no user registered in the system with given KAÜ user
+			KAUUserNotFound,
+
 		}
 		#region GrpcMapping
 		public static class SignInResultMappings
@@ -96,6 +102,8 @@ namespace Core.Identities
 					ILoginIF_v1.SignInResult.DomainNotSpecified => Protos.LoginIF_v1.SignInResult.DomainNotSpecified,
 					ILoginIF_v1.SignInResult.DomainNotRegistered => Protos.LoginIF_v1.SignInResult.DomainNotRegistered,
 					ILoginIF_v1.SignInResult.DomainUserNotRegistered => Protos.LoginIF_v1.SignInResult.DomainUserNotRegistered,
+					ILoginIF_v1.SignInResult.KAUTokenError => Protos.LoginIF_v1.SignInResult.KautokenError,
+					ILoginIF_v1.SignInResult.KAUUserNotFound => Protos.LoginIF_v1.SignInResult.KauuserNotFound,
 					_ => throw new NotImplementedException(), 
 				};
 			}
@@ -112,6 +120,8 @@ namespace Core.Identities
 					Protos.LoginIF_v1.SignInResult.DomainNotSpecified => ILoginIF_v1.SignInResult.DomainNotSpecified,
 					Protos.LoginIF_v1.SignInResult.DomainNotRegistered => ILoginIF_v1.SignInResult.DomainNotRegistered,
 					Protos.LoginIF_v1.SignInResult.DomainUserNotRegistered => ILoginIF_v1.SignInResult.DomainUserNotRegistered,
+					Protos.LoginIF_v1.SignInResult.KautokenError => ILoginIF_v1.SignInResult.KAUTokenError,
+					Protos.LoginIF_v1.SignInResult.KauuserNotFound => ILoginIF_v1.SignInResult.KAUUserNotFound,
 					_ => throw new NotImplementedException(), 
 				};
 			}
@@ -199,9 +209,9 @@ namespace Core.Identities
 		public partial class LoginResultDTO : IEquatable<LoginResultDTO>
 		{
 			/// The result of the login attempt
-			public SignInResult result { get; set; }
+			public ILoginIF_v1.SignInResult result { get; set; }
 			/// Tokens returned when login is successful
-			public TokensDTO tokens { get; set; }
+			public ILoginIF_v1.TokensDTO tokens { get; set; }
 			/// Indicates whether two-factor authentication is required
 			public bool requires2FA { get; set; }
 
