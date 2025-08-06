@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;..\..\..\..\..\SrvKit\src\dotnet\SrvKit.General\Protos\" />
+    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(SrvKitProtoRoot)" />
   </ItemGroup>
 
   <ItemGroup>

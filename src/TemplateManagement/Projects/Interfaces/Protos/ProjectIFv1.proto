@@ -15,7 +15,7 @@ package TemplateManagement.Projects;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "servicekit_error.proto";
+import "srvkit/error.proto";
 
 service ProjectIF_v1 {
 	rpc createProject(ProjectIF_v1_createProjectRequest) returns (ProjectIF_v1_createProjectResponse);
