@@ -11,13 +11,19 @@ namespace Core.Identities.Identity
 {
 	public partial class Account : Core.Base.IBaseEntity, IEquatable<Account>
 	{
+		public enum Types
+		{
+			User,
+			ExternalSystem,
+			InternalService,
+		}
 		#region IBaseEntity
 		public string id { get; set; }
 		public string etag { get; set; }
 		public DateTime LastUpdate { get; set; }
 		#endregion IBaseEntity
 
-		public AccountTypes Type { get; set; }
+		public Account.Types Type { get; set; }
 		public string Name { get; set; }
 		public bool isActive { get; set; }
 		public List<ContactInfo> contacts { get; set; } = new();

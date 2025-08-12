@@ -1,5 +1,4 @@
-﻿using Core.Identities.Identity;
-using ServiceKit.Net;
+﻿using ServiceKit.Net;
 
 namespace Core.Identities.Service.Implementations
 {
@@ -7,7 +6,7 @@ namespace Core.Identities.Service.Implementations
     {
         private readonly ILoginService _loginService;
 
-        public LoginIF_v1(IAccountService accountService, ILoginService loginService)
+        public LoginIF_v1(ILoginService loginService)
         {
             _loginService = loginService;
         }

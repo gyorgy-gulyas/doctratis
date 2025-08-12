@@ -1,4 +1,5 @@
-﻿using Core.Auditing.Worker;
+﻿using Core.Auditing;
+using Core.Auditing.Worker;
 using Core.Identities.Identity;
 using Core.Identities.Ldap;
 using PolyPersist;
@@ -15,8 +16,9 @@ namespace Core.Identities.Service.Implementations
         public readonly IDocumentCollection<Auth> Auths;
         public readonly IDocumentCollection<LdapDomain> LdapDomains;
         public readonly IColumnTable<LoginAuditEventLog> LoginAuditEventLogs;
+        public readonly IColumnTable<LdapDomainAuditTrail> LdapDomainAuditTrails;
 
-        public IdentityStoreContext(IStoreProvider storeProvider, IAuditEntryContainer auditEntryContainer) 
+        public IdentityStoreContext(IStoreProvider storeProvider, IAuditEntryContainer auditEntryContainer)
             : base(storeProvider)
         {
             _auditEntryContainer = auditEntryContainer;
@@ -26,11 +28,13 @@ namespace Core.Identities.Service.Implementations
             LdapDomains = base.GetOrCreateDocumentCollection<LdapDomain>().Result;
 
             LoginAuditEventLogs = base.GetOrCreateColumnTable<LoginAuditEventLog>().Result;
+            LdapDomainAuditTrails = base.GetOrCreateColumnTable<LdapDomainAuditTrail>().Result;
         }
 
-        internal void AuditLog_LoggedIn(CallingContext ctx, Account loginedAccount, Auth.Methods usedAuthMetod  )
+        #region Login Audit
+        internal void AuditLog_LoggedIn(CallingContext ctx, Account loginedAccount, Auth.Methods usedAuthMetod)
         {
-            _auditEntryContainer.AddEntryForBackgrondSave(new LoginEventLog(this, ctx, "logged_in" )
+            _auditEntryContainer.AddEntryForBackgrondSave(new LoginEventLog(this, ctx, "logged_in")
             {
                 _account = loginedAccount,
                 _authMethod = usedAuthMetod,
@@ -103,9 +107,45 @@ namespace Core.Identities.Service.Implementations
                 log.authMethod = _authMethod;
             }
 
-            protected override string GetLogSpecificPayloadJSON() => JsonSerializer.Serialize( _jsonData );
+            protected override string GetLogSpecificPayloadJSON() => JsonSerializer.Serialize(_jsonData);
             protected override string GetPartitionKey() => _account.id;
             protected override IColumnTable<LoginAuditEventLog> GetTable() => _storeContext.LoginAuditEventLogs;
         }
+        #endregion Login Audit
+
+
+        #region Domain Audit
+        internal void Audit_Domain(TrailOperations operation, CallingContext ctx, LdapDomain domain)
+        {
+            _auditEntryContainer.AddEntryForBackgrondSave(new LdapDomainAuditEntry(this, ctx, operation)
+            {
+                _domain = domain,
+            });
+        }
+
+        public class LdapDomainAuditEntry : AuditTrail<LdapDomainAuditTrail>
+        {
+            private readonly IdentityStoreContext _storeContext;
+            public LdapDomain _domain { get; set; }
+
+            public LdapDomainAuditEntry(IdentityStoreContext storeContext, CallingContext callingContext, TrailOperations operation)
+                : base(callingContext, operation)
+            {
+                _storeContext = storeContext;
+            }
+
+            protected override Task InitializeAsync() => Task.CompletedTask;
+
+            protected override void FillAddtionalMembers(LdapDomainAuditTrail trail)
+            {
+                trail.domainId = _domain.id;
+                trail.domainName = _domain.name;
+            }
+
+            protected override IEntity GetRootEntity() => _domain;
+            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { _domain });
+            protected override IColumnTable<LdapDomainAuditTrail> GetTable() => _storeContext.LdapDomainAuditTrails;
+        }
+        #endregion Domain Audit
     }
 }

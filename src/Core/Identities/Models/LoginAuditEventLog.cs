@@ -28,7 +28,7 @@ namespace Core.Identities.Identity
 		public string payload { get; set; }
 		#endregion IAuditLog
 
-		public AccountTypes AccountType { get; set; }
+		public Account.Types AccountType { get; set; }
 		public Auth.Methods authMethod { get; set; }
 
 		#region Clone 

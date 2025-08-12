@@ -4,14 +4,14 @@ domain Core {
 
         aggregate Identity 
         {
-            enum AccountTypes {
-                User,
-                ExternalSystem,
-                InternalService
-            }
-
             root entity Account inherits Core.Base.BaseEntity {
-                Type:AccountTypes
+                enum Types {
+                    User,
+                    ExternalSystem,
+                    InternalService
+                }
+
+                Type:Types
                 Name:string
                 isActive: boolean
 
@@ -107,7 +107,7 @@ domain Core {
             }
 
             entity LoginAuditEventLog inherits Core.Base.BaseEntity, Core.Auditing.AuditLog {
-                AccountType:AccountTypes
+                AccountType:Account.Types
                 authMethod:Auth.Methods
             }
         }
@@ -143,6 +143,12 @@ domain Core {
                 # Service account password (should be stored securely/encrypted)
                 serviceAccountPassword: string
             }
+
+            entity LdapDomainAuditTrail inherits Core.Base.BaseEntity, Core.Auditing.AuditTrail {
+                domainId: string
+                domainName: string
+            }
+
         }
 
         service AccountService {
@@ -156,7 +162,18 @@ domain Core {
             query findAccountByEmailAuth( email:string ) : AccountWithAuth
             # Finds a user account by email address
             query findAccountByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : AccountWithAuth
+            # Finds a user account by KAU id
             query findAccountKAUUserId( kauUserId:string ) : AccountWithAuth
+
+            command insertLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
+            command updateLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
+            command getLdapDomain( id:string ) : Ldap.LdapDomain
+            command getAllLdapDomain() : List[Ldap.LdapDomain]
+        
+            command getAllAccount() : List[Identity.Account]
+            command getAccount( id:string ) : List[Identity.Account]
+            command createAccount(account:Identity.Account) : Identity.Account
+            command updateAccount(account:Identity.Account) : Identity.Account
         }
 
         service LoginService {
@@ -175,6 +192,99 @@ domain Core {
             }
             command KAUCallback( code:string, state:string ) : KAUCallbackResponse
         }
+
+        @internal_api(grpc,rest)
+        @public_api(rest, collection="Admin")
+        interface IdentityAdminIF version 1 {
+            dto LdapDomainDTO {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+
+                dto DomainController {
+                    # Hostname or IP address of the DC
+                    host: string
+                    # LDAP or LDAPS port (e.g. 389 or 636)
+                    port: integer
+                }
+
+                # Fully Qualified Domain Name (e.g. yourdomain.local)
+                name: string
+                # Optional description or notes
+                description: string
+
+                # NetBIOS name (e.g. YOURDOMAIN)
+                netbiosName: string
+                # List of Domain Controller hostnames or IP addresses
+                domainControllers: List[DomainController]
+
+                # Base Distinguished Name (where LDAP queries start, e.g. DC=yourdomain,DC=local)
+                baseDn: string
+
+                # Whether to use secure LDAP (LDAPS)
+                useSecureLdap: boolean
+
+                # Service account username used for directory queries (if required)
+                serviceAccountUser: string
+                # Service account password (should be stored securely/encrypted)
+                serviceAccountPassword: string
+            }
+
+            dto LdapDomainSummaryDTO
+            {
+                id:string
+                # Fully Qualified Domain Name (e.g. yourdomain.local)
+                name: string
+                # Optional description or notes
+                description: string
+            }
+
+            command RegisterLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
+            query GetAllRegisteredLdapDomain() : List[LdapDomainSummaryDTO]
+            query GetRegisteredLdapDomain( id:string ) : LdapDomainDTO
+            query UpdateRegisteredLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
+
+            enum AccountTypesDTO {
+                User,
+                ExternalSystem,
+                InternalService
+            }
+
+            dto AccountSummaryDTO {
+                Type:AccountTypesDTO
+                Name:string
+                isActive: boolean
+            }
+
+            dto AccountDTO {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+
+                Type:AccountTypesDTO
+                Name:string
+                isActive: boolean
+
+                contacts: List[ContactInfo]
+
+                # account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
+                accountSecret: string
+            }
+
+            dto ContactInfo
+            {
+                contactType: string
+                email: string
+                phoneNumber : string
+            }
+            command getAllAccount() : List[AccountSummaryDTO]
+            command getAccount( id:string ) : List[AccountSummaryDTO]
+            command createAccount(account:AccountDTO) : AccountDTO
+            command updateAccount(account:AccountDTO) : AccountDTO
+        }
+
 
         @internal_api(grpc,rest)
         @public_api(grpc, rest, collection="BFF")

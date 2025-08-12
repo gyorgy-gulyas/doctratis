@@ -24,8 +24,35 @@ namespace Core.Identities
 		/// <return>IAccountService.AccountWithAuth</return>
 		public Task<Response<IAccountService.AccountWithAuth>> findAccountByADCredentrials(CallingContext ctx, Ldap.LdapDomain ldapDomain, string username);
 
+		/// <summary>
+		///  Finds a user account by KAU id
+		/// </summary>
 		/// <return>IAccountService.AccountWithAuth</return>
 		public Task<Response<IAccountService.AccountWithAuth>> findAccountKAUUserId(CallingContext ctx, string kauUserId);
+
+		/// <return>Ldap.LdapDomain</return>
+		public Task<Response<Ldap.LdapDomain>> insertLdapDomain(CallingContext ctx, Ldap.LdapDomain ldapDomain);
+
+		/// <return>Ldap.LdapDomain</return>
+		public Task<Response<Ldap.LdapDomain>> updateLdapDomain(CallingContext ctx, Ldap.LdapDomain ldapDomain);
+
+		/// <return>Ldap.LdapDomain</return>
+		public Task<Response<Ldap.LdapDomain>> getLdapDomain(CallingContext ctx, string id);
+
+		/// <return>List<Ldap.LdapDomain></return>
+		public Task<Response<List<Ldap.LdapDomain>>> getAllLdapDomain(CallingContext ctx);
+
+		/// <return>List<Identity.Account></return>
+		public Task<Response<List<Identity.Account>>> getAllAccount(CallingContext ctx);
+
+		/// <return>List<Identity.Account></return>
+		public Task<Response<List<Identity.Account>>> getAccount(CallingContext ctx, string id);
+
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> createAccount(CallingContext ctx, Identity.Account account);
+
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> updateAccount(CallingContext ctx, Identity.Account account);
 
 
 		public partial class AccountWithAuth : IEquatable<AccountWithAuth>

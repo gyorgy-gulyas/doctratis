@@ -88,5 +88,62 @@ namespace Core.Identities.Service.Implementations
 
             return new(new IAccountService.AccountWithAuth() { account = account, auth = auth } );
         }
+
+        async Task<Response<LdapDomain>> IAccountService.insertLdapDomain(CallingContext ctx, LdapDomain ldapDomain)
+        {
+            await _context.LdapDomains.Insert(ldapDomain).ConfigureAwait(false);
+
+            _context.Audit_Domain(Auditing.TrailOperations.Create, ctx, ldapDomain);
+
+            return new(ldapDomain);
+        }
+
+        async Task<Response<LdapDomain>> IAccountService.updateLdapDomain(CallingContext ctx, LdapDomain ldapDomain)
+        {
+            await _context.LdapDomains.Update(ldapDomain).ConfigureAwait(false);
+
+            _context.Audit_Domain(Auditing.TrailOperations.Update, ctx, ldapDomain);
+
+            return new(ldapDomain);
+        }
+
+        async Task<Response<LdapDomain>> IAccountService.getLdapDomain(CallingContext ctx, string id)
+        {
+            var ldapDomain = await _context.LdapDomains.Find(id, id);
+            if (ldapDomain == null)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"LDAP domain '{id}' does not exist" });
+            
+            return new(ldapDomain);
+        }
+
+        Task<Response<List<LdapDomain>>> IAccountService.getAllLdapDomain(CallingContext ctx)
+        {
+            var accesses = _context
+                .LdapDomains
+                .AsQueryable()
+                .ToList();
+
+            return Response<List<LdapDomain>>.Success(accesses).AsTask();
+        }
+
+        Task<Response<List<Account>>> IAccountService.getAllAccount(CallingContext ctx)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<List<Account>>> IAccountService.getAccount(CallingContext ctx, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<Account>> IAccountService.createAccount(CallingContext ctx, Account account)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<Account>> IAccountService.updateAccount(CallingContext ctx, Account account)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
