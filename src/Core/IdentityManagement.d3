@@ -164,12 +164,16 @@ domain Core {
             query findAccountByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : AccountWithAuth
             # Finds a user account by KAU id
             query findAccountKAUUserId( kauUserId:string ) : AccountWithAuth
+        }
 
+        repository LdapDomainRepository {
             command insertLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
             command updateLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
             command getLdapDomain( id:string ) : Ldap.LdapDomain
             command getAllLdapDomain() : List[Ldap.LdapDomain]
-        
+        }
+
+        repository AccountRepository {
             command getAllAccount() : List[Identity.Account]
             command getAccount( id:string ) : List[Identity.Account]
             command createAccount(account:Identity.Account) : Identity.Account

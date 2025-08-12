@@ -2,7 +2,6 @@
 
     context Projects {
 
-
         // todo: datasource
         aggregate Project {
             enum ProjectStatuses {

@@ -1,22 +1,25 @@
 ﻿using ServiceKit.Net;
-using Twilio.Rest.Api.V2010.Account.Usage.Record;
 
 namespace Core.Identities.Service.Implementations
 {
     public class IdentityAdminIF_v1 : IIdentityAdminIF_v1
     {
-
         private readonly IAccountService _accountService;
-        public IdentityAdminIF_v1(IAccountService accountService)
+        private readonly IAccountRepository _accountRepository;
+        private readonly ILdapDomainRepository _ldapDomainRepository;
+
+        public IdentityAdminIF_v1(IAccountService accountService, IAccountRepository accountRepository, ILdapDomainRepository ldapDomainRepository)
         {
             _accountService = accountService;
+            _accountRepository = accountRepository;
+            _ldapDomainRepository = ldapDomainRepository;
         }
 
         async Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> IIdentityAdminIF_v1.RegisterLdapDomain(CallingContext ctx, IIdentityAdminIF_v1.LdapDomainDTO ldap)
         {
             var domain = ldap.Convert();
 
-            var result = await _accountService.insertLdapDomain(ctx, domain).ConfigureAwait(false);
+            var result = await _ldapDomainRepository.insertLdapDomain(ctx, domain).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -25,16 +28,16 @@ namespace Core.Identities.Service.Implementations
 
         async Task<Response<List<IIdentityAdminIF_v1.LdapDomainSummaryDTO>>> IIdentityAdminIF_v1.GetAllRegisteredLdapDomain(CallingContext ctx)
         {
-            var result = await _accountService.getAllLdapDomain(ctx).ConfigureAwait(false);
+            var result = await _ldapDomainRepository.getAllLdapDomain(ctx).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
-            return new(result.Value.Select( d => d.ConvertToSummary()).ToList());
+            return new(result.Value.Select(d => d.ConvertToSummary()).ToList());
         }
 
         async Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> IIdentityAdminIF_v1.GetRegisteredLdapDomain(CallingContext ctx, string id)
         {
-            var result = await _accountService.getLdapDomain(ctx, id).ConfigureAwait(false);
+            var result = await _ldapDomainRepository.getLdapDomain(ctx, id).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -45,7 +48,7 @@ namespace Core.Identities.Service.Implementations
         {
             var domain = ldap.Convert();
 
-            var result = await _accountService.updateLdapDomain(ctx, domain).ConfigureAwait(false);
+            var result = await _ldapDomainRepository.updateLdapDomain(ctx, domain).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -75,7 +78,6 @@ namespace Core.Identities.Service.Implementations
 
     internal static class ConversionExtensions
     {
-
         internal static Ldap.LdapDomain Convert(this IIdentityAdminIF_v1.LdapDomainDTO @this)
         {
             return new()
