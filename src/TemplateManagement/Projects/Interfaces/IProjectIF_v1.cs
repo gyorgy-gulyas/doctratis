@@ -446,6 +446,7 @@ namespace TemplateManagement.Projects
 		{
 			public string id { get; set; }
 			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
 			public string IdentityId { get; set; }
 			public string IdentityName { get; set; }
 			public IProjectIF_v1.ProjectAccessRoles Role { get; set; }
@@ -485,6 +486,7 @@ namespace TemplateManagement.Projects
 				var hash = new HashCode();
 				hash.Add(id);
 				hash.Add(etag);
+				hash.Add(LastUpdate);
 				hash.Add(IdentityId);
 				hash.Add(IdentityName);
 				hash.Add(Role);
@@ -501,6 +503,7 @@ namespace TemplateManagement.Projects
 
 				result.Id = @this.id;
 				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.IdentityId = @this.IdentityId;
 				result.IdentityName = @this.IdentityName;
 				result.Role = IProjectIF_v1.ProjectAccessRolesMappings.ToGrpc( @this.Role );
@@ -514,6 +517,7 @@ namespace TemplateManagement.Projects
 
 				result.id = @from.Id;
 				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.IdentityId = @from.IdentityId;
 				result.IdentityName = @from.IdentityName;
 				result.Role = IProjectIF_v1.ProjectAccessRolesMappings.FromGrpc( @from.Role) ;
@@ -528,6 +532,7 @@ namespace TemplateManagement.Projects
 		{
 			public string id { get; set; }
 			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
 			public string Name { get; set; }
 			public string Description { get; set; }
 			public List<string> Tags { get; set; } = new();
@@ -591,6 +596,7 @@ namespace TemplateManagement.Projects
 				var hash = new HashCode();
 				hash.Add(id);
 				hash.Add(etag);
+				hash.Add(LastUpdate);
 				hash.Add(Name);
 				hash.Add(Description);
 
@@ -620,6 +626,7 @@ namespace TemplateManagement.Projects
 
 				result.Id = @this.id;
 				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.Name = @this.Name;
 				result.Description = @this.Description;
 				result.Tags.AddRange( @this.Tags);
@@ -637,6 +644,7 @@ namespace TemplateManagement.Projects
 
 				result.id = @from.Id;
 				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.Name = @from.Name;
 				result.Description = @from.Description;
 				result.Tags.AddRange( @from.Tags);

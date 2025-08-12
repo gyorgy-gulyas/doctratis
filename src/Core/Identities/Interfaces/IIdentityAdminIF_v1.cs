@@ -7,6 +7,7 @@
 
 using Core.Identities;
 using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using ServiceKit.Net;
 
 namespace Core.Identities
@@ -28,14 +29,8 @@ namespace Core.Identities
 		/// <return>List<IIdentityAdminIF_v1.AccountSummaryDTO></return>
 		public Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> getAllAccount(CallingContext ctx);
 
-		/// <return>List<IIdentityAdminIF_v1.AccountSummaryDTO></return>
-		public Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> getAccount(CallingContext ctx, string id);
-
 		/// <return>IIdentityAdminIF_v1.AccountDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> createAccount(CallingContext ctx, AccountDTO account);
-
-		/// <return>IIdentityAdminIF_v1.AccountDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> updateAccount(CallingContext ctx, AccountDTO account);
+		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> getAccount(CallingContext ctx, string id);
 
 
 		public enum AccountTypesDTO
@@ -141,6 +136,7 @@ namespace Core.Identities
 
 			public string id { get; set; }
 			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
 			/// Fully Qualified Domain Name (e.g. yourdomain.local)
 			public string name { get; set; }
 			/// Optional description or notes
@@ -204,6 +200,7 @@ namespace Core.Identities
 				var hash = new HashCode();
 				hash.Add(id);
 				hash.Add(etag);
+				hash.Add(LastUpdate);
 				hash.Add(name);
 				hash.Add(description);
 				hash.Add(netbiosName);
@@ -227,6 +224,7 @@ namespace Core.Identities
 
 				result.Id = @this.id;
 				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.Name = @this.name;
 				result.Description = @this.description;
 				result.NetbiosName = @this.netbiosName;
@@ -244,6 +242,7 @@ namespace Core.Identities
 
 				result.id = @from.Id;
 				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.name = @from.Name;
 				result.description = @from.Description;
 				result.netbiosName = @from.NetbiosName;
@@ -330,6 +329,7 @@ namespace Core.Identities
 
 		public partial class AccountSummaryDTO : IEquatable<AccountSummaryDTO>
 		{
+			public string id { get; set; }
 			public IIdentityAdminIF_v1.AccountTypesDTO Type { get; set; }
 			public string Name { get; set; }
 			public bool isActive { get; set; }
@@ -364,6 +364,7 @@ namespace Core.Identities
 			public override int GetHashCode()
 			{
 				var hash = new HashCode();
+				hash.Add(id);
 				hash.Add(Type);
 				hash.Add(Name);
 				hash.Add(isActive);
@@ -377,6 +378,7 @@ namespace Core.Identities
 			{
 				Protos.IdentityAdminIF_v1.AccountSummaryDTO result = new();
 
+				result.Id = @this.id;
 				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.ToGrpc( @this.Type );
 				result.Name = @this.Name;
 				result.IsActive = @this.isActive;
@@ -387,6 +389,7 @@ namespace Core.Identities
 			{
 				IIdentityAdminIF_v1.AccountSummaryDTO result = new();
 
+				result.id = @from.Id;
 				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.FromGrpc( @from.Type) ;
 				result.Name = @from.Name;
 				result.isActive = @from.IsActive;
@@ -400,12 +403,11 @@ namespace Core.Identities
 		{
 			public string id { get; set; }
 			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
 			public IIdentityAdminIF_v1.AccountTypesDTO Type { get; set; }
 			public string Name { get; set; }
 			public bool isActive { get; set; }
 			public List<IIdentityAdminIF_v1.ContactInfo> contacts { get; set; } = new();
-			/// account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
-			public string accountSecret { get; set; }
 
 			#region Clone 
 			public virtual AccountDTO Clone()
@@ -418,7 +420,6 @@ namespace Core.Identities
 
 				// clone of contacts
 				clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
-				clone.accountSecret = new string(accountSecret.ToCharArray());
 
 				return clone;
 			}
@@ -435,7 +436,6 @@ namespace Core.Identities
 
 				// equals of contacts
 				if(contacts.SequenceEqual(other.contacts) == false ) return false;
-				if(accountSecret != other.accountSecret) return false;
 
 				return true;
 			}
@@ -447,6 +447,7 @@ namespace Core.Identities
 				var hash = new HashCode();
 				hash.Add(id);
 				hash.Add(etag);
+				hash.Add(LastUpdate);
 				hash.Add(Type);
 				hash.Add(Name);
 				hash.Add(isActive);
@@ -454,7 +455,6 @@ namespace Core.Identities
 				// hash of contacts
 				foreach( var element_contacts in contacts)
 					hash.Add(element_contacts);
-				hash.Add(accountSecret);
 
 				return hash.ToHashCode();
 			}
@@ -467,11 +467,11 @@ namespace Core.Identities
 
 				result.Id = @this.id;
 				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.ToGrpc( @this.Type );
 				result.Name = @this.Name;
 				result.IsActive = @this.isActive;
 				result.Contacts.AddRange( @this.contacts.Select( v => IIdentityAdminIF_v1.ContactInfo.ToGrpc( v ) ));
-				result.AccountSecret = @this.accountSecret;
 
 				return result;
 			}
@@ -481,11 +481,11 @@ namespace Core.Identities
 
 				result.id = @from.Id;
 				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.FromGrpc( @from.Type) ;
 				result.Name = @from.Name;
 				result.isActive = @from.IsActive;
 				result.contacts.AddRange( @from.Contacts.Select( v => IIdentityAdminIF_v1.ContactInfo.FromGrpc(v) ));
-				result.accountSecret = @from.AccountSecret;
 
 				return result;
 			}

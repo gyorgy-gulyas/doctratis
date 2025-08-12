@@ -192,6 +192,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             {
                 id = @this.id,
                 etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
                 Name = @this.Name,
                 Description = @this.Description,
                 SubFolders = @this.SubFolders.Convert(),
@@ -225,6 +226,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             {
                 id = @this.id,
                 etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
                 Name = @this.Name,
             };
         }
@@ -236,6 +238,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             {
                 id = @this.id,
                 etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
 
                 IdentityId = @this.IdentityId,
                 IdentityName = @this.IdentityName,
@@ -272,6 +275,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             {
                 id = @this.id,
                 etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
 
                 ProjectId = header.id,
                 ProjectName = header.Name,

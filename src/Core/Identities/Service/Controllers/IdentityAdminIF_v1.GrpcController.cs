@@ -335,7 +335,7 @@ namespace Core.Identities
 						if( response.HasValue() == true )
 						{
 							var result = new IdentityAdminIF_v1_getAccountResponse();
-							result.Value.Value.AddRange( response.Value.Select( v => IIdentityAdminIF_v1.AccountSummaryDTO.ToGrpc( v ) ));
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( response.Value ) : null;
 							return result;
 						}
 						else
@@ -362,124 +362,6 @@ namespace Core.Identities
 				catch(Exception ex)
 				{
 					return new IdentityAdminIF_v1_getAccountResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		public override async Task<IdentityAdminIF_v1_createAccountResponse> createAccount( IdentityAdminIF_v1_createAccountRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createAccount" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					IIdentityAdminIF_v1.AccountDTO account;
-					account = request.Account != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( request.Account ) : null;
-
-					// calling the service function itself
-					var response = await _service.createAccount( ctx , account );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_createAccountResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_createAccountResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.createAccount'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_createAccountResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_createAccountResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		public override async Task<IdentityAdminIF_v1_updateAccountResponse> updateAccount( IdentityAdminIF_v1_updateAccountRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.updateAccount" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					IIdentityAdminIF_v1.AccountDTO account;
-					account = request.Account != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( request.Account ) : null;
-
-					// calling the service function itself
-					var response = await _service.updateAccount( ctx , account );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_updateAccountResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_updateAccountResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.updateAccount'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_updateAccountResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_updateAccountResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

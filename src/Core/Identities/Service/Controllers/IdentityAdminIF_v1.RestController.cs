@@ -262,7 +262,7 @@ namespace Core.Identities
 
 		[HttpPost( "getaccount/{id}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IIdentityAdminIF_v1.AccountSummaryDTO>) )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AccountDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
@@ -288,98 +288,6 @@ namespace Core.Identities
 						else
 						{
 							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getAccount'" );
-						}
-					}
-					else
-					{
-						return StatusCode(response.Error.Status.ToHttp(), response.Error);
-					}
-				}
-				catch(Exception ex)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		[HttpPost( "None" )] 
-		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AccountDTO) )]
-		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> createAccount( [FromBody] IIdentityAdminIF_v1.AccountDTO account)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createAccount" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
-				try
-				{
-					// calling the service function itself
-					var response = await _service.createAccount( ctx, account );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							return Ok(response.Value);
-						}
-						else
-						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createAccount'" );
-						}
-					}
-					else
-					{
-						return StatusCode(response.Error.Status.ToHttp(), response.Error);
-					}
-				}
-				catch(Exception ex)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		[HttpPost( "None" )] 
-		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AccountDTO) )]
-		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> updateAccount( [FromBody] IIdentityAdminIF_v1.AccountDTO account)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.updateAccount" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
-				try
-				{
-					// calling the service function itself
-					var response = await _service.updateAccount( ctx, account );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							return Ok(response.Value);
-						}
-						else
-						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.updateAccount'" );
 						}
 					}
 					else

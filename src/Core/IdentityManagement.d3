@@ -110,6 +110,11 @@ domain Core {
                 AccountType:Account.Types
                 authMethod:Auth.Methods
             }
+
+            entity AccountAuditTrail inherits Core.Base.BaseEntity, Core.Auditing.AuditTrail {
+                accountId: string
+                accountName: string
+            }
         }
         
         aggregate Ldap
@@ -148,7 +153,6 @@ domain Core {
                 domainId: string
                 domainName: string
             }
-
         }
 
         service AccountService {
@@ -174,10 +178,8 @@ domain Core {
         }
 
         repository AccountRepository {
+            command getAccount( id:string ) : Identity.Account
             command getAllAccount() : List[Identity.Account]
-            command getAccount( id:string ) : List[Identity.Account]
-            command createAccount(account:Identity.Account) : Identity.Account
-            command updateAccount(account:Identity.Account) : Identity.Account
         }
 
         service LoginService {
@@ -205,6 +207,8 @@ domain Core {
                 id:string
                 @system_field
                 etag:string
+                @system_field
+                LastUpdate:datetime
 
                 dto DomainController {
                     # Hostname or IP address of the DC
@@ -256,6 +260,8 @@ domain Core {
             }
 
             dto AccountSummaryDTO {
+                @system_field
+                id:string
                 Type:AccountTypesDTO
                 Name:string
                 isActive: boolean
@@ -266,15 +272,14 @@ domain Core {
                 id:string
                 @system_field
                 etag:string
+                @system_field
+                LastUpdate:datetime
 
                 Type:AccountTypesDTO
                 Name:string
                 isActive: boolean
 
                 contacts: List[ContactInfo]
-
-                # account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
-                accountSecret: string
             }
 
             dto ContactInfo
@@ -284,9 +289,7 @@ domain Core {
                 phoneNumber : string
             }
             command getAllAccount() : List[AccountSummaryDTO]
-            command getAccount( id:string ) : List[AccountSummaryDTO]
-            command createAccount(account:AccountDTO) : AccountDTO
-            command updateAccount(account:AccountDTO) : AccountDTO
+            command getAccount( id:string ) : AccountDTO
         }
 
 

@@ -271,7 +271,7 @@ namespace Core.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> IIdentityAdminIF_v1.getAccount(CallingContext ctx, string id)
+		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.getAccount(CallingContext ctx, string id)
 		{
 			try
 			{
@@ -284,121 +284,19 @@ namespace Core.Identities
 
 				if (response.IsSuccessStatusCode)
 				{
-					var value = await response.Content.ReadFromJsonAsync<List<IIdentityAdminIF_v1.AccountSummaryDTO>>();
-					return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Success( value );
+					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.AccountDTO>();
+					return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
 				}
 				else if( response.Content != null )
 				{
 					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( error );
+					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( error );
 				}
 				else
 				{
-					return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
 						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_getAccount'",
-					} );
-				}
-			}
-			catch (HttpRequestException ex)
-			{
-				return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.createAccount(CallingContext ctx, IIdentityAdminIF_v1.AccountDTO account)
-		{
-			try
-			{
-				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/identityadminif/v1/None" ) );
-				ctx.FillHttpRequest( request, "CoreIdentitiesIdentityAdminIF_v1", "createAccount" );
-
-				// build content
-				request.Content = new StringContent( JsonSerializer.Serialize<IIdentityAdminIF_v1.AccountDTO>( account ));
-
-				// call http client 
-				HttpResponseMessage response = await _httpClient.SendAsync( request );
-
-				if (response.IsSuccessStatusCode)
-				{
-					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.AccountDTO>();
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
-				}
-				else if( response.Content != null )
-				{
-					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( error );
-				}
-				else
-				{
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_createAccount'",
-					} );
-				}
-			}
-			catch (HttpRequestException ex)
-			{
-				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.updateAccount(CallingContext ctx, IIdentityAdminIF_v1.AccountDTO account)
-		{
-			try
-			{
-				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/core/identities/identityadminif/v1/None" ) );
-				ctx.FillHttpRequest( request, "CoreIdentitiesIdentityAdminIF_v1", "updateAccount" );
-
-				// build content
-				request.Content = new StringContent( JsonSerializer.Serialize<IIdentityAdminIF_v1.AccountDTO>( account ));
-
-				// call http client 
-				HttpResponseMessage response = await _httpClient.SendAsync( request );
-
-				if (response.IsSuccessStatusCode)
-				{
-					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.AccountDTO>();
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
-				}
-				else if( response.Content != null )
-				{
-					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( error );
-				}
-				else
-				{
-					return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_updateAccount'",
 					} );
 				}
 			}

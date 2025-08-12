@@ -1,5 +1,4 @@
 ﻿using Core.Identities.Identity;
-using Core.Identities.Ldap;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
 
@@ -14,24 +13,23 @@ namespace Core.Identities.Service.Implementations
             _context = context;
         }
 
+        async Task<Response<Account>> IAccountRepository.getAccount(CallingContext ctx, string id)
+        {
+            var account = await _context.Accounts.Find(id, id);
+            if (account == null)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"LDAP domain '{id}' does not exist" });
+            
+            return new(account);
+        }
+
         Task<Response<List<Account>>> IAccountRepository.getAllAccount(CallingContext ctx)
         {
-            throw new NotImplementedException();
-        }
+             var accounts = _context
+                .Accounts
+                .AsQueryable()
+                .ToList();
 
-        Task<Response<List<Account>>> IAccountRepository.getAccount(CallingContext ctx, string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Response<Account>> IAccountRepository.createAccount(CallingContext ctx, Account account)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Response<Account>> IAccountRepository.updateAccount(CallingContext ctx, Account account)
-        {
-            throw new NotImplementedException();
+            return Response<List<Account>>.Success(accounts).AsTask();
         }
     }
 }

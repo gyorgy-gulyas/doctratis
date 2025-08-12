@@ -290,7 +290,7 @@ namespace Core.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> IIdentityAdminIF_v1.getAccount(CallingContext ctx, string id)
+		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.getAccount(CallingContext ctx, string id)
 		{
 			try
 			{
@@ -305,12 +305,12 @@ namespace Core.Identities
 				switch( grpc_response.ResultCase )
 				{
 					case IdentityAdminIF_v1_getAccountResponse.ResultOneofCase.Value:
-						List<IIdentityAdminIF_v1.AccountSummaryDTO> value = new();
-						value.AddRange( grpc_response.Value.Value.Select( v => IIdentityAdminIF_v1.AccountSummaryDTO.FromGrpc(v) ));
-						return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Success( value );
+						IIdentityAdminIF_v1.AccountDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
 
 					case IdentityAdminIF_v1_getAccountResponse.ResultOneofCase.Error:
-						return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = grpc_response.Error.MessageText,
 							AdditionalInformation = grpc_response.Error.AdditionalInformation,
@@ -318,115 +318,9 @@ namespace Core.Identities
 
 					case IdentityAdminIF_v1_getAccountResponse.ResultOneofCase.None:
 					default:
-						return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_getAccount'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.createAccount(CallingContext ctx, IIdentityAdminIF_v1.AccountDTO account)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_createAccountRequest();
-				request.Account = account != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( account ) : null;
-
-				// calling grpc client
-				var grpc_response = await _client.createAccountAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesIdentityAdminIF_v1", "createAccount" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.AccountDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
-
-					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_createAccount'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.updateAccount(CallingContext ctx, IIdentityAdminIF_v1.AccountDTO account)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_updateAccountRequest();
-				request.Account = account != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( account ) : null;
-
-				// calling grpc client
-				var grpc_response = await _client.updateAccountAsync( request, new CallOptions(ctx.ToGrpcMetadata( "Core.IdentitiesIdentityAdminIF_v1", "updateAccount" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.AccountDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
-
-					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_updateAccount'",
 						} );
 				}
 			}

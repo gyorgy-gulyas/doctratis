@@ -17,6 +17,7 @@ namespace Core.Identities.Service.Implementations
         public readonly IDocumentCollection<LdapDomain> LdapDomains;
         public readonly IColumnTable<LoginAuditEventLog> LoginAuditEventLogs;
         public readonly IColumnTable<LdapDomainAuditTrail> LdapDomainAuditTrails;
+        public readonly IColumnTable<AccountAuditTrail> AccountAuditTrails;
 
         public IdentityStoreContext(IStoreProvider storeProvider, IAuditEntryContainer auditEntryContainer)
             : base(storeProvider)
@@ -29,6 +30,7 @@ namespace Core.Identities.Service.Implementations
 
             LoginAuditEventLogs = base.GetOrCreateColumnTable<LoginAuditEventLog>().Result;
             LdapDomainAuditTrails = base.GetOrCreateColumnTable<LdapDomainAuditTrail>().Result;
+            AccountAuditTrails = base.GetOrCreateColumnTable<AccountAuditTrail>().Result;
         }
 
         #region Login Audit
@@ -147,5 +149,39 @@ namespace Core.Identities.Service.Implementations
             protected override IColumnTable<LdapDomainAuditTrail> GetTable() => _storeContext.LdapDomainAuditTrails;
         }
         #endregion Domain Audit
+
+        #region Account Audit
+        internal void Audit_Account(TrailOperations operation, CallingContext ctx, Account account)
+        {
+            _auditEntryContainer.AddEntryForBackgrondSave(new AccountAuditEntry(this, ctx, operation)
+            {
+                _account = account,
+            });
+        }
+
+        public class AccountAuditEntry : AuditTrail<AccountAuditTrail>
+        {
+            private readonly IdentityStoreContext _storeContext;
+            public Account _account { get; set; }
+
+            public AccountAuditEntry(IdentityStoreContext storeContext, CallingContext callingContext, TrailOperations operation)
+                : base(callingContext, operation)
+            {
+                _storeContext = storeContext;
+            }
+
+            protected override Task InitializeAsync() => Task.CompletedTask;
+
+            protected override void FillAddtionalMembers(AccountAuditTrail trail)
+            {
+                trail.accountId = _account.id;
+                trail.accountName = _account.Name;
+            }
+
+            protected override IEntity GetRootEntity() => _account;
+            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { _account });
+            protected override IColumnTable<AccountAuditTrail> GetTable() => _storeContext.AccountAuditTrails;
+        }
+        #endregion Account Audit
     }
 }

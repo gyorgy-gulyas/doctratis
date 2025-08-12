@@ -42,12 +42,12 @@ namespace Core.Identities.Service.Implementations
 
         Task<Response<List<LdapDomain>>> ILdapDomainRepository.getAllLdapDomain(CallingContext ctx)
         {
-            var accesses = _context
+            var domains = _context
                 .LdapDomains
                 .AsQueryable()
                 .ToList();
 
-            return Response<List<LdapDomain>>.Success(accesses).AsTask();
+            return Response<List<LdapDomain>>.Success(domains).AsTask();
         }
     }
 }

@@ -175,23 +175,25 @@ message ProjectIdentityAssignmentDTO {
 message ProjectAccessDTO {
 	string id = 1;
 	string etag = 2;
-	string IdentityId = 3;
-	string IdentityName = 4;
-	ProjectAccessRoles Role = 5;
-	ProjectAccessStatuses Status = 6;
+	google.protobuf.Timestamp LastUpdate = 3;
+	string IdentityId = 4;
+	string IdentityName = 5;
+	ProjectAccessRoles Role = 6;
+	ProjectAccessStatuses Status = 7;
 }
 
 message ProjectDetailsDTO {
 	string id = 1;
 	string etag = 2;
-	string Name = 3;
-	string Description = 4;
-	repeated string Tags = 5;
-	ProjectStatuses Status = 6;
-	repeated ProjectFolderDTO SubFolders = 7;
-	repeated ProjectAccessDTO Accesses = 8;
-	google.protobuf.Timestamp CreatedAt = 9;
-	string CreatedBy = 10;
+	google.protobuf.Timestamp LastUpdate = 3;
+	string Name = 4;
+	string Description = 5;
+	repeated string Tags = 6;
+	ProjectStatuses Status = 7;
+	repeated ProjectFolderDTO SubFolders = 8;
+	repeated ProjectAccessDTO Accesses = 9;
+	google.protobuf.Timestamp CreatedAt = 10;
+	string CreatedBy = 11;
 }
 
 message list_ProjectIdentityAssignmentDTO {

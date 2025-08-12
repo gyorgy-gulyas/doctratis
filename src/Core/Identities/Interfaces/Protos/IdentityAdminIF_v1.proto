@@ -14,6 +14,7 @@ option java_multiple_files = true;
 package Core.Identities;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 import "srvkit/error.proto";
 
 service IdentityAdminIF_v1 {
@@ -23,8 +24,6 @@ service IdentityAdminIF_v1 {
 	rpc UpdateRegisteredLdapDomain(IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest) returns (IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse);
 	rpc getAllAccount(google.protobuf.Empty) returns (IdentityAdminIF_v1_getAllAccountResponse);
 	rpc getAccount(IdentityAdminIF_v1_getAccountRequest) returns (IdentityAdminIF_v1_getAccountResponse);
-	rpc createAccount(IdentityAdminIF_v1_createAccountRequest) returns (IdentityAdminIF_v1_createAccountResponse);
-	rpc updateAccount(IdentityAdminIF_v1_updateAccountRequest) returns (IdentityAdminIF_v1_updateAccountResponse);
 }
 
 message IdentityAdminIF_v1_RegisterLdapDomainRequest {
@@ -78,28 +77,6 @@ message IdentityAdminIF_v1_getAccountRequest {
 
 message IdentityAdminIF_v1_getAccountResponse {
 	oneof result {
-		list_AccountSummaryDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
-message IdentityAdminIF_v1_createAccountRequest {
-	AccountDTO account = 1;
-}
-
-message IdentityAdminIF_v1_createAccountResponse {
-	oneof result {
-		AccountDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
-message IdentityAdminIF_v1_updateAccountRequest {
-	AccountDTO account = 1;
-}
-
-message IdentityAdminIF_v1_updateAccountResponse {
-	oneof result {
 		AccountDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
@@ -121,22 +98,23 @@ message LdapDomainDTO {
 
 	string id = 1;
 	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
 	/// Fully Qualified Domain Name (e.g. yourdomain.local)
-	string name = 3;
+	string name = 4;
 	/// Optional description or notes
-	string description = 4;
+	string description = 5;
 	/// NetBIOS name (e.g. YOURDOMAIN)
-	string netbiosName = 5;
+	string netbiosName = 6;
 	/// List of Domain Controller hostnames or IP addresses
-	repeated DomainController domainControllers = 6;
+	repeated DomainController domainControllers = 7;
 	/// Base Distinguished Name (where LDAP queries start, e.g. DC=yourdomain,DC=local)
-	string baseDn = 7;
+	string baseDn = 8;
 	/// Whether to use secure LDAP (LDAPS)
-	bool useSecureLdap = 8;
+	bool useSecureLdap = 9;
 	/// Service account username used for directory queries (if required)
-	string serviceAccountUser = 9;
+	string serviceAccountUser = 10;
 	/// Service account password (should be stored securely/encrypted)
-	string serviceAccountPassword = 10;
+	string serviceAccountPassword = 11;
 }
 
 message LdapDomainSummaryDTO {
@@ -148,20 +126,20 @@ message LdapDomainSummaryDTO {
 }
 
 message AccountSummaryDTO {
-	AccountTypesDTO Type = 1;
-	string Name = 2;
-	bool isActive = 3;
+	string id = 1;
+	AccountTypesDTO Type = 2;
+	string Name = 3;
+	bool isActive = 4;
 }
 
 message AccountDTO {
 	string id = 1;
 	string etag = 2;
-	AccountTypesDTO Type = 3;
-	string Name = 4;
-	bool isActive = 5;
-	repeated ContactInfo contacts = 6;
-	/// account specific unique secret is, for account specific sign in operations (like TOTP, Hash)
-	string accountSecret = 7;
+	google.protobuf.Timestamp LastUpdate = 3;
+	AccountTypesDTO Type = 4;
+	string Name = 5;
+	bool isActive = 6;
+	repeated ContactInfo contacts = 7;
 }
 
 message ContactInfo {
