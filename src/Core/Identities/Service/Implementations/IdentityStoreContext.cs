@@ -4,6 +4,7 @@ using Core.Identities.Identity;
 using Core.Identities.Ldap;
 using PolyPersist;
 using PolyPersist.Net.Context;
+using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
 using System.Text.Json;
 
@@ -151,18 +152,22 @@ namespace Core.Identities.Service.Implementations
         #endregion Domain Audit
 
         #region Account Audit
-        internal void Audit_Account(TrailOperations operation, CallingContext ctx, Account account)
+        internal void Audit_Account(TrailOperations operation, CallingContext ctx, Account account = null, IEnumerable<Auth> auths = null, string accountId = null )
         {
             _auditEntryContainer.AddEntryForBackgrondSave(new AccountAuditEntry(this, ctx, operation)
             {
-                _account = account,
+                accountId = account != null ? account.id : accountId,
+                account = account,
+                auths = auths,
             });
         }
 
         public class AccountAuditEntry : AuditTrail<AccountAuditTrail>
         {
             private readonly IdentityStoreContext _storeContext;
-            public Account _account { get; set; }
+            public string accountId { get; set; }
+            public Account account { get; set; }
+            public IEnumerable<Auth> auths { get; set; }
 
             public AccountAuditEntry(IdentityStoreContext storeContext, CallingContext callingContext, TrailOperations operation)
                 : base(callingContext, operation)
@@ -170,16 +175,23 @@ namespace Core.Identities.Service.Implementations
                 _storeContext = storeContext;
             }
 
-            protected override Task InitializeAsync() => Task.CompletedTask;
+            protected override async Task InitializeAsync()
+            {
+                account ??= await _storeContext.Accounts.Find(accountId, accountId);
+                auths ??= _storeContext.Auths
+                        .AsQueryable()
+                        .Where(pa => pa.accountId == account.id)
+                        .ToArray();
+            }
 
             protected override void FillAddtionalMembers(AccountAuditTrail trail)
             {
-                trail.accountId = _account.id;
-                trail.accountName = _account.Name;
+                trail.accountId = account.id;
+                trail.accountName = account.Name;
             }
 
-            protected override IEntity GetRootEntity() => _account;
-            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { _account });
+            protected override IEntity GetRootEntity() => account;
+            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { account, auths });
             protected override IColumnTable<AccountAuditTrail> GetTable() => _storeContext.AccountAuditTrails;
         }
         #endregion Account Audit

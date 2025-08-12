@@ -32,6 +32,7 @@ namespace TemplateManagement.Projects.Project
 		#endregion IAuditTrail
 
 		public string projectId { get; set; }
+		public string projectName { get; set; }
 
 		#region Clone 
 		public virtual ProjectAuditTrail Clone()
@@ -54,6 +55,7 @@ namespace TemplateManagement.Projects.Project
 			// end: AuditTrail
 
 			clone.projectId = new string(projectId.ToCharArray());
+			clone.projectName = new string(projectName.ToCharArray());
 
 			return clone;
 		}
@@ -80,6 +82,7 @@ namespace TemplateManagement.Projects.Project
 			// end: AuditTrail
 
 			if(projectId != other.projectId) return false;
+			if(projectName != other.projectName) return false;
 
 			return true;
 		}
@@ -108,6 +111,7 @@ namespace TemplateManagement.Projects.Project
 			// end: AuditTrail
 
 			hash.Add(projectId);
+			hash.Add(projectName);
 
 			return hash.ToHashCode();
 		}

@@ -78,6 +78,7 @@
 
             entity ProjectAuditTrail inherits Core.Base.BaseEntity, Core.Auditing.AuditTrail {
                 projectId: string
+                projectName: string
             }
         }
 

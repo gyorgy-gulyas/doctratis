@@ -54,13 +54,14 @@ namespace TemplateManagement.Projects.Service.Implementations
             header ??= await _storeContext.ProjectHeaders.Find(projectId, projectId);
             accesses ??= _storeContext.ProjectAccesses
                     .AsQueryable()
-                    .Where(pa => pa.ProjectId == projectId)
+                    .Where(pa => pa.ProjectId == header.id)
                     .ToArray();
         }
 
         protected override void FillAddtionalMembers(ProjectAuditTrail trail)
         {
-            trail.projectId = projectId;
+            trail.projectId = header.id;
+            trail.projectName = header.Name;
         }
 
         protected override IEntity GetRootEntity() => header;
