@@ -1,0 +1,37 @@
+{{- if or .Values.ports.http .Values.ports.https .Values.ports.grpc .Values.ports.grpcs }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.serviceName }}
+  labels:
+    {{- include "docratis-services.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  selector:
+    {{- include "docratis-services.selectorLabels" . | nindent 4 }}
+  ports:
+    {{- if .Values.ports.http }}
+    - name: http
+      port: {{ .Values.portDefinitions.http }}
+      targetPort: {{ .Values.portDefinitions.http }}
+      protocol: TCP
+    {{- end }}
+    {{- if .Values.ports.https }}
+    - name: https
+      port: {{ .Values.portDefinitions.https }}
+      targetPort: {{ .Values.portDefinitions.https }}
+      protocol: TCP
+    {{- end }}
+    {{- if .Values.ports.grpc }}
+    - name: grpc
+      port: {{ .Values.portDefinitions.grpc }}
+      targetPort: {{ .Values.portDefinitions.grpc }}
+      protocol: TCP
+    {{- end }}
+    {{- if .Values.ports.grpcs }}
+    - name: grpcs
+      port: {{ .Values.portDefinitions.grpcs }}
+      targetPort: {{ .Values.portDefinitions.grpcs }}
+      protocol: TCP
+    {{- end }}
+{{- end }}

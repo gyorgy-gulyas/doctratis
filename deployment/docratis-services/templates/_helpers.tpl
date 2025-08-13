@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "docratis-service.name" -}}
+{{- define "docratis-services.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,9 +10,11 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "docratis-service.fullname" -}}
+{{- define "docratis-services.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else if .Values.serviceName }}
+{{- .Values.serviceName | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
@@ -26,16 +28,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "docratis-service.chart" -}}
+{{- define "docratis-services.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "docratis-service.labels" -}}
-helm.sh/chart: {{ include "docratis-service.chart" . }}
-{{ include "docratis-service.selectorLabels" . }}
+{{- define "docratis-services.labels" -}}
+helm.sh/chart: {{ include "docratis-services.chart" . }}
+{{ include "docratis-services.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +47,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "docratis-service.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "docratis-service.name" . }}
+{{- define "docratis-services.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "docratis-services.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "docratis-service.serviceAccountName" -}}
+{{- define "docratis-services.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "docratis-service.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "docratis-services.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

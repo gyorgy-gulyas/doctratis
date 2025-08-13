@@ -32,6 +32,7 @@
     <PackageReference Include="PolyPersist.Net.ColumnStore.Memory" />
     <PackageReference Include="SrvKit.General" />
     <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="SrvKit.ServiceHost" />
   </ItemGroup>
 
 </Project>

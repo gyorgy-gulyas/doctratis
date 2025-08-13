@@ -1,0 +1,53 @@
+replicaCount: 1
+
+image:
+  registryPrefix: docratis    
+  pullPolicy: IfNotPresent
+  tag: latest
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+# Portokhoz tartozó alap containerPort értékek
+portDefinitions:
+  http: 8080
+  https: 8443
+  grpc: 5000
+  grpcs: 5001
+
+probes:
+  liveness:
+    path: /health/live
+    portName: http
+    initialDelaySeconds: 5
+    periodSeconds: 30
+    timeoutSeconds: 2
+    failureThreshold: 3
+  readiness:
+    path: /health/ready
+    portName: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+resources: {}
+serviceAccount:
+  create: true
+  automount: true
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -22,6 +22,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
+LABEL app.kubernetes.io/part-of="docratis"
+
 # Build ARG – paraméterezett entrypoint
 ARG ENTRY_DLL
 ENV ENTRY_DLL=$ENTRY_DLL

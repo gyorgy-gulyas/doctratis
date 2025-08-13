@@ -1,7 +1,6 @@
 ﻿using Core.Identities.Ldap;
 using Novell.Directory.Ldap;
 using PolyPersist.Net.Extensions;
-using Twilio.Rest;
 
 namespace Core.Identities.Service.Implementations.Helpers
 {

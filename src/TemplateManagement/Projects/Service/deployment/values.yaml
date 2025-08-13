@@ -1,1 +1,7 @@
 serviceName: template-management
+
+ports:
+  http: true
+  grpc: true
+  https: false
+  grpcs: false

@@ -13,7 +13,7 @@ namespace Core.Base.Service.Implementations
 
         Task<Response> ISmsService.SendOTP(CallingContext ctx, string phoneNumber, string otp)
         {
-            return _smsCommunicator.SendSMS(phoneNumber, $"Docratis bejelentkeési kód: {otp}").AsTask();
+            return _smsCommunicator.SendSMS(phoneNumber, $"Docratis bejelentkeési kód: {otp}");
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Identities\Interfaces\Core.Identities.Interfaces.csproj" />
+    <ProjectReference Include="..\..\TemplateManagement\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
+    <PackageReference Include="SrvKit.General" />
+  </ItemGroup>
+</Project>

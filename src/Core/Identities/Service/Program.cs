@@ -1,55 +1,64 @@
 using Core.Auditing.Worker;
+using Core.Base;
+using Core.Base.Service.Implementations;
 using Core.Identities;
 using Core.Identities.Service;
 using Core.Identities.Service.Implementations;
+using Core.Identities.Service.Implementations.Helpers;
 using PolyPersist;
-using PolyPersist.Net.Core;
-using SrvKit.Net;
+using ServiceKit.Net;
+using SrvKit.Communicators;
 
 
-var builder = WebApplication.CreateBuilder(args);
-//builder.Services.AddAuthentication("Bearer");
-//builder.Services.AddAuthorization();
-builder.Services.AddControllers();
-builder.Services.AddGrpc();
-builder.Services.AddSingleton<IStoreProvider>(new IdentityStoreProvider());
-builder.Services.AddSingleton<IdentityStoreContext>();
-builder.Services.AddAuditWorker();
-// Swagger service registartion
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// and service specific services
-builder.Services.AddSingleton<ILoginIF_v1, LoginIF_v1>();
-builder.Services.AddSingleton<IAccountService, AccountService>();
-builder.Services.AddSingleton<ILoginService, LoginService>();
-builder.Services.AddCors(options =>
+BaseServiceHost.Create<IdentityManagementServiceHost>(args, new BaseServiceHost.Options()
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    WithAuthentication = false,
+    WithGrpc = true,
+    WithRest = true,
+    WithReponseCompression = false,
+}).Run();
+
+public class IdentityManagementServiceHost : BaseServiceHost
+{
+    protected override void _BeforeAddServices(IServiceCollection services, Options options)
     {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
+    }
 
-var app = builder.Build();
+    protected override void _AfterAddServices(IServiceCollection services, Options options)
+    {
+        services.AddSingleton<IStoreProvider>(new IdentityStoreProvider());
+        services.AddSingleton<IdentityStoreContext>();
+        services.AddAuditWorker();
 
-app.UseCors("AllowReactApp"); // Middleware engedélyezés
+        services.UseSms_Twilio();
+        services.AddSingleton<ISmsService, SmsService>();
+        services.UseEmail_Graph();
+        services.AddSingleton<IEmailService, EmailService>();
 
-// Swagger middleware bekapcsolása (csak dev-ben)
-app.UseSwagger();
-app.UseSwaggerUI();
+        services.AddSingleton<LdapAuthenticator>();
+        services.AddHttpClient<KAUAuthenticator>();
+        services.AddSingleton<KAUAuthenticator>(); 
 
-//app.UseAuthentication();
-//app.UseAuthorization();
-//app.MapRestControllers();
-app.MapControllers();
-app.MapGrpcControllers();
-app.MapGet("/", () => "Service is running!");
+        // interfaces
+        services.AddSingleton<ILoginIF_v1, LoginIF_v1>();
+        services.AddSingleton<IIdentityAdminIF_v1, IdentityAdminIF_v1>();
+        // repositories
+        services.AddSingleton<IAccountRepository, AccountRepository>();
+        services.AddSingleton<ILdapDomainRepository, LdapDomainRepository>();
+        // services
+        services.AddSingleton<IAccountService, AccountService>();
+        services.AddSingleton<ILoginService, LoginService>();
+        // acls
+    }
 
-app.Run();
+    protected override void _BeforeBuild(IServiceCollection services, Options options)
+    {
+    }
+
+    protected override void _AfterBuild(IServiceCollection services, Options options)
+    {
+    }
+}
 
 namespace Core.Identities.Service
 {
@@ -57,6 +66,7 @@ namespace Core.Identities.Service
     using PolyPersist.Net.BlobStore.Memory;
     using PolyPersist.Net.ColumnStore.Cassandra;
     using PolyPersist.Net.ColumnStore.Memory;
+    using PolyPersist.Net.Core;
     using PolyPersist.Net.DocumentStore.Memory;
     using PolyPersist.Net.DocumentStore.MongoDB;
 

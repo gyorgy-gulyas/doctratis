@@ -5,8 +5,9 @@
     <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.4"/>
     <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.4"/>
 
-    <PackageVersion Include="SrvKit.General" Version="1.0.26"/>
-    <PackageVersion Include="SrvKit.Service" Version="1.0.26"/>
-    <PackageVersion Include="SrvKit.Communicators" Version="1.0.26"/>
+    <PackageVersion Include="SrvKit.General" Version="1.0.31"/>
+    <PackageVersion Include="SrvKit.Service" Version="1.0.31"/>
+    <PackageVersion Include="SrvKit.Communicators" Version="1.0.31"/>
+    <PackageVersion Include="SrvKit.ServiceHost" Version="1.0.31"/>
   </ItemGroup>
 </Project>

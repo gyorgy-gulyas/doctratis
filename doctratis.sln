@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Auditing.Models", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Auditing.Worker", "src\Core\Auditing\Worker\Core.Auditing.Worker.csproj", "{DB1B1ECE-3654-4C80-95E4-067C3530721D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BFF", "BFF", "{B5512AA7-7B9B-1802-74DB-5DED17EB80F5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClientKit", "ApiClientKit", "{B5512AA7-7B9B-1802-74DB-5DED17EB80F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.ApiClientKit", "src\ApiClientKit\BFF\BFF.ApiClientKit.csproj", "{0F5A664F-276F-4F0B-885B-9E7D4C955EF0}"
 EndProject
@@ -74,6 +74,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Identities.Service", "src\Core\Identities\Service\Core.Identities.Service.csproj", "{15A55916-0CF7-41F4-B6A8-0A9F79D63014}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Base.Service", "src\Core\Base\Service\Core.Base.Service.csproj", "{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.ApiClientKit", "src\ApiClientKit\Admin\Admin.ApiClientKit.csproj", "{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -277,6 +279,18 @@ Global
 		{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}.Release|x64.Build.0 = Release|Any CPU
 		{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}.Release|x86.Build.0 = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|x64.Build.0 = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -301,6 +315,7 @@ Global
 		{4F082DF5-FC58-4DA3-AAE0-99DC9950FF2B} = {1A080536-9F9C-4B0C-B2F4-745EED7BA11B}
 		{15A55916-0CF7-41F4-B6A8-0A9F79D63014} = {1A080536-9F9C-4B0C-B2F4-745EED7BA11B}
 		{AFA3C890-1DA3-FF08-3D4A-78CC837750C4} = {2CDDF983-CE19-4E54-B9EE-AD516C61A0EC}
+		{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF} = {B5512AA7-7B9B-1802-74DB-5DED17EB80F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C074C67E-A13B-4F7B-A375-8EC8A5BDFC1F}
