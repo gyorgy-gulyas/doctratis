@@ -1,0 +1,8 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+metadata:
+  name: prometheus
+  labels:
+    global: "true"
+plugin: prometheus
+config: {}   # Kong 3.x-ben a magas kardinalitású metrikákat külön is lehet kapcsolni; kezdésnek üresen jó

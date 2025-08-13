@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apps-gateway
+  namespace: docratis
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/override: "default-timeouts"
+spec:
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      - path: /core/identities
+        pathType: Prefix
+        backend:
+          service:
+            name: identitymanagement
+            port:
+              number: 80
+      - path: /template-management
+        pathType: Prefix
+        backend:
+          service:
+            name: templatemanagement
+            port:
+              number: 80

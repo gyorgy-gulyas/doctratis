@@ -1,0 +1,51 @@
+fullnameOverride: kong-gateway
+
+image:
+  repository: kong
+  tag: "3.7"
+
+ingressController:
+  enabled: true
+  env:
+    CONTROLLER_INGRESS_CLASS: "kong"
+
+proxy:
+  type: LoadBalancer
+  http:
+    enabled: true
+  tls:
+    enabled: false
+
+admin:
+  enabled: true
+  type: ClusterIP
+
+env:
+  KONG_DATABASE: "off"
+  KONG_LOG_LEVEL: "info"
+  KONG_WORKER_PROCESSES: "2"
+  KONG_PROXY_ACCESS_LOG: /dev/stdout
+  KONG_PROXY_ERROR_LOG: /dev/stderr
+  KONG_ADMIN_ACCESS_LOG: /dev/stdout
+  KONG_ADMIN_ERROR_LOG: /dev/stderr
+  KONG_STATUS_LISTEN: "0.0.0.0:8100"
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+ingressClass:
+  enabled: true
+  name: kong
+  controller: konghq.com/ingress-controller
+
+metrics:
+  enabled: true
+
+serviceMonitor:
+    enabled: true
+    namespace: docratis-infra

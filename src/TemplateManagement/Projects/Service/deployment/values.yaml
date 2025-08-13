@@ -1,4 +1,4 @@
-serviceName: template-management
+serviceName: template-management-projects
 
 ports:
   http: true
