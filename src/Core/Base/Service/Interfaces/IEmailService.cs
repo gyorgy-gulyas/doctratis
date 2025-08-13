@@ -11,7 +11,7 @@ namespace Core.Base
 {
 	public partial interface IEmailService
 	{
-		public Task<Response> SendOTP(CallingContext ctx, string emailAddress, string otp);
+		public Task<Response> SendOTP(CallingContext ctx, string phoneNumber, string otp);
 
 
 	}
