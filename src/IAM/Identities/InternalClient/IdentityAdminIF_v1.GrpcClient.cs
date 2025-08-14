@@ -342,5 +342,383 @@ namespace IAM.Identities
 			}
 		}
 
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.createAccount(CallingContext ctx, string username, IIdentityAdminIF_v1.AccountTypes accountType)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_createAccountRequest();
+				request.Username = username;
+				request.AccountType = IIdentityAdminIF_v1.AccountTypesMappings.ToGrpc( accountType );
+
+				// calling grpc client
+				var grpc_response = await _client.createAccountAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "createAccount" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.AccountDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
+
+					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_createAccountResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_createAccount'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.updateAccount(CallingContext ctx, string accountId, string etag, IIdentityAdminIF_v1.AccountDataDTO data)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_updateAccountRequest();
+				request.AccountId = accountId;
+				request.Etag = etag;
+				request.Data = data != null ? IIdentityAdminIF_v1.AccountDataDTO.ToGrpc( data ) : null;
+
+				// calling grpc client
+				var grpc_response = await _client.updateAccountAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "updateAccount" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.AccountDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.AccountDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Success( value );
+
+					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_updateAccountResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_updateAccount'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.AccountDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> IIdentityAdminIF_v1.listAuthsForAccount(CallingContext ctx, string accountId)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_listAuthsForAccountRequest();
+				request.AccountId = accountId;
+
+				// calling grpc client
+				var grpc_response = await _client.listAuthsForAccountAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "listAuthsForAccount" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_listAuthsForAccountResponse.ResultOneofCase.Value:
+						List<IIdentityAdminIF_v1.AuthDTO> value = new();
+						value.AddRange( grpc_response.Value.Value.Select( v => IIdentityAdminIF_v1.AuthDTO.FromGrpc(v) ));
+						return Response<List<IIdentityAdminIF_v1.AuthDTO>>.Success( value );
+
+					case IdentityAdminIF_v1_listAuthsForAccountResponse.ResultOneofCase.Error:
+						return Response<List<IIdentityAdminIF_v1.AuthDTO>>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_listAuthsForAccountResponse.ResultOneofCase.None:
+					default:
+						return Response<List<IIdentityAdminIF_v1.AuthDTO>>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_listAuthsForAccount'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<List<IIdentityAdminIF_v1.AuthDTO>>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<List<IIdentityAdminIF_v1.AuthDTO>>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>> IIdentityAdminIF_v1.getEmailAndPasswordAuth(CallingContext ctx, string accountId, string authId)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_getEmailAndPasswordAuthRequest();
+				request.AccountId = accountId;
+				request.AuthId = authId;
+
+				// calling grpc client
+				var grpc_response = await _client.getEmailAndPasswordAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "getEmailAndPasswordAuth" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_getEmailAndPasswordAuthResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.EmailAndPasswordAuthDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.EmailAndPasswordAuthDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>.Success( value );
+
+					case IdentityAdminIF_v1_getEmailAndPasswordAuthResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_getEmailAndPasswordAuthResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_getEmailAndPasswordAuth'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.getADAuth(CallingContext ctx, string accountId, string authId)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_getADAuthRequest();
+				request.AccountId = accountId;
+				request.AuthId = authId;
+
+				// calling grpc client
+				var grpc_response = await _client.getADAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "getADAuth" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_getADAuthResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.ADAuthDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.ADAuthDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.ADAuthDTO>.Success( value );
+
+					case IdentityAdminIF_v1_getADAuthResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.ADAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_getADAuthResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.ADAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_getADAuth'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.ADAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.ADAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.getKAUAuth(CallingContext ctx, string accountId, string authId)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_getKAUAuthRequest();
+				request.AccountId = accountId;
+				request.AuthId = authId;
+
+				// calling grpc client
+				var grpc_response = await _client.getKAUAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "getKAUAuth" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_getKAUAuthResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.KAUAuthDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.KAUAuthDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.KAUAuthDTO>.Success( value );
+
+					case IdentityAdminIF_v1_getKAUAuthResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.KAUAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_getKAUAuthResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.KAUAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_getKAUAuth'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.KAUAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.KAUAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.getCertificateAuth(CallingContext ctx, string accountId, string authId)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_getCertificateAuthRequest();
+				request.AccountId = accountId;
+				request.AuthId = authId;
+
+				// calling grpc client
+				var grpc_response = await _client.getCertificateAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "getCertificateAuth" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_getCertificateAuthResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.CertificateAuthDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
+
+					case IdentityAdminIF_v1_getCertificateAuthResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_getCertificateAuthResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_getCertificateAuth'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
 	}
 }

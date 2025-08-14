@@ -168,6 +168,24 @@ domain IAM {
             query findAccountByADCredentrials( ldapDomain:Ldap.LdapDomain, username:string ) : AccountWithAuth
             # Finds a user account by KAU id
             query findAccountKAUUserId( kauUserId:string ) : AccountWithAuth
+
+            valueobject AccountData {
+                Type: Identity.Account.Types
+                Name: string
+                isActive: boolean
+                contacts: List[Identity.ContactInfo]
+            }
+            command createAccount( data:AccountData ) : Identity.Account
+            command updateAccount( accountId:string, etag:string, data:AccountData ) : Identity.Account
+        }
+
+        repository AccountRepository {
+            command createAccount( account:Identity.Account ) : Identity.Account
+            command updateAccount( account:Identity.Account ) : Identity.Account
+            command getAccount( id:string ) : Identity.Account
+            command getAllAccount() : List[Identity.Account]
+
+            query findByName( name:string ) : Identity.Account
         }
 
         repository LdapDomainRepository {
@@ -175,11 +193,6 @@ domain IAM {
             command updateLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
             command getLdapDomain( id:string ) : Ldap.LdapDomain
             command getAllLdapDomain() : List[Ldap.LdapDomain]
-        }
-
-        repository AccountRepository {
-            command getAccount( id:string ) : Identity.Account
-            command getAllAccount() : List[Identity.Account]
         }
 
         service LoginService {
@@ -253,7 +266,7 @@ domain IAM {
             query GetRegisteredLdapDomain( id:string ) : LdapDomainDTO
             query UpdateRegisteredLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
 
-            enum AccountTypesDTO {
+            enum AccountTypes {
                 User,
                 ExternalSystem,
                 InternalService
@@ -262,7 +275,7 @@ domain IAM {
             dto AccountSummaryDTO {
                 @system_field
                 id:string
-                Type:AccountTypesDTO
+                Type:AccountTypes
                 Name:string
                 isActive: boolean
             }
@@ -275,10 +288,13 @@ domain IAM {
                 @system_field
                 LastUpdate:datetime
 
-                Type:AccountTypesDTO
+                data:AccountDataDTO
+            }
+
+            dto AccountDataDTO {
+                Type:AccountTypes
                 Name:string
                 isActive: boolean
-
                 contacts: List[ContactInfo]
             }
 
@@ -288,8 +304,113 @@ domain IAM {
                 email: string
                 phoneNumber : string
             }
+
             command getAllAccount() : List[AccountSummaryDTO]
             command getAccount( id:string ) : AccountDTO
+            command createAccount( username:string, accountType:AccountTypes ) : AccountDTO
+            command updateAccount( accountId:string, etag:string, data:AccountDataDTO ) : AccountDTO
+
+            dto AuthDTO
+            {
+                @system_field
+                id:string
+                enum Methods {
+                    EmailAndPassword,
+                    ActiveDirectory,
+                    KAU,
+                    Certificate
+                }
+                method: Methods
+            }
+
+            dto TwoFactorConfigurationDTO {
+                enum Method {
+                    # Time-based One-Time Password (e.g. Google Authenticator)
+                    TOTP,
+                    # SMS-based OTP
+                    SMS,
+                    # Email-based OTP
+                    Email
+                }
+                enabled: boolean
+                method: Method
+                phoneNumber: string
+                email:string
+            }
+
+            # Password-based authentication
+            dto EmailAndPasswordAuthDTO {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+                @system_field
+                LastUpdate:datetime
+
+                email: string
+                isEmailConfirmed: boolean
+                passwordExpiresAt: date
+                twoFactor: TwoFactorConfigurationDTO
+            }
+
+             # Active Directory-based authentication
+            dto ADAuthDTO {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+                @system_field
+                LastUpdate:datetime
+
+                # Active Directory domain
+                LdapDomainId: string
+                LdapDomainName: string
+                # Active Directory username
+                userName: string
+
+                 # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfigurationDTO
+            }
+
+            # KAU Ügyfélkapu authentication
+            dto KAUAuthDTO  {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+                @system_field
+                LastUpdate:datetime
+
+                # Government-issued unique identifier (Ügyfélkapu ID)
+                KAUUserId: string
+                # User’s full legal name as returned by the service
+                legalName: string
+                # Email address verified by the service (optional)
+                email: string
+                # Optional two-factor authentication settings (TOTP, SMS, Email)
+                twoFactor: TwoFactorConfigurationDTO
+            }
+
+             # Certificate-based authentication
+            dto CertificateAuthDTO {
+                @system_field
+                id:string
+                @system_field
+                etag:string
+                @system_field
+                LastUpdate:datetime
+
+                certificateThumbprint: string
+                validFrom: datetime
+                validUntil: datetime
+            }
+
+            command listAuthsForAccount( accountId:string ) : List[AuthDTO]
+            
+            command getEmailAndPasswordAuth( accountId:string, authId:string ) : EmailAndPasswordAuthDTO
+            command getADAuth( accountId:string, authId:string ) : ADAuthDTO
+            command getKAUAuth( accountId:string, authId:string ) : KAUAuthDTO
+            command getCertificateAuth( accountId:string, authId:string ) : CertificateAuthDTO
         }
 
 

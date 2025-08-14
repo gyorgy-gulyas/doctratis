@@ -306,5 +306,328 @@ namespace IAM.Identities
 				}
 			}
 		}
+
+		[HttpPost( "createaccount/{username}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AccountDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> createAccount( [FromRoute] string username,  [FromQuery] string _str_accountType)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					IIdentityAdminIF_v1.AccountTypes accountType = (IIdentityAdminIF_v1.AccountTypes)Enum.Parse(typeof(IIdentityAdminIF_v1.AccountTypes), _str_accountType);
+					// calling the service function itself
+					var response = await _service.createAccount( ctx, username, accountType );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createAccount'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "updateaccount/{accountId}/{etag}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AccountDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> updateAccount( [FromRoute] string accountId,  [FromRoute] string etag,  [FromBody] IIdentityAdminIF_v1.AccountDataDTO data)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.updateAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.updateAccount( ctx, accountId, etag, data );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.updateAccount'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "listauthsforaccount/{accountId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IIdentityAdminIF_v1.AuthDTO>) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> listAuthsForAccount( [FromRoute] string accountId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.listAuthsForAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.listAuthsForAccount( ctx, accountId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.listAuthsForAccount'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getemailandpasswordauth/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAndPasswordAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getEmailAndPasswordAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getEmailAndPasswordAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getEmailAndPasswordAuth( ctx, accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getEmailAndPasswordAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getadauth/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.ADAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getADAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getADAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getADAuth( ctx, accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getADAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getkauauth/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.KAUAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getKAUAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getKAUAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getKAUAuth( ctx, accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getKAUAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getcertificateauth/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getCertificateAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getCertificateAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getCertificateAuth( ctx, accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getCertificateAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
 	}
 }

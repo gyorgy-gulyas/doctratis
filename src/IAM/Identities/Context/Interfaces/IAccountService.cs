@@ -30,6 +30,12 @@ namespace IAM.Identities
 		/// <return>IAccountService.AccountWithAuth</return>
 		public Task<Response<IAccountService.AccountWithAuth>> findAccountKAUUserId(CallingContext ctx, string kauUserId);
 
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> createAccount(CallingContext ctx, AccountData data);
+
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> updateAccount(CallingContext ctx, string accountId, string etag, AccountData data);
+
 
 		public partial class AccountWithAuth : IEquatable<AccountWithAuth>
 		{
@@ -80,6 +86,62 @@ namespace IAM.Identities
 
 				// hash of auth
 				if(auth != null ) hash.Add(auth);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+		}
+
+		public partial class AccountData : IEquatable<AccountData>
+		{
+			public Identity.Account.Types Type { get; set; }
+			public string Name { get; set; }
+			public bool isActive { get; set; }
+			public List<Identity.ContactInfo> contacts { get; set; } = new();
+
+			#region Clone 
+			public virtual AccountData Clone()
+			{
+				AccountData clone = new();
+
+				clone.Type = Type;
+				clone.Name = new string(Name.ToCharArray());
+				clone.isActive = isActive;
+
+				// clone of contacts
+				clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( AccountData other )
+			{
+				if (other is null) return false;
+
+				if(Type != other.Type) return false;
+				if(Name != other.Name) return false;
+				if(isActive != other.isActive) return false;
+
+				// equals of contacts
+				if(contacts.SequenceEqual(other.contacts) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as AccountData);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(Type);
+				hash.Add(Name);
+				hash.Add(isActive);
+
+				// hash of contacts
+				foreach( var element_contacts in contacts)
+					hash.Add(element_contacts);
 
 				return hash.ToHashCode();
 			}

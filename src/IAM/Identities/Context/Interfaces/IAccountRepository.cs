@@ -13,10 +13,19 @@ namespace IAM.Identities
 	public partial interface IAccountRepository
 	{
 		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> createAccount(CallingContext ctx, Identity.Account account);
+
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> updateAccount(CallingContext ctx, Identity.Account account);
+
+		/// <return>Identity.Account</return>
 		public Task<Response<Identity.Account>> getAccount(CallingContext ctx, string id);
 
 		/// <return>List<Identity.Account></return>
 		public Task<Response<List<Identity.Account>>> getAllAccount(CallingContext ctx);
+
+		/// <return>Identity.Account</return>
+		public Task<Response<Identity.Account>> findByName(CallingContext ctx, string name);
 
 
 	}

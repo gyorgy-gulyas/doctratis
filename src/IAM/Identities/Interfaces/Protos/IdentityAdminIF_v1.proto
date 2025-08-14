@@ -24,6 +24,13 @@ service IdentityAdminIF_v1 {
 	rpc UpdateRegisteredLdapDomain(IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest) returns (IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse);
 	rpc getAllAccount(google.protobuf.Empty) returns (IdentityAdminIF_v1_getAllAccountResponse);
 	rpc getAccount(IdentityAdminIF_v1_getAccountRequest) returns (IdentityAdminIF_v1_getAccountResponse);
+	rpc createAccount(IdentityAdminIF_v1_createAccountRequest) returns (IdentityAdminIF_v1_createAccountResponse);
+	rpc updateAccount(IdentityAdminIF_v1_updateAccountRequest) returns (IdentityAdminIF_v1_updateAccountResponse);
+	rpc listAuthsForAccount(IdentityAdminIF_v1_listAuthsForAccountRequest) returns (IdentityAdminIF_v1_listAuthsForAccountResponse);
+	rpc getEmailAndPasswordAuth(IdentityAdminIF_v1_getEmailAndPasswordAuthRequest) returns (IdentityAdminIF_v1_getEmailAndPasswordAuthResponse);
+	rpc getADAuth(IdentityAdminIF_v1_getADAuthRequest) returns (IdentityAdminIF_v1_getADAuthResponse);
+	rpc getKAUAuth(IdentityAdminIF_v1_getKAUAuthRequest) returns (IdentityAdminIF_v1_getKAUAuthResponse);
+	rpc getCertificateAuth(IdentityAdminIF_v1_getCertificateAuthRequest) returns (IdentityAdminIF_v1_getCertificateAuthResponse);
 }
 
 message IdentityAdminIF_v1_RegisterLdapDomainRequest {
@@ -82,10 +89,94 @@ message IdentityAdminIF_v1_getAccountResponse {
 	}
 }
 
-enum AccountTypesDTO {
-	AccountTypesDTO_User = 0;
-	AccountTypesDTO_ExternalSystem = 1;
-	AccountTypesDTO_InternalService = 2;
+message IdentityAdminIF_v1_createAccountRequest {
+	string username = 1;
+	AccountTypes accountType = 2;
+}
+
+message IdentityAdminIF_v1_createAccountResponse {
+	oneof result {
+		AccountDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_updateAccountRequest {
+	string accountId = 1;
+	string etag = 2;
+	AccountDataDTO data = 3;
+}
+
+message IdentityAdminIF_v1_updateAccountResponse {
+	oneof result {
+		AccountDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_listAuthsForAccountRequest {
+	string accountId = 1;
+}
+
+message IdentityAdminIF_v1_listAuthsForAccountResponse {
+	oneof result {
+		list_AuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_getEmailAndPasswordAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+}
+
+message IdentityAdminIF_v1_getEmailAndPasswordAuthResponse {
+	oneof result {
+		EmailAndPasswordAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_getADAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+}
+
+message IdentityAdminIF_v1_getADAuthResponse {
+	oneof result {
+		ADAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_getKAUAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+}
+
+message IdentityAdminIF_v1_getKAUAuthResponse {
+	oneof result {
+		KAUAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_getCertificateAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+}
+
+message IdentityAdminIF_v1_getCertificateAuthResponse {
+	oneof result {
+		CertificateAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+enum AccountTypes {
+	AccountTypes_User = 0;
+	AccountTypes_ExternalSystem = 1;
+	AccountTypes_InternalService = 2;
 }
 
 message LdapDomainDTO {
@@ -127,7 +218,7 @@ message LdapDomainSummaryDTO {
 
 message AccountSummaryDTO {
 	string id = 1;
-	AccountTypesDTO Type = 2;
+	AccountTypes Type = 2;
 	string Name = 3;
 	bool isActive = 4;
 }
@@ -136,10 +227,14 @@ message AccountDTO {
 	string id = 1;
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
-	AccountTypesDTO Type = 4;
-	string Name = 5;
-	bool isActive = 6;
-	repeated ContactInfo contacts = 7;
+	AccountDataDTO data = 4;
+}
+
+message AccountDataDTO {
+	AccountTypes Type = 1;
+	string Name = 2;
+	bool isActive = 3;
+	repeated ContactInfo contacts = 4;
 }
 
 message ContactInfo {
@@ -148,11 +243,98 @@ message ContactInfo {
 	string phoneNumber = 3;
 }
 
+message AuthDTO {
+
+	enum Methods {
+		Methods_EmailAndPassword = 0;
+		Methods_ActiveDirectory = 1;
+		Methods_KAU = 2;
+		Methods_Certificate = 3;
+	}
+
+	string id = 1;
+	Methods method = 2;
+}
+
+message TwoFactorConfigurationDTO {
+
+	enum Method {
+		/// Time-based One-Time Password (e.g. Google Authenticator)
+		Method_TOTP = 0;
+
+		/// SMS-based OTP
+		Method_SMS = 1;
+
+		/// Email-based OTP
+		Method_Email = 2;
+
+	}
+
+	bool enabled = 1;
+	Method method = 2;
+	string phoneNumber = 3;
+	string email = 4;
+}
+
+/// Password-based authentication
+message EmailAndPasswordAuthDTO {
+	string id = 1;
+	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
+	string email = 4;
+	bool isEmailConfirmed = 5;
+	string passwordExpiresAt = 6;
+	TwoFactorConfigurationDTO twoFactor = 7;
+}
+
+/// Active Directory-based authentication
+message ADAuthDTO {
+	string id = 1;
+	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
+	/// Active Directory domain
+	string LdapDomainId = 4;
+	string LdapDomainName = 5;
+	/// Active Directory username
+	string userName = 6;
+	/// Optional two-factor authentication settings (TOTP, SMS, Email)
+	TwoFactorConfigurationDTO twoFactor = 7;
+}
+
+/// KAU Ügyfélkapu authentication
+message KAUAuthDTO {
+	string id = 1;
+	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
+	/// Government-issued unique identifier (Ügyfélkapu ID)
+	string KAUUserId = 4;
+	/// User’s full legal name as returned by the service
+	string legalName = 5;
+	/// Email address verified by the service (optional)
+	string email = 6;
+	/// Optional two-factor authentication settings (TOTP, SMS, Email)
+	TwoFactorConfigurationDTO twoFactor = 7;
+}
+
+/// Certificate-based authentication
+message CertificateAuthDTO {
+	string id = 1;
+	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
+	string certificateThumbprint = 4;
+	google.protobuf.Timestamp validFrom = 5;
+	google.protobuf.Timestamp validUntil = 6;
+}
+
 message list_LdapDomainSummaryDTO {
 	repeated LdapDomainSummaryDTO Value = 1;
 }
 
 message list_AccountSummaryDTO {
 	repeated AccountSummaryDTO Value = 1;
+}
+
+message list_AuthDTO {
+	repeated AuthDTO Value = 1;
 }
 

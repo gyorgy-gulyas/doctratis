@@ -376,5 +376,432 @@ namespace IAM.Identities
 				}
 			}
 		}
+
+		public override async Task<IdentityAdminIF_v1_createAccountResponse> createAccount( IdentityAdminIF_v1_createAccountRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string username;
+					username = request.Username;
+					IIdentityAdminIF_v1.AccountTypes accountType;
+					accountType = IIdentityAdminIF_v1.AccountTypesMappings.FromGrpc( request.AccountType) ;
+
+					// calling the service function itself
+					var response = await _service.createAccount( ctx , username, accountType );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_createAccountResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_createAccountResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.createAccount'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_createAccountResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_createAccountResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_updateAccountResponse> updateAccount( IdentityAdminIF_v1_updateAccountRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.updateAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+					string etag;
+					etag = request.Etag;
+					IIdentityAdminIF_v1.AccountDataDTO data;
+					data = request.Data != null ? IIdentityAdminIF_v1.AccountDataDTO.FromGrpc( request.Data ) : null;
+
+					// calling the service function itself
+					var response = await _service.updateAccount( ctx , accountId, etag, data );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_updateAccountResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.AccountDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_updateAccountResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.updateAccount'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_updateAccountResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_updateAccountResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_listAuthsForAccountResponse> listAuthsForAccount( IdentityAdminIF_v1_listAuthsForAccountRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.listAuthsForAccount" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+
+					// calling the service function itself
+					var response = await _service.listAuthsForAccount( ctx , accountId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_listAuthsForAccountResponse();
+							result.Value.Value.AddRange( response.Value.Select( v => IIdentityAdminIF_v1.AuthDTO.ToGrpc( v ) ));
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_listAuthsForAccountResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.listAuthsForAccount'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_listAuthsForAccountResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_listAuthsForAccountResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_getEmailAndPasswordAuthResponse> getEmailAndPasswordAuth( IdentityAdminIF_v1_getEmailAndPasswordAuthRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getEmailAndPasswordAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+					string authId;
+					authId = request.AuthId;
+
+					// calling the service function itself
+					var response = await _service.getEmailAndPasswordAuth( ctx , accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_getEmailAndPasswordAuthResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.EmailAndPasswordAuthDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_getEmailAndPasswordAuthResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.getEmailAndPasswordAuth'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_getEmailAndPasswordAuthResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_getEmailAndPasswordAuthResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_getADAuthResponse> getADAuth( IdentityAdminIF_v1_getADAuthRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getADAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+					string authId;
+					authId = request.AuthId;
+
+					// calling the service function itself
+					var response = await _service.getADAuth( ctx , accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_getADAuthResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.ADAuthDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_getADAuthResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.getADAuth'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_getADAuthResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_getADAuthResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_getKAUAuthResponse> getKAUAuth( IdentityAdminIF_v1_getKAUAuthRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getKAUAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+					string authId;
+					authId = request.AuthId;
+
+					// calling the service function itself
+					var response = await _service.getKAUAuth( ctx , accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_getKAUAuthResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.KAUAuthDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_getKAUAuthResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.getKAUAuth'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_getKAUAuthResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_getKAUAuthResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<IdentityAdminIF_v1_getCertificateAuthResponse> getCertificateAuth( IdentityAdminIF_v1_getCertificateAuthRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getCertificateAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string accountId;
+					accountId = request.AccountId;
+					string authId;
+					authId = request.AuthId;
+
+					// calling the service function itself
+					var response = await _service.getCertificateAuth( ctx , accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_getCertificateAuthResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_getCertificateAuthResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.getCertificateAuth'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_getCertificateAuthResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_getCertificateAuthResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
 	}
 }

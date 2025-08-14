@@ -66,11 +66,37 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> IIdentityAdminIF_v1.getAllAccount(CallingContext ctx)
         {
-             var result = await _accountRepository.getAllAccount(ctx).ConfigureAwait(false);
+            var result = await _accountRepository.getAllAccount(ctx).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
             return new(result.Value.Select(a => a.ConvertToSummary()).ToList());
+        }
+
+        async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.createAccount(CallingContext ctx, string username, IIdentityAdminIF_v1.AccountTypes accountType)
+        {
+            var data = new IAccountService.AccountData()
+            {
+                Name = username,
+                isActive = true,
+                contacts = [],
+                Type = accountType.Convert()
+            };
+            var result = await _accountService.createAccount(ctx, data);
+            if (result.IsFailed())
+                return new(result.Error);
+            
+            return new(result.Value.Convert());
+        }
+
+        async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.updateAccount(CallingContext ctx, string accountId, string etag, IIdentityAdminIF_v1.AccountDataDTO dto)
+        {
+            var data = dto.Convert();
+            var result = await _accountService.updateAccount(ctx, accountId, etag, data );
+            if (result.IsFailed())
+                return new(result.Error);
+            
+            return new(result.Value.Convert());
         }
     }
 
@@ -130,21 +156,6 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static Identity.Account Convert(this IIdentityAdminIF_v1.AccountDTO @this, Identity.Account original)
-        {
-            return new()
-            {
-                id = @this.id,
-                etag = @this.etag,
-                LastUpdate = @this.LastUpdate,
-                Name = @this.Name,
-                isActive = @this.isActive,
-                contacts = @this.contacts.Select(c => c.Convert()).ToList(),
-                Type = @this.Type.Convert(),
-                accountSecret = original?.accountSecret,
-            };
-        }
-
         internal static IIdentityAdminIF_v1.AccountDTO Convert(this Identity.Account @this)
         {
             return new()
@@ -152,6 +163,20 @@ namespace IAM.Identities.Service.Implementations
                 id = @this.id,
                 etag = @this.etag,
                 LastUpdate = @this.LastUpdate,
+                data = new()
+                {
+                    Name = @this.Name,
+                    isActive = @this.isActive,
+                    contacts = @this.contacts.Select(c => c.Convert()).ToList(),
+                    Type = @this.Type.Convert(),
+                }
+            };
+        }
+
+        internal static IAccountService.AccountData Convert(this IIdentityAdminIF_v1.AccountDataDTO @this)
+        {
+            return new()
+            {
                 Name = @this.Name,
                 isActive = @this.isActive,
                 contacts = @this.contacts.Select(c => c.Convert()).ToList(),
@@ -190,24 +215,24 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static Identity.Account.Types Convert(this IIdentityAdminIF_v1.AccountTypesDTO @this)
+        internal static Identity.Account.Types Convert(this IIdentityAdminIF_v1.AccountTypes @this)
         {
             return @this switch
             {
-                IIdentityAdminIF_v1.AccountTypesDTO.User => Identity.Account.Types.User,
-                IIdentityAdminIF_v1.AccountTypesDTO.ExternalSystem => Identity.Account.Types.ExternalSystem,
-                IIdentityAdminIF_v1.AccountTypesDTO.InternalService => Identity.Account.Types.InternalService,
+                IIdentityAdminIF_v1.AccountTypes.User => Identity.Account.Types.User,
+                IIdentityAdminIF_v1.AccountTypes.ExternalSystem => Identity.Account.Types.ExternalSystem,
+                IIdentityAdminIF_v1.AccountTypes.InternalService => Identity.Account.Types.InternalService,
                 _ => throw new NotImplementedException(),
             };
         }
 
-        internal static IIdentityAdminIF_v1.AccountTypesDTO Convert(this Identity.Account.Types @this)
+        internal static IIdentityAdminIF_v1.AccountTypes Convert(this Identity.Account.Types @this)
         {
             return @this switch
             {
-                Identity.Account.Types.User => IIdentityAdminIF_v1.AccountTypesDTO.User,
-                Identity.Account.Types.ExternalSystem => IIdentityAdminIF_v1.AccountTypesDTO.ExternalSystem,
-                Identity.Account.Types.InternalService => IIdentityAdminIF_v1.AccountTypesDTO.InternalService,
+                Identity.Account.Types.User => IIdentityAdminIF_v1.AccountTypes.User,
+                Identity.Account.Types.ExternalSystem => IIdentityAdminIF_v1.AccountTypes.ExternalSystem,
+                Identity.Account.Types.InternalService => IIdentityAdminIF_v1.AccountTypes.InternalService,
                 _ => throw new NotImplementedException(),
             };
         }

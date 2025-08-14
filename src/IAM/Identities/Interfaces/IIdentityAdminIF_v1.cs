@@ -9,6 +9,7 @@ using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using IAM.Identities;
 using ServiceKit.Net;
+using System.Globalization;
 
 namespace IAM.Identities
 {
@@ -32,34 +33,55 @@ namespace IAM.Identities
 		/// <return>IIdentityAdminIF_v1.AccountDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> getAccount(CallingContext ctx, string id);
 
+		/// <return>IIdentityAdminIF_v1.AccountDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> createAccount(CallingContext ctx, string username, AccountTypes accountType);
 
-		public enum AccountTypesDTO
+		/// <return>IIdentityAdminIF_v1.AccountDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.AccountDTO>> updateAccount(CallingContext ctx, string accountId, string etag, AccountDataDTO data);
+
+		/// <return>List<IIdentityAdminIF_v1.AuthDTO></return>
+		public Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> listAuthsForAccount(CallingContext ctx, string accountId);
+
+		/// <return>IIdentityAdminIF_v1.EmailAndPasswordAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>> getEmailAndPasswordAuth(CallingContext ctx, string accountId, string authId);
+
+		/// <return>IIdentityAdminIF_v1.ADAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> getADAuth(CallingContext ctx, string accountId, string authId);
+
+		/// <return>IIdentityAdminIF_v1.KAUAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> getKAUAuth(CallingContext ctx, string accountId, string authId);
+
+		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> getCertificateAuth(CallingContext ctx, string accountId, string authId);
+
+
+		public enum AccountTypes
 		{
 			User,
 			ExternalSystem,
 			InternalService,
 		}
 		#region GrpcMapping
-		public static class AccountTypesDTOMappings
+		public static class AccountTypesMappings
 		{
-			public static Protos.IdentityAdminIF_v1.AccountTypesDTO ToGrpc( IIdentityAdminIF_v1.AccountTypesDTO @this )
+			public static Protos.IdentityAdminIF_v1.AccountTypes ToGrpc( IIdentityAdminIF_v1.AccountTypes @this )
 			{
 				return @this switch
 				{
-					IIdentityAdminIF_v1.AccountTypesDTO.User => Protos.IdentityAdminIF_v1.AccountTypesDTO.User,
-					IIdentityAdminIF_v1.AccountTypesDTO.ExternalSystem => Protos.IdentityAdminIF_v1.AccountTypesDTO.ExternalSystem,
-					IIdentityAdminIF_v1.AccountTypesDTO.InternalService => Protos.IdentityAdminIF_v1.AccountTypesDTO.InternalService,
+					IIdentityAdminIF_v1.AccountTypes.User => Protos.IdentityAdminIF_v1.AccountTypes.User,
+					IIdentityAdminIF_v1.AccountTypes.ExternalSystem => Protos.IdentityAdminIF_v1.AccountTypes.ExternalSystem,
+					IIdentityAdminIF_v1.AccountTypes.InternalService => Protos.IdentityAdminIF_v1.AccountTypes.InternalService,
 					_ => throw new NotImplementedException(), 
 				};
 			}
 
-			public static IIdentityAdminIF_v1.AccountTypesDTO FromGrpc( Protos.IdentityAdminIF_v1.AccountTypesDTO @this )
+			public static IIdentityAdminIF_v1.AccountTypes FromGrpc( Protos.IdentityAdminIF_v1.AccountTypes @this )
 			{
 				return @this switch
 				{
-					Protos.IdentityAdminIF_v1.AccountTypesDTO.User => IIdentityAdminIF_v1.AccountTypesDTO.User,
-					Protos.IdentityAdminIF_v1.AccountTypesDTO.ExternalSystem => IIdentityAdminIF_v1.AccountTypesDTO.ExternalSystem,
-					Protos.IdentityAdminIF_v1.AccountTypesDTO.InternalService => IIdentityAdminIF_v1.AccountTypesDTO.InternalService,
+					Protos.IdentityAdminIF_v1.AccountTypes.User => IIdentityAdminIF_v1.AccountTypes.User,
+					Protos.IdentityAdminIF_v1.AccountTypes.ExternalSystem => IIdentityAdminIF_v1.AccountTypes.ExternalSystem,
+					Protos.IdentityAdminIF_v1.AccountTypes.InternalService => IIdentityAdminIF_v1.AccountTypes.InternalService,
 					_ => throw new NotImplementedException(), 
 				};
 			}
@@ -330,7 +352,7 @@ namespace IAM.Identities
 		public partial class AccountSummaryDTO : IEquatable<AccountSummaryDTO>
 		{
 			public string id { get; set; }
-			public IIdentityAdminIF_v1.AccountTypesDTO Type { get; set; }
+			public IIdentityAdminIF_v1.AccountTypes Type { get; set; }
 			public string Name { get; set; }
 			public bool isActive { get; set; }
 
@@ -379,7 +401,7 @@ namespace IAM.Identities
 				Protos.IdentityAdminIF_v1.AccountSummaryDTO result = new();
 
 				result.Id = @this.id;
-				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.ToGrpc( @this.Type );
+				result.Type = IIdentityAdminIF_v1.AccountTypesMappings.ToGrpc( @this.Type );
 				result.Name = @this.Name;
 				result.IsActive = @this.isActive;
 
@@ -390,7 +412,7 @@ namespace IAM.Identities
 				IIdentityAdminIF_v1.AccountSummaryDTO result = new();
 
 				result.id = @from.Id;
-				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.FromGrpc( @from.Type) ;
+				result.Type = IIdentityAdminIF_v1.AccountTypesMappings.FromGrpc( @from.Type) ;
 				result.Name = @from.Name;
 				result.isActive = @from.IsActive;
 
@@ -404,22 +426,16 @@ namespace IAM.Identities
 			public string id { get; set; }
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
-			public IIdentityAdminIF_v1.AccountTypesDTO Type { get; set; }
-			public string Name { get; set; }
-			public bool isActive { get; set; }
-			public List<IIdentityAdminIF_v1.ContactInfo> contacts { get; set; } = new();
+			public IIdentityAdminIF_v1.AccountDataDTO data { get; set; }
 
 			#region Clone 
 			public virtual AccountDTO Clone()
 			{
 				AccountDTO clone = new();
 
-				clone.Type = Type;
-				clone.Name = new string(Name.ToCharArray());
-				clone.isActive = isActive;
 
-				// clone of contacts
-				clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
+				// clone of data
+				clone.data = data?.Clone();
 
 				return clone;
 			}
@@ -430,12 +446,10 @@ namespace IAM.Identities
 			{
 				if (other is null) return false;
 
-				if(Type != other.Type) return false;
-				if(Name != other.Name) return false;
-				if(isActive != other.isActive) return false;
 
-				// equals of contacts
-				if(contacts.SequenceEqual(other.contacts) == false ) return false;
+				// equals of data
+				if(data == null && other.data != null ) return false;
+				if(data != null && data.Equals(other.data) == false ) return false;
 
 				return true;
 			}
@@ -448,13 +462,9 @@ namespace IAM.Identities
 				hash.Add(id);
 				hash.Add(etag);
 				hash.Add(LastUpdate);
-				hash.Add(Type);
-				hash.Add(Name);
-				hash.Add(isActive);
 
-				// hash of contacts
-				foreach( var element_contacts in contacts)
-					hash.Add(element_contacts);
+				// hash of data
+				if(data != null ) hash.Add(data);
 
 				return hash.ToHashCode();
 			}
@@ -468,10 +478,7 @@ namespace IAM.Identities
 				result.Id = @this.id;
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
-				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.ToGrpc( @this.Type );
-				result.Name = @this.Name;
-				result.IsActive = @this.isActive;
-				result.Contacts.AddRange( @this.contacts.Select( v => IIdentityAdminIF_v1.ContactInfo.ToGrpc( v ) ));
+				result.Data = @this.data != null ? IIdentityAdminIF_v1.AccountDataDTO.ToGrpc( @this.data ) : null;
 
 				return result;
 			}
@@ -482,7 +489,85 @@ namespace IAM.Identities
 				result.id = @from.Id;
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
-				result.Type = IIdentityAdminIF_v1.AccountTypesDTOMappings.FromGrpc( @from.Type) ;
+				result.data = @from.Data != null ? IIdentityAdminIF_v1.AccountDataDTO.FromGrpc( @from.Data ) : null;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		public partial class AccountDataDTO : IEquatable<AccountDataDTO>
+		{
+			public IIdentityAdminIF_v1.AccountTypes Type { get; set; }
+			public string Name { get; set; }
+			public bool isActive { get; set; }
+			public List<IIdentityAdminIF_v1.ContactInfo> contacts { get; set; } = new();
+
+			#region Clone 
+			public virtual AccountDataDTO Clone()
+			{
+				AccountDataDTO clone = new();
+
+				clone.Type = Type;
+				clone.Name = new string(Name.ToCharArray());
+				clone.isActive = isActive;
+
+				// clone of contacts
+				clone.contacts.AddRange( contacts.Select( v => v.Clone() ));
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( AccountDataDTO other )
+			{
+				if (other is null) return false;
+
+				if(Type != other.Type) return false;
+				if(Name != other.Name) return false;
+				if(isActive != other.isActive) return false;
+
+				// equals of contacts
+				if(contacts.SequenceEqual(other.contacts) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as AccountDataDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(Type);
+				hash.Add(Name);
+				hash.Add(isActive);
+
+				// hash of contacts
+				foreach( var element_contacts in contacts)
+					hash.Add(element_contacts);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.AccountDataDTO ToGrpc( IIdentityAdminIF_v1.AccountDataDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.AccountDataDTO result = new();
+
+				result.Type = IIdentityAdminIF_v1.AccountTypesMappings.ToGrpc( @this.Type );
+				result.Name = @this.Name;
+				result.IsActive = @this.isActive;
+				result.Contacts.AddRange( @this.contacts.Select( v => IIdentityAdminIF_v1.ContactInfo.ToGrpc( v ) ));
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.AccountDataDTO FromGrpc( Protos.IdentityAdminIF_v1.AccountDataDTO @from )
+			{
+				IIdentityAdminIF_v1.AccountDataDTO result = new();
+
+				result.Type = IIdentityAdminIF_v1.AccountTypesMappings.FromGrpc( @from.Type) ;
 				result.Name = @from.Name;
 				result.isActive = @from.IsActive;
 				result.contacts.AddRange( @from.Contacts.Select( v => IIdentityAdminIF_v1.ContactInfo.FromGrpc(v) ));
@@ -554,6 +639,585 @@ namespace IAM.Identities
 				result.contactType = @from.ContactType;
 				result.email = @from.Email;
 				result.phoneNumber = @from.PhoneNumber;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		public partial class AuthDTO : IEquatable<AuthDTO>
+		{
+			public enum Methods
+			{
+				EmailAndPassword,
+				ActiveDirectory,
+				KAU,
+				Certificate,
+			}
+			#region GrpcMapping
+			public static class MethodsMappings
+			{
+				public static Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods ToGrpc( IIdentityAdminIF_v1.AuthDTO.Methods @this )
+				{
+					return @this switch
+					{
+						IIdentityAdminIF_v1.AuthDTO.Methods.EmailAndPassword => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.EmailAndPassword,
+						IIdentityAdminIF_v1.AuthDTO.Methods.ActiveDirectory => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.ActiveDirectory,
+						IIdentityAdminIF_v1.AuthDTO.Methods.KAU => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Kau,
+						IIdentityAdminIF_v1.AuthDTO.Methods.Certificate => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Certificate,
+						_ => throw new NotImplementedException(), 
+					};
+				}
+
+				public static IIdentityAdminIF_v1.AuthDTO.Methods FromGrpc( Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods @this )
+				{
+					return @this switch
+					{
+						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.EmailAndPassword => IIdentityAdminIF_v1.AuthDTO.Methods.EmailAndPassword,
+						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.ActiveDirectory => IIdentityAdminIF_v1.AuthDTO.Methods.ActiveDirectory,
+						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Kau => IIdentityAdminIF_v1.AuthDTO.Methods.KAU,
+						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Certificate => IIdentityAdminIF_v1.AuthDTO.Methods.Certificate,
+						_ => throw new NotImplementedException(), 
+					};
+				}
+
+			}
+			#endregion GrpcMapping
+			public string id { get; set; }
+			public IIdentityAdminIF_v1.AuthDTO.Methods method { get; set; }
+
+			#region Clone 
+			public virtual AuthDTO Clone()
+			{
+				AuthDTO clone = new();
+
+				clone.method = method;
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( AuthDTO other )
+			{
+				if (other is null) return false;
+
+				if(method != other.method) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as AuthDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(method);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.AuthDTO ToGrpc( IIdentityAdminIF_v1.AuthDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.AuthDTO result = new();
+
+				result.Id = @this.id;
+				result.Method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.ToGrpc( @this.method );
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.AuthDTO FromGrpc( Protos.IdentityAdminIF_v1.AuthDTO @from )
+			{
+				IIdentityAdminIF_v1.AuthDTO result = new();
+
+				result.id = @from.Id;
+				result.method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.FromGrpc( @from.Method) ;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		public partial class TwoFactorConfigurationDTO : IEquatable<TwoFactorConfigurationDTO>
+		{
+			public enum Method
+			{
+				/// Time-based One-Time Password (e.g. Google Authenticator)
+				TOTP,
+
+				/// SMS-based OTP
+				SMS,
+
+				/// Email-based OTP
+				Email,
+
+			}
+			#region GrpcMapping
+			public static class MethodMappings
+			{
+				public static Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method ToGrpc( IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method @this )
+				{
+					return @this switch
+					{
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.TOTP => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Totp,
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.SMS => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Sms,
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.Email => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Email,
+						_ => throw new NotImplementedException(), 
+					};
+				}
+
+				public static IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method FromGrpc( Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method @this )
+				{
+					return @this switch
+					{
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Totp => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.TOTP,
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Sms => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.SMS,
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Email => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.Email,
+						_ => throw new NotImplementedException(), 
+					};
+				}
+
+			}
+			#endregion GrpcMapping
+			public bool enabled { get; set; }
+			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method method { get; set; }
+			public string phoneNumber { get; set; }
+			public string email { get; set; }
+
+			#region Clone 
+			public virtual TwoFactorConfigurationDTO Clone()
+			{
+				TwoFactorConfigurationDTO clone = new();
+
+				clone.enabled = enabled;
+				clone.method = method;
+				clone.phoneNumber = new string(phoneNumber.ToCharArray());
+				clone.email = new string(email.ToCharArray());
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( TwoFactorConfigurationDTO other )
+			{
+				if (other is null) return false;
+
+				if(enabled != other.enabled) return false;
+				if(method != other.method) return false;
+				if(phoneNumber != other.phoneNumber) return false;
+				if(email != other.email) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as TwoFactorConfigurationDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(enabled);
+				hash.Add(method);
+				hash.Add(phoneNumber);
+				hash.Add(email);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO ToGrpc( IIdentityAdminIF_v1.TwoFactorConfigurationDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO result = new();
+
+				result.Enabled = @this.enabled;
+				result.Method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodMappings.ToGrpc( @this.method );
+				result.PhoneNumber = @this.phoneNumber;
+				result.Email = @this.email;
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.TwoFactorConfigurationDTO FromGrpc( Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO @from )
+			{
+				IIdentityAdminIF_v1.TwoFactorConfigurationDTO result = new();
+
+				result.enabled = @from.Enabled;
+				result.method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodMappings.FromGrpc( @from.Method) ;
+				result.phoneNumber = @from.PhoneNumber;
+				result.email = @from.Email;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		/// Password-based authentication
+		public partial class EmailAndPasswordAuthDTO : IEquatable<EmailAndPasswordAuthDTO>
+		{
+			public string id { get; set; }
+			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
+			public string email { get; set; }
+			public bool isEmailConfirmed { get; set; }
+			public DateOnly passwordExpiresAt { get; set; }
+			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor { get; set; }
+
+			#region Clone 
+			public virtual EmailAndPasswordAuthDTO Clone()
+			{
+				EmailAndPasswordAuthDTO clone = new();
+
+				clone.email = new string(email.ToCharArray());
+				clone.isEmailConfirmed = isEmailConfirmed;
+				clone.passwordExpiresAt = passwordExpiresAt;
+
+				// clone of twoFactor
+				clone.twoFactor = twoFactor?.Clone();
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( EmailAndPasswordAuthDTO other )
+			{
+				if (other is null) return false;
+
+				if(email != other.email) return false;
+				if(isEmailConfirmed != other.isEmailConfirmed) return false;
+				if(passwordExpiresAt != other.passwordExpiresAt) return false;
+
+				// equals of twoFactor
+				if(twoFactor == null && other.twoFactor != null ) return false;
+				if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as EmailAndPasswordAuthDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(LastUpdate);
+				hash.Add(email);
+				hash.Add(isEmailConfirmed);
+				hash.Add(passwordExpiresAt);
+
+				// hash of twoFactor
+				if(twoFactor != null ) hash.Add(twoFactor);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO ToGrpc( IIdentityAdminIF_v1.EmailAndPasswordAuthDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO result = new();
+
+				result.Id = @this.id;
+				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.Email = @this.email;
+				result.IsEmailConfirmed = @this.isEmailConfirmed;
+				result.PasswordExpiresAt = @this.passwordExpiresAt.ToString( "yyyy-MM-dd", CultureInfo.InvariantCulture);
+				result.TwoFactor = @this.twoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.ToGrpc( @this.twoFactor ) : null;
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.EmailAndPasswordAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO @from )
+			{
+				IIdentityAdminIF_v1.EmailAndPasswordAuthDTO result = new();
+
+				result.id = @from.Id;
+				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.email = @from.Email;
+				result.isEmailConfirmed = @from.IsEmailConfirmed;
+				result.passwordExpiresAt = DateOnly.Parse(@from.PasswordExpiresAt, CultureInfo.InvariantCulture);
+				result.twoFactor = @from.TwoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.FromGrpc( @from.TwoFactor ) : null;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		/// Active Directory-based authentication
+		public partial class ADAuthDTO : IEquatable<ADAuthDTO>
+		{
+			public string id { get; set; }
+			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
+			/// Active Directory domain
+			public string LdapDomainId { get; set; }
+			public string LdapDomainName { get; set; }
+			/// Active Directory username
+			public string userName { get; set; }
+			/// Optional two-factor authentication settings (TOTP, SMS, Email)
+			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor { get; set; }
+
+			#region Clone 
+			public virtual ADAuthDTO Clone()
+			{
+				ADAuthDTO clone = new();
+
+				clone.LdapDomainId = new string(LdapDomainId.ToCharArray());
+				clone.LdapDomainName = new string(LdapDomainName.ToCharArray());
+				clone.userName = new string(userName.ToCharArray());
+
+				// clone of twoFactor
+				clone.twoFactor = twoFactor?.Clone();
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( ADAuthDTO other )
+			{
+				if (other is null) return false;
+
+				if(LdapDomainId != other.LdapDomainId) return false;
+				if(LdapDomainName != other.LdapDomainName) return false;
+				if(userName != other.userName) return false;
+
+				// equals of twoFactor
+				if(twoFactor == null && other.twoFactor != null ) return false;
+				if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as ADAuthDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(LastUpdate);
+				hash.Add(LdapDomainId);
+				hash.Add(LdapDomainName);
+				hash.Add(userName);
+
+				// hash of twoFactor
+				if(twoFactor != null ) hash.Add(twoFactor);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.ADAuthDTO ToGrpc( IIdentityAdminIF_v1.ADAuthDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.ADAuthDTO result = new();
+
+				result.Id = @this.id;
+				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.LdapDomainId = @this.LdapDomainId;
+				result.LdapDomainName = @this.LdapDomainName;
+				result.UserName = @this.userName;
+				result.TwoFactor = @this.twoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.ToGrpc( @this.twoFactor ) : null;
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.ADAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.ADAuthDTO @from )
+			{
+				IIdentityAdminIF_v1.ADAuthDTO result = new();
+
+				result.id = @from.Id;
+				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.LdapDomainId = @from.LdapDomainId;
+				result.LdapDomainName = @from.LdapDomainName;
+				result.userName = @from.UserName;
+				result.twoFactor = @from.TwoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.FromGrpc( @from.TwoFactor ) : null;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		/// KAU Ügyfélkapu authentication
+		public partial class KAUAuthDTO : IEquatable<KAUAuthDTO>
+		{
+			public string id { get; set; }
+			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
+			/// Government-issued unique identifier (Ügyfélkapu ID)
+			public string KAUUserId { get; set; }
+			/// User’s full legal name as returned by the service
+			public string legalName { get; set; }
+			/// Email address verified by the service (optional)
+			public string email { get; set; }
+			/// Optional two-factor authentication settings (TOTP, SMS, Email)
+			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor { get; set; }
+
+			#region Clone 
+			public virtual KAUAuthDTO Clone()
+			{
+				KAUAuthDTO clone = new();
+
+				clone.KAUUserId = new string(KAUUserId.ToCharArray());
+				clone.legalName = new string(legalName.ToCharArray());
+				clone.email = new string(email.ToCharArray());
+
+				// clone of twoFactor
+				clone.twoFactor = twoFactor?.Clone();
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( KAUAuthDTO other )
+			{
+				if (other is null) return false;
+
+				if(KAUUserId != other.KAUUserId) return false;
+				if(legalName != other.legalName) return false;
+				if(email != other.email) return false;
+
+				// equals of twoFactor
+				if(twoFactor == null && other.twoFactor != null ) return false;
+				if(twoFactor != null && twoFactor.Equals(other.twoFactor) == false ) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as KAUAuthDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(LastUpdate);
+				hash.Add(KAUUserId);
+				hash.Add(legalName);
+				hash.Add(email);
+
+				// hash of twoFactor
+				if(twoFactor != null ) hash.Add(twoFactor);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.KAUAuthDTO ToGrpc( IIdentityAdminIF_v1.KAUAuthDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.KAUAuthDTO result = new();
+
+				result.Id = @this.id;
+				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.KAUUserId = @this.KAUUserId;
+				result.LegalName = @this.legalName;
+				result.Email = @this.email;
+				result.TwoFactor = @this.twoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.ToGrpc( @this.twoFactor ) : null;
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.KAUAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.KAUAuthDTO @from )
+			{
+				IIdentityAdminIF_v1.KAUAuthDTO result = new();
+
+				result.id = @from.Id;
+				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.KAUUserId = @from.KAUUserId;
+				result.legalName = @from.LegalName;
+				result.email = @from.Email;
+				result.twoFactor = @from.TwoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.FromGrpc( @from.TwoFactor ) : null;
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		/// Certificate-based authentication
+		public partial class CertificateAuthDTO : IEquatable<CertificateAuthDTO>
+		{
+			public string id { get; set; }
+			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
+			public string certificateThumbprint { get; set; }
+			public DateTime validFrom { get; set; }
+			public DateTime validUntil { get; set; }
+
+			#region Clone 
+			public virtual CertificateAuthDTO Clone()
+			{
+				CertificateAuthDTO clone = new();
+
+				clone.certificateThumbprint = new string(certificateThumbprint.ToCharArray());
+				clone.validFrom = validFrom;
+				clone.validUntil = validUntil;
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( CertificateAuthDTO other )
+			{
+				if (other is null) return false;
+
+				if(certificateThumbprint != other.certificateThumbprint) return false;
+				if(validFrom != other.validFrom) return false;
+				if(validUntil != other.validUntil) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as CertificateAuthDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(LastUpdate);
+				hash.Add(certificateThumbprint);
+				hash.Add(validFrom);
+				hash.Add(validUntil);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.CertificateAuthDTO ToGrpc( IIdentityAdminIF_v1.CertificateAuthDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.CertificateAuthDTO result = new();
+
+				result.Id = @this.id;
+				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.CertificateThumbprint = @this.certificateThumbprint;
+				result.ValidFrom = Timestamp.FromDateTime(@this.validFrom);
+				result.ValidUntil = Timestamp.FromDateTime(@this.validUntil);
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.CertificateAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.CertificateAuthDTO @from )
+			{
+				IIdentityAdminIF_v1.CertificateAuthDTO result = new();
+
+				result.id = @from.Id;
+				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.certificateThumbprint = @from.CertificateThumbprint;
+				result.validFrom = @from.ValidFrom.ToDateTime();
+				result.validUntil = @from.ValidUntil.ToDateTime();
 
 				return result;
 			}
