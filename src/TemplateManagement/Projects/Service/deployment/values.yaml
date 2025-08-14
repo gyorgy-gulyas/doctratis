@@ -1,7 +1,0 @@
-serviceName: template-management-projects
-
-ports:
-  http: true
-  grpc: true
-  https: false
-  grpcs: false

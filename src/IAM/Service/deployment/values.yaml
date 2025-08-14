@@ -1,0 +1,7 @@
+serviceName: identity-and-access-management
+
+ports:
+  http: true
+  grpc: true
+  https: false
+  grpcs: false

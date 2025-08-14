@@ -9,6 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Novell.Directory.Ldap.NETStandard" />
+    <PackageReference Include="Otp.NET" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
@@ -16,7 +19,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Base\Models\Core.Base.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Base\Agents\Core.Base.Agents.csproj" />
     <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
     <ProjectReference Include="..\Interfaces\IAM.Identities.Interfaces.csproj" />
     <ProjectReference Include="..\Models\IAM.Identities.Models.csproj" />
   </ItemGroup>

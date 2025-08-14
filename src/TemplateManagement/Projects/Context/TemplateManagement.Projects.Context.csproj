@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="ServiceKit.Net.General" />
 </ItemGroup>
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Base\Models\Core.Base.Models.csproj" />
     <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
     <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
     <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
   </ItemGroup>

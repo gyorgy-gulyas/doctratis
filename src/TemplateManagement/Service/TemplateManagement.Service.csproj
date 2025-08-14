@@ -19,11 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
-    <ProjectReference Include="..\Context\TemplateManagement.Projects.Context.csproj" />
-    <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
-    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
-    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
+    <ProjectReference Include="..\Projects\Models\TemplateManagement.Projects.Models.csproj" />
+    <ProjectReference Include="..\Projects\Context\TemplateManagement.Projects.Context.csproj" />
+    <ProjectReference Include="..\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

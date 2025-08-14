@@ -1,4 +1,4 @@
-serviceName: identity-management
+serviceName: template-management
 
 ports:
   http: true
