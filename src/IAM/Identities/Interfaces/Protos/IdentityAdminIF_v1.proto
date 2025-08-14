@@ -15,7 +15,7 @@ package IAM.Identities;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "srvkit/error.proto";
+import "servicekit/error.proto";
 
 service IdentityAdminIF_v1 {
 	rpc RegisterLdapDomain(IdentityAdminIF_v1_RegisterLdapDomainRequest) returns (IdentityAdminIF_v1_RegisterLdapDomainResponse);

@@ -12,6 +12,6 @@
   <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
     <PackageReference Include="PolyPersist.Net.Transactions" />
-    <PackageReference Include="SrvKit.General" />
+    <PackageReference Include="ServiceKit.Net.General" />
   </ItemGroup>
 </Project>

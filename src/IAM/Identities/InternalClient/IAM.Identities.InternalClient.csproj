@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SrvKit.General" />
-    <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
   </ItemGroup>
 
 </Project>

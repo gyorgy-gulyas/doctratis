@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SrvKit.Communicators" />
-    <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="ServiceKit.Net.Communicators" />
+    <PackageReference Include="ServiceKit.Net.Service" />
   </ItemGroup>
 </Project>

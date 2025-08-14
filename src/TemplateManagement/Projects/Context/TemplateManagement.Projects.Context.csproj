@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
     <PackageReference Include="Serilog" />
-    <PackageReference Include="SrvKit.General" />
+    <PackageReference Include="ServiceKit.Net.General" />
 </ItemGroup>
 
   <ItemGroup>

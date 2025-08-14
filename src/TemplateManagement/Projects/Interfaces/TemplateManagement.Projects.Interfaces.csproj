@@ -8,19 +8,14 @@
     <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\..\</SolutionDir>
   </PropertyGroup>
 
-  <Target Name="DebugPrint" AfterTargets="PrepareForBuild">
-    <Message Importance="high" Text="NuGetPackageRoot = '$(NuGetPackageRoot)'" />
-    <Message Importance="high" Text="SrvKitProtoRoot = '$(SrvKitProtoRoot)'" />
-  </Target>
-  
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" />
-    <PackageReference Include="SrvKit.General" />
-    <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(SrvKitProtoRoot)" />
+    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
   </ItemGroup>
 
 </Project>

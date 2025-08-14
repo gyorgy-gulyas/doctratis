@@ -12,11 +12,11 @@
     <PackageVersion Include="PolyPersist.Net.DocumentStore.Memory" Version="1.0.5"/>
     <PackageVersion Include="PolyPersist.Net.ColumnStore.Cassandra" Version="1.0.5"/>
     <PackageVersion Include="PolyPersist.Net.ColumnStore.Memory" Version="1.0.5"/>
-    <!-- SrvKit Local packages -->
-    <PackageVersion Include="SrvKit.General" Version="1.0.31" />
-    <PackageVersion Include="SrvKit.Service" Version="1.0.31" />
-    <PackageVersion Include="SrvKit.Communicators" Version="1.0.31" />
-    <PackageVersion Include="SrvKit.ServiceHost" Version="1.0.31" />
+    <!-- ServiceKit.Net Local packages -->
+    <PackageVersion Include="ServiceKit.Net.General" Version="1.1.1" />
+    <PackageVersion Include="ServiceKit.Net.Service" Version="1.1.1" />
+    <PackageVersion Include="ServiceKit.Net.Communicators" Version="1.1.1" />
+    <PackageVersion Include="ServiceKit.Net.ServiceHost" Version="1.1.1" />
     <!-- Microsoft packages -->
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0" />

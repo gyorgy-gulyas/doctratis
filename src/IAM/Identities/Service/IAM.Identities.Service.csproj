@@ -28,9 +28,9 @@
     <PackageReference Include="PolyPersist.Net.DocumentStore.Memory" />
     <PackageReference Include="PolyPersist.Net.ColumnStore.Cassandra" />
     <PackageReference Include="PolyPersist.Net.ColumnStore.Memory" />
-    <PackageReference Include="SrvKit.General" />
-    <PackageReference Include="SrvKit.Service" />
-    <PackageReference Include="SrvKit.ServiceHost" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
+    <PackageReference Include="ServiceKit.Net.ServiceHost" />
   </ItemGroup>
 
 </Project>

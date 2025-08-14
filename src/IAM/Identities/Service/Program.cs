@@ -7,7 +7,7 @@ using IAM.Identities.Service.Implementations;
 using IAM.Identities.Service.Implementations.Helpers;
 using PolyPersist;
 using ServiceKit.Net;
-using SrvKit.Communicators;
+using ServiceKit.Net.Communicators;
 
 
 BaseServiceHost.Create<IdentityManagementServiceHost>(args, new BaseServiceHost.Options()

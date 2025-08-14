@@ -6,8 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
-    <PackageReference Include="SrvKit.General" />
-    <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,7 +14,7 @@ option java_multiple_files = true;
 package IAM.Identities;
 
 import "google/protobuf/timestamp.proto";
-import "srvkit/error.proto";
+import "servicekit/error.proto";
 
 service LoginIF_v1 {
 	/// Login using email and password credentials
