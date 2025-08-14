@@ -1,7 +1,7 @@
 ﻿using ServiceKit.Net;
 using ServiceKit.Net.Communicators;
 
-namespace Core.Base.Service.Communication
+namespace Core.Base.Agents.Communication
 {
     public class SmsAgent
     {

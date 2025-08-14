@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Novell.Directory.Ldap.NETStandard</id>
+    <version>4.0.0</version>
+    <authors>Novell,dsbenghe</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/dsbenghe/Novell.Directory.Ldap.NETStandard</projectUrl>
+    <description>LDAP client library - .NET Standard 2.0/2.1, - compatible .NET platforms: .NET &gt;= NET6, NET8, NET9, .NET Framework &gt;= 4.6, Universal Windows Platform, Xamarin. Works with any LDAP server (including Microsoft Active Directory - AD)</description>
+    <tags>LDAP Microsoft Active Directory AD .NET Standard .NET Core C#</tags>
+    <repository type="git" commit="e0cd8d459b759dc9d2d74471d3458e61059d7911" />
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="6.0.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net7.0">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="7.0.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.3" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="9.0.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="2.2.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.5" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="3.1.32" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

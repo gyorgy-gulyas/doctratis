@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PolyPersist.Net.ColumnStore.Cassandra</id>
+    <version>1.0.5</version>
+    <authors>György Gulyás</authors>
+    <description>PolyPersist is a cross-platform library that abstracts data persistence across different database types, including SQL, NoSQL, and file-based systems. It offers a unified interface, enabling seamless switching between databases while maintaining flexibility and minimal code changes</description>
+    <repository type="git" commit="d6a3c7d952ab429ad59e9a6614393ee05acb3ca6" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="PolyPersist.Net" version="1.0.5" exclude="Build,Analyzers" />
+        <dependency id="CassandraCSharpDriver" version="3.22.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

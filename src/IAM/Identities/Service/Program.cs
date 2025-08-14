@@ -1,6 +1,6 @@
 using Core.Auditing.Worker;
 using Core.Base;
-using Core.Base.Service.Implementations;
+using Core.Base.Agents.Communication;
 using IAM.Identities;
 using IAM.Identities.Service;
 using IAM.Identities.Service.Implementations;
@@ -31,9 +31,9 @@ public class IdentityManagementServiceHost : BaseServiceHost
         services.AddAuditWorker();
 
         services.UseSms_Twilio();
-        services.AddSingleton<ISmsService, SmsService>();
+        services.AddSingleton<SmsAgent>();
         services.UseEmail_Graph();
-        services.AddSingleton<IEmailService, EmailService>();
+        services.AddSingleton<EmailAgent>();
 
         services.AddSingleton<LdapAuthenticator>();
         services.AddHttpClient<KAUAuthenticator>();

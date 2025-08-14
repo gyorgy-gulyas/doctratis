@@ -1,4 +1,4 @@
-﻿using Core.Base;
+﻿using Core.Base.Agents.Communication;
 using IAM.Identities.Identity;
 using IAM.Identities.Service.Implementations.Helpers;
 using OtpNet;
@@ -12,23 +12,23 @@ namespace IAM.Identities.Service.Implementations
     {
         private readonly IdentityStoreContext _context;
         private readonly IAccountService _accountService;
-        private readonly ISmsService _smsService;
-        private readonly IEmailService _emailService;
+        private readonly SmsAgent _smsAgent;
+        private readonly EmailAgent _emailAgent;
         private readonly TokenService _tokenService = new();
         private readonly LdapAuthenticator _ldapAuthenticator;
         private readonly KAUAuthenticator _kauAuthenticator;
 
         public LoginService(IdentityStoreContext context
             , IAccountService accountService
-            , ISmsService smsService
-            , IEmailService emailService
+            , SmsAgent smsAgent
+            , EmailAgent emailAgent
             , LdapAuthenticator ldapAuthenticator
             , KAUAuthenticator kauAuthenticator)
         {
             _context = context;
             _accountService = accountService;
-            _smsService = smsService;
-            _emailService = emailService;
+            _smsAgent = smsAgent;
+            _emailAgent = emailAgent;
             _ldapAuthenticator = ldapAuthenticator;
             _kauAuthenticator = kauAuthenticator;
         }
@@ -301,14 +301,14 @@ namespace IAM.Identities.Service.Implementations
                     case TwoFactorConfiguration.Method.SMS:
                         {
                             var totp = new Totp(secretBytes, step: 5 * 30); // 5 minutes window
-                            await _smsService.SendOTP(ctx, twoFactor.phoneNumber, code = totp.ComputeTotp());
+                            await _smsAgent.SendOTP(ctx, twoFactor.phoneNumber, code = totp.ComputeTotp());
                             _context.AuditLog_2FASent(ctx, account, twoFactor.phoneNumber);
                         }
                         break;
                     case TwoFactorConfiguration.Method.Email:
                         {
                             var totp = new Totp(secretBytes, step: 5 * 30); // 5 minutes window
-                            await _emailService.SendOTP(ctx, twoFactor.email, code = totp.ComputeTotp());
+                            await _emailAgent.SendOTP(ctx, twoFactor.email, code = totp.ComputeTotp());
                             _context.AuditLog_2FASent(ctx, account, twoFactor.email);
                         }
                         break;

@@ -8,6 +8,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using IAM.Identities.Protos.LoginIF_v1;
+using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using ServiceKit.Net;
 
