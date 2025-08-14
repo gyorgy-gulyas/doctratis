@@ -1,5 +1,6 @@
 import  Core.Base
-import  Core.IdentityManagement
 import  Core.Auditing
 
-import  TemplateManagement.TemplateManagement
+import  IAM.Identities
+import  IAM.Access
+import  TemplateManagement.Projects

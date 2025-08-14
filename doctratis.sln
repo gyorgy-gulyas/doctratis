@@ -19,13 +19,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TemplateManagement", "Templ
 		src\TemplateManagement\TemplateManagement.d3 = src\TemplateManagement\TemplateManagement.d3
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Service", "src\TemplateManagement\Projects\Service\TemplateManagement.Projects.Service.csproj", "{671CD9B4-A606-65CB-FF18-DFCE46A19442}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Interfaces", "src\TemplateManagement\Projects\Interfaces\TemplateManagement.Projects.Interfaces.csproj", "{99046452-2502-15EB-3A85-1FCA0E4AB93A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.Models", "src\TemplateManagement\Projects\Models\TemplateManagement.Projects.Models.csproj", "{BB6A68B7-A018-BB9F-1E32-9FCEA2624890}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateManagement.Projects.InternalClient", "src\TemplateManagement\Projects\InternalClient\TemplateManagement.Projects.InternalClient.csproj", "{5ECF7476-A56A-D981-6AAE-2AF747E86520}"
 EndProject
@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClientKit", "ApiClientKi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.ApiClientKit", "src\ApiClientKit\BFF\BFF.ApiClientKit.csproj", "{0F5A664F-276F-4F0B-885B-9E7D4C955EF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.ApiClientKit", "src\ApiClientKit\Admin\Admin.ApiClientKit.csproj", "{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "docratis.ts.api", "src\Client\docratis.ts.api\docratis.ts.api.esproj", "{B7740FA1-2435-0F3D-1EC5-9E3A6AAC753B}"
@@ -60,22 +62,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{2CDDF983-C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Base.Models", "src\Core\Base\Models\Core.Base.Models.csproj", "{74A985A2-E213-4BC6-843B-217D102A3D5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Base.Service", "src\Core\Base\Service\Core.Base.Service.csproj", "{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identities", "Identities", "{1A080536-9F9C-4B0C-B2F4-745EED7BA11B}"
 	ProjectSection(SolutionItems) = preProject
 		src\Core\IdentityManagement.d3 = src\Core\IdentityManagement.d3
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Identities.Models", "src\Core\Identities\Models\Core.Identities.Models.csproj", "{1B368A05-901A-45BE-9804-AB5DDF1DAB5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Identities.Models", "src\IAM\Identities\Models\IAM.Identities.Models.csproj", "{1B368A05-901A-45BE-9804-AB5DDF1DAB5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Identities.Interfaces", "src\Core\Identities\Interfaces\Core.Identities.Interfaces.csproj", "{9B154AA8-3AA7-4660-9991-0C57C6CB853B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Identities.Interfaces", "src\IAM\Identities\Interfaces\IAM.Identities.Interfaces.csproj", "{9B154AA8-3AA7-4660-9991-0C57C6CB853B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Identities.InternalClient", "src\Core\Identities\InternalClient\Core.Identities.InternalClient.csproj", "{4F082DF5-FC58-4DA3-AAE0-99DC9950FF2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Identities.InternalClient", "src\IAM\Identities\InternalClient\IAM.Identities.InternalClient.csproj", "{4F082DF5-FC58-4DA3-AAE0-99DC9950FF2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Identities.Service", "src\Core\Identities\Service\Core.Identities.Service.csproj", "{15A55916-0CF7-41F4-B6A8-0A9F79D63014}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Base.Service", "src\Core\Base\Service\Core.Base.Service.csproj", "{AFA3C890-1DA3-FF08-3D4A-78CC837750C4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.ApiClientKit", "src\ApiClientKit\Admin\Admin.ApiClientKit.csproj", "{6AED19E8-CC53-0AD0-E754-F161E2FCC6AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Identities.Service", "src\IAM\Identities\Service\IAM.Identities.Service.csproj", "{15A55916-0CF7-41F4-B6A8-0A9F79D63014}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

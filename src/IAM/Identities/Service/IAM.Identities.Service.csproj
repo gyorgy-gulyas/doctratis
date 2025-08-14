@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+    <PackageReference Include="Novell.Directory.Ldap.NETStandard" Version="4.0.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.1" />
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Base\Service\Core.Base.Service.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
+    <ProjectReference Include="..\Interfaces\IAM.Identities.Interfaces.csproj" />
+    <ProjectReference Include="..\Models\IAM.Identities.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
+    <PackageReference Include="PolyPersist.Net.BlobStore.GridFS" />
+    <PackageReference Include="PolyPersist.Net.BlobStore.Memory" />
+    <PackageReference Include="PolyPersist.Net.DocumentStore.MongoDB" />
+    <PackageReference Include="PolyPersist.Net.DocumentStore.Memory" />
+    <PackageReference Include="PolyPersist.Net.ColumnStore.Cassandra" />
+    <PackageReference Include="PolyPersist.Net.ColumnStore.Memory" />
+    <PackageReference Include="SrvKit.General" />
+    <PackageReference Include="SrvKit.Service" />
+    <PackageReference Include="SrvKit.ServiceHost" />
+  </ItemGroup>
+
+</Project>
