@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0" />
+    <PackageReference Include="JsonDiffPatch.Net"  />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
   </ItemGroup>
   
 </Project>

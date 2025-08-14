@@ -8,6 +8,7 @@
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using ServiceKit.Net;
 using TemplateManagement.Projects;

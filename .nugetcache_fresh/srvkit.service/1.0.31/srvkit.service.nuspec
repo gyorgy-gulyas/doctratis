@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SrvKit.Service</id>
+    <version>1.0.31</version>
+    <authors>György Gulyás</authors>
+    <description>Dotnet Service helpers for microservice environment</description>
+    <repository type="git" commit="71d50321043bba4efd9d64081d97ed55294fc4ee" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="SrvKit.General" version="1.0.31" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging" version="8.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

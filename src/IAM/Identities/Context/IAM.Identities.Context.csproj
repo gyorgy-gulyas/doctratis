@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\Core\Base\Models\Core.Base.Models.csproj" />
     <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
     <ProjectReference Include="..\Interfaces\IAM.Identities.Interfaces.csproj" />
+    <ProjectReference Include="..\Models\IAM.Identities.Models.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,13 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
     <PackageReference Include="PolyPersist.Net.Transactions" />
     <PackageReference Include="PolyPersist.Net.BlobStore.GridFS" />
@@ -26,8 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
     <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
+    <ProjectReference Include="..\Context\TemplateManagement.Projects.Context.csproj" />
+    <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
     <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
   </ItemGroup>

@@ -14,7 +14,7 @@
   </Target>
   
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageReference Include="Grpc.AspNetCore" />
     <PackageReference Include="SrvKit.General" />
     <PackageReference Include="SrvKit.Service" />
   </ItemGroup>

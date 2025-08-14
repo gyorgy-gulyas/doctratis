@@ -1,21 +1,41 @@
 <Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="PolyPersist.Net" Version="1.0.4" />
-    <PackageVersion Include="PolyPersist.Net.Transactions" Version="1.0.4"/>
-    <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.4"/>
-    <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.4"/>
-
-    <PackageVersion Include="SrvKit.General" Version="1.0.31"/>
-    <PackageVersion Include="SrvKit.Service" Version="1.0.31"/>
-    <PackageVersion Include="SrvKit.Communicators" Version="1.0.31"/>
-    <PackageVersion Include="SrvKit.ServiceHost" Version="1.0.31"/>
-
-    <!-- JWT token handling for Login -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+    <!-- PolyPersist Local packages -->
+    <PackageVersion Include="PolyPersist.Net" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.Transactions" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.BlobStore.Memory" Version="1.0.5"/>
+    <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.DocumentStore.Memory" Version="1.0.5"/>
+    <PackageVersion Include="PolyPersist.Net.ColumnStore.Cassandra" Version="1.0.5"/>
+    <PackageVersion Include="PolyPersist.Net.ColumnStore.Memory" Version="1.0.5"/>
+    <!-- SrvKit Local packages -->
+    <PackageVersion Include="SrvKit.General" Version="1.0.31" />
+    <PackageVersion Include="SrvKit.Service" Version="1.0.31" />
+    <PackageVersion Include="SrvKit.Communicators" Version="1.0.31" />
+    <PackageVersion Include="SrvKit.ServiceHost" Version="1.0.31" />
+    <!-- Microsoft packages -->
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0" />
+    <!-- LDAP for logging -->
+    <PackageVersion Include="Novell.Directory.Ldap.NETStandard" Version="4.0.0" />
+    <!-- One Time Password generate for logging-->
+    <PackageVersion Include="Otp.NET" Version="1.4.0" />
+    <!-- JSON Diff for aufiting -->
+    <PackageVersion Include="JsonDiffPatch.Net" Version="2.3.0" />
+    <!-- Google protobuf -->
+    <PackageVersion Include="Google.Protobuf" Version="3.23.1" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.57.0" />
     <!-- logging for controllers -->
-    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Swagger funcionality for controllers -->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.1" />
+    <!-- JWT token handling for Login -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
   </ItemGroup>
 </Project>
