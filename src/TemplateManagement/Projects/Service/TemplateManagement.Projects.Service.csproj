@@ -5,17 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
-    <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
-    <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
-    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
-    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +23,13 @@
     <PackageReference Include="SrvKit.General" />
     <PackageReference Include="SrvKit.Service" />
     <PackageReference Include="SrvKit.ServiceHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Interfaces\TemplateManagement.Projects.Interfaces.csproj" />
+    <ProjectReference Include="..\Models\TemplateManagement.Projects.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
   </ItemGroup>
 
 </Project>

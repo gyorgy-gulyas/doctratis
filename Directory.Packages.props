@@ -9,5 +9,13 @@
     <PackageVersion Include="SrvKit.Service" Version="1.0.31"/>
     <PackageVersion Include="SrvKit.Communicators" Version="1.0.31"/>
     <PackageVersion Include="SrvKit.ServiceHost" Version="1.0.31"/>
+
+    <!-- JWT token handling for Login -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+    <!-- logging for controllers -->
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <!-- Swagger funcionality for controllers -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.1" />
   </ItemGroup>
 </Project>

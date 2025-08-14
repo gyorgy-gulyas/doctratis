@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolyPersist.Net" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Base\Models\Core.Base.Models.csproj" />
+    <ProjectReference Include="..\..\..\Core\Auditing\Models\Core.Auditing.Models.csproj" />
+    <ProjectReference Include="..\Interfaces\IAM.Identities.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>
