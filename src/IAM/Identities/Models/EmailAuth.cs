@@ -9,22 +9,26 @@ using IAM.Identities;
 
 namespace IAM.Identities.Identity
 {
-	/// KAU Ügyfélkapu authentication
-	public partial class KAUAuth : Auth, IEquatable<KAUAuth>
+	/// Password-based authentication
+	public partial class EmailAuth : Auth, IEquatable<EmailAuth>
 	{
-		/// Government-issued unique identifier (Ügyfélkapu ID)
-		public string KAUUserId { get; set; }
-		/// User’s full legal name as returned by the service
-		public string legalName { get; set; }
-		/// Email address verified by the service (optional)
 		public string email { get; set; }
+		public bool isEmailConfirmed { get; set; }
+		/// Hashed password
+		public string passwordHash { get; set; }
+		/// Salt used for hashing
+		public string passwordSalt { get; set; }
+		/// old password hashes
+		public List<string> passwordHistory { get; set; } = new();
+		/// password expiration time
+		public DateOnly passwordExpiresAt { get; set; }
 		/// Optional two-factor authentication settings (TOTP, SMS, Email)
 		public TwoFactorConfiguration twoFactor { get; set; }
 
 		#region Clone 
-		public override KAUAuth Clone()
+		public override EmailAuth Clone()
 		{
-			KAUAuth clone = new();
+			EmailAuth clone = new();
 
 			// begin: Auth
 			clone.method = method;
@@ -35,9 +39,14 @@ namespace IAM.Identities.Identity
 			// begin: BaseEntity
 			// end: BaseEntity
 
-			clone.KAUUserId = new string(KAUUserId.ToCharArray());
-			clone.legalName = new string(legalName.ToCharArray());
 			clone.email = new string(email.ToCharArray());
+			clone.isEmailConfirmed = isEmailConfirmed;
+			clone.passwordHash = new string(passwordHash.ToCharArray());
+			clone.passwordSalt = new string(passwordSalt.ToCharArray());
+
+			// clone of passwordHistory
+			clone.passwordHistory.AddRange( passwordHistory.Select( v => new string(v.ToCharArray()) ));
+			clone.passwordExpiresAt = passwordExpiresAt;
 
 			// clone of twoFactor
 			clone.twoFactor = twoFactor?.Clone();
@@ -47,7 +56,7 @@ namespace IAM.Identities.Identity
 		#endregion Clone 
 
 		#region Equals & HashCode 
-		public bool Equals( KAUAuth other )
+		public bool Equals( EmailAuth other )
 		{
 			if (other is null) return false;
 
@@ -60,9 +69,14 @@ namespace IAM.Identities.Identity
 			// begin: BaseEntity
 			// end: BaseEntity
 
-			if(KAUUserId != other.KAUUserId) return false;
-			if(legalName != other.legalName) return false;
 			if(email != other.email) return false;
+			if(isEmailConfirmed != other.isEmailConfirmed) return false;
+			if(passwordHash != other.passwordHash) return false;
+			if(passwordSalt != other.passwordSalt) return false;
+
+			// equals of passwordHistory
+			if(passwordHistory.SequenceEqual(other.passwordHistory) == false ) return false;
+			if(passwordExpiresAt != other.passwordExpiresAt) return false;
 
 			// equals of twoFactor
 			if(twoFactor == null && other.twoFactor != null ) return false;
@@ -71,7 +85,7 @@ namespace IAM.Identities.Identity
 			return true;
 		}
 
-		public override bool Equals(object obj) => Equals(obj as KAUAuth);
+		public override bool Equals(object obj) => Equals(obj as EmailAuth);
 
 		public override int GetHashCode()
 		{
@@ -88,9 +102,15 @@ namespace IAM.Identities.Identity
 			hash.Add(LastUpdate);
 			// end: BaseEntity
 
-			hash.Add(KAUUserId);
-			hash.Add(legalName);
 			hash.Add(email);
+			hash.Add(isEmailConfirmed);
+			hash.Add(passwordHash);
+			hash.Add(passwordSalt);
+
+			// hash of passwordHistory
+			foreach( var element_passwordHistory in passwordHistory)
+				hash.Add(element_passwordHistory);
+			hash.Add(passwordExpiresAt);
 
 			// hash of twoFactor
 			if(twoFactor != null ) hash.Add(twoFactor);

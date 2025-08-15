@@ -27,9 +27,22 @@ service IdentityAdminIF_v1 {
 	rpc createAccount(IdentityAdminIF_v1_createAccountRequest) returns (IdentityAdminIF_v1_createAccountResponse);
 	rpc updateAccount(IdentityAdminIF_v1_updateAccountRequest) returns (IdentityAdminIF_v1_updateAccountResponse);
 	rpc listAuthsForAccount(IdentityAdminIF_v1_listAuthsForAccountRequest) returns (IdentityAdminIF_v1_listAuthsForAccountResponse);
-	rpc getEmailAndPasswordAuth(IdentityAdminIF_v1_getEmailAndPasswordAuthRequest) returns (IdentityAdminIF_v1_getEmailAndPasswordAuthResponse);
+	rpc setActiveForAuth(IdentityAdminIF_v1_setActiveForAuthRequest) returns (IdentityAdminIF_v1_setActiveForAuthResponse);
+	rpc createtEmailAuth(IdentityAdminIF_v1_createtEmailAuthRequest) returns (IdentityAdminIF_v1_createtEmailAuthResponse);
+	rpc getEmailAuth(IdentityAdminIF_v1_getEmailAuthRequest) returns (IdentityAdminIF_v1_getEmailAuthResponse);
+	rpc changePasswordOnEmailAuth(IdentityAdminIF_v1_changePasswordOnEmailAuthRequest) returns (IdentityAdminIF_v1_changePasswordOnEmailAuthResponse);
+	rpc setTwoFactorOnEmailAuth(IdentityAdminIF_v1_setTwoFactorOnEmailAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnEmailAuthResponse);
+	rpc confirmEmail(IdentityAdminIF_v1_confirmEmailRequest) returns (IdentityAdminIF_v1_confirmEmailResponse);
+	rpc createADAuth(IdentityAdminIF_v1_createADAuthRequest) returns (IdentityAdminIF_v1_createADAuthResponse);
 	rpc getADAuth(IdentityAdminIF_v1_getADAuthRequest) returns (IdentityAdminIF_v1_getADAuthResponse);
+	rpc setTwoFactorOnADAuth(IdentityAdminIF_v1_setTwoFactorOnADAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnADAuthResponse);
+	rpc createKAUAuth(IdentityAdminIF_v1_createKAUAuthRequest) returns (IdentityAdminIF_v1_createKAUAuthResponse);
 	rpc getKAUAuth(IdentityAdminIF_v1_getKAUAuthRequest) returns (IdentityAdminIF_v1_getKAUAuthResponse);
+	rpc setTwoFactorOnKAUAuth(IdentityAdminIF_v1_setTwoFactorOnKAUAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnKAUAuthResponse);
+	rpc createCertificateAuthFromCSR(IdentityAdminIF_v1_createCertificateAuthFromCSRRequest) returns (IdentityAdminIF_v1_createCertificateAuthFromCSRResponse);
+	rpc setCertificateAuthActive(IdentityAdminIF_v1_setCertificateAuthActiveRequest) returns (IdentityAdminIF_v1_setCertificateAuthActiveResponse);
+	rpc revokeCertificate(IdentityAdminIF_v1_revokeCertificateRequest) returns (IdentityAdminIF_v1_revokeCertificateResponse);
+	rpc reissueCertificate(IdentityAdminIF_v1_reissueCertificateRequest) returns (IdentityAdminIF_v1_reissueCertificateResponse);
 	rpc getCertificateAuth(IdentityAdminIF_v1_getCertificateAuthRequest) returns (IdentityAdminIF_v1_getCertificateAuthResponse);
 }
 
@@ -125,14 +138,94 @@ message IdentityAdminIF_v1_listAuthsForAccountResponse {
 	}
 }
 
-message IdentityAdminIF_v1_getEmailAndPasswordAuthRequest {
+message IdentityAdminIF_v1_setActiveForAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	bool isActive = 3;
+}
+
+message IdentityAdminIF_v1_setActiveForAuthResponse {
+	oneof result {
+		AuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_createtEmailAuthRequest {
+	string accountId = 1;
+	string email = 2;
+	bool initialPassword = 3;
+	TwoFactorConfigurationDTO twoFactor = 4;
+}
+
+message IdentityAdminIF_v1_createtEmailAuthResponse {
+	oneof result {
+		EmailAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_getEmailAuthRequest {
 	string accountId = 1;
 	string authId = 2;
 }
 
-message IdentityAdminIF_v1_getEmailAndPasswordAuthResponse {
+message IdentityAdminIF_v1_getEmailAuthResponse {
 	oneof result {
-		EmailAndPasswordAuthDTO Value = 1;
+		EmailAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_changePasswordOnEmailAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	string newPassword = 4;
+}
+
+message IdentityAdminIF_v1_changePasswordOnEmailAuthResponse {
+	oneof result {
+		EmailAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_setTwoFactorOnEmailAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	TwoFactorConfigurationDTO twoFactor = 4;
+}
+
+message IdentityAdminIF_v1_setTwoFactorOnEmailAuthResponse {
+	oneof result {
+		EmailAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_confirmEmailRequest {
+	string token = 1;
+}
+
+message IdentityAdminIF_v1_confirmEmailResponse {
+	oneof result {
+		bool Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_createADAuthRequest {
+	string accountId = 1;
+	string ldapDomainId = 2;
+	string adUsername = 3;
+	TwoFactorConfigurationDTO twoFactor = 4;
+}
+
+message IdentityAdminIF_v1_createADAuthResponse {
+	oneof result {
+		ADAuthDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
@@ -149,6 +242,33 @@ message IdentityAdminIF_v1_getADAuthResponse {
 	}
 }
 
+message IdentityAdminIF_v1_setTwoFactorOnADAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	TwoFactorConfigurationDTO twoFactor = 4;
+}
+
+message IdentityAdminIF_v1_setTwoFactorOnADAuthResponse {
+	oneof result {
+		ADAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_createKAUAuthRequest {
+	string accountId = 1;
+	string kauUserId = 2;
+	TwoFactorConfigurationDTO twoFactor = 3;
+}
+
+message IdentityAdminIF_v1_createKAUAuthResponse {
+	oneof result {
+		KAUAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
 message IdentityAdminIF_v1_getKAUAuthRequest {
 	string accountId = 1;
 	string authId = 2;
@@ -157,6 +277,73 @@ message IdentityAdminIF_v1_getKAUAuthRequest {
 message IdentityAdminIF_v1_getKAUAuthResponse {
 	oneof result {
 		KAUAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_setTwoFactorOnKAUAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	TwoFactorConfigurationDTO twoFactor = 4;
+}
+
+message IdentityAdminIF_v1_setTwoFactorOnKAUAuthResponse {
+	oneof result {
+		KAUAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_createCertificateAuthFromCSRRequest {
+	string accountId = 1;
+	CsrInputDTO data = 2;
+}
+
+message IdentityAdminIF_v1_createCertificateAuthFromCSRResponse {
+	oneof result {
+		CertificateAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_setCertificateAuthActiveRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	bool isActive = 4;
+}
+
+message IdentityAdminIF_v1_setCertificateAuthActiveResponse {
+	oneof result {
+		CertificateAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_revokeCertificateRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	string reason = 4;
+}
+
+message IdentityAdminIF_v1_revokeCertificateResponse {
+	oneof result {
+		CertificateAuthDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message IdentityAdminIF_v1_reissueCertificateRequest {
+	string accountId = 1;
+	string authId = 2;
+	CsrInputDTO data = 3;
+}
+
+message IdentityAdminIF_v1_reissueCertificateResponse {
+	oneof result {
+		CertificateAuthDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
@@ -246,7 +433,7 @@ message ContactInfo {
 message AuthDTO {
 
 	enum Methods {
-		Methods_EmailAndPassword = 0;
+		Methods_Email = 0;
 		Methods_ActiveDirectory = 1;
 		Methods_KAU = 2;
 		Methods_Certificate = 3;
@@ -254,6 +441,7 @@ message AuthDTO {
 
 	string id = 1;
 	Methods method = 2;
+	bool isActive = 3;
 }
 
 message TwoFactorConfigurationDTO {
@@ -277,14 +465,15 @@ message TwoFactorConfigurationDTO {
 }
 
 /// Password-based authentication
-message EmailAndPasswordAuthDTO {
+message EmailAuthDTO {
 	string id = 1;
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
-	string email = 4;
-	bool isEmailConfirmed = 5;
-	string passwordExpiresAt = 6;
-	TwoFactorConfigurationDTO twoFactor = 7;
+	bool isActive = 4;
+	string email = 5;
+	bool isEmailConfirmed = 6;
+	string passwordExpiresAt = 7;
+	TwoFactorConfigurationDTO twoFactor = 8;
 }
 
 /// Active Directory-based authentication
@@ -322,8 +511,22 @@ message CertificateAuthDTO {
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
 	string certificateThumbprint = 4;
-	google.protobuf.Timestamp validFrom = 5;
-	google.protobuf.Timestamp validUntil = 6;
+	string serialNumber = 5;
+	string issuer = 6;
+	string subject = 7;
+	string publicKeyHash = 8;
+	google.protobuf.Timestamp validFrom = 9;
+	google.protobuf.Timestamp validUntil = 10;
+	bool isActive = 11;
+	string revocationStatus = 12;
+	string revocationReason = 13;
+	google.protobuf.Timestamp revokedAt = 14;
+}
+
+message CsrInputDTO {
+	string csrPem = 1;
+	/// CA profil/sablon (opcionális)
+	string profile = 2;
 }
 
 message list_LdapDomainSummaryDTO {

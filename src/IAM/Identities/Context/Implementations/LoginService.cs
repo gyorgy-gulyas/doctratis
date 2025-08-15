@@ -49,11 +49,11 @@ namespace IAM.Identities.Service.Implementations
             var signIn = _trySignInWithPassword(account, auth as EmailAndPasswordAuth, password);
             if (signIn != ILoginIF_v1.SignInResult.Ok)
             {
-                _context.AuditLog_SignInFailed(ctx, account, Auth.Methods.EmailAndPassword, signIn);
+                _context.AuditLog_SignInFailed(ctx, account, Auth.Methods.Email, signIn);
                 return new(new ILoginIF_v1.LoginResultDTO() { result = signIn });
             }
 
-            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.EmailAndPassword, auth.twoFactor);
+            return await _HandleSuccessSignIn(ctx, account, Auth.Methods.Email, auth.twoFactor);
         }
 
         async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginService.LoginWithAD(CallingContext ctx, string username, string password)

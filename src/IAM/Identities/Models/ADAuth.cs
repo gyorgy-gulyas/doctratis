@@ -26,6 +26,7 @@ namespace IAM.Identities.Identity
 
 			// begin: Auth
 			clone.method = method;
+			clone.isActive = isActive;
 			clone.accountId = new string(accountId.ToCharArray());
 			// end: Auth
 
@@ -49,6 +50,7 @@ namespace IAM.Identities.Identity
 
 			// begin: Auth
 			if(method != other.method) return false;
+			if(isActive != other.isActive) return false;
 			if(accountId != other.accountId) return false;
 			// end: Auth
 
@@ -72,6 +74,7 @@ namespace IAM.Identities.Identity
 			var hash = new HashCode();
 			// begin: Auth
 			hash.Add(method);
+			hash.Add(isActive);
 			hash.Add(accountId);
 			// end: Auth
 

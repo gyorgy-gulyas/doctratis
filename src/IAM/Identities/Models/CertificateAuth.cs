@@ -5,16 +5,32 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+using IAM.Identities;
 
 namespace IAM.Identities.Identity
 {
 	/// Certificate-based authentication
 	public partial class CertificateAuth : Auth, IEquatable<CertificateAuth>
 	{
-		/// Certificate thumbprint (unique identifier)
+		public enum RevocationStatuses
+		{
+			None,
+			Revoked,
+			Suspended,
+		}
 		public string certificateThumbprint { get; set; }
+		/// csak KIADOTT cert után számolható
+		public string serialNumber { get; set; }
+		public string issuer { get; set; }
+		public string subject { get; set; }
+		public string publicKeyHash { get; set; }
+		/// SPKI hash - CSR-ből is képezhető
 		public DateTime validFrom { get; set; }
 		public DateTime validUntil { get; set; }
+		public bool isActive { get; set; }
+		public CertificateAuth.RevocationStatuses revocationStatus { get; set; }
+		public string revocationReason { get; set; }
+		public DateTime revokedAt { get; set; }
 
 		#region Clone 
 		public override CertificateAuth Clone()
@@ -23,6 +39,7 @@ namespace IAM.Identities.Identity
 
 			// begin: Auth
 			clone.method = method;
+			clone.isActive = isActive;
 			clone.accountId = new string(accountId.ToCharArray());
 			// end: Auth
 
@@ -30,8 +47,16 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			clone.certificateThumbprint = new string(certificateThumbprint.ToCharArray());
+			clone.serialNumber = new string(serialNumber.ToCharArray());
+			clone.issuer = new string(issuer.ToCharArray());
+			clone.subject = new string(subject.ToCharArray());
+			clone.publicKeyHash = new string(publicKeyHash.ToCharArray());
 			clone.validFrom = validFrom;
 			clone.validUntil = validUntil;
+			clone.isActive = isActive;
+			clone.revocationStatus = revocationStatus;
+			clone.revocationReason = new string(revocationReason.ToCharArray());
+			clone.revokedAt = revokedAt;
 
 			return clone;
 		}
@@ -44,6 +69,7 @@ namespace IAM.Identities.Identity
 
 			// begin: Auth
 			if(method != other.method) return false;
+			if(isActive != other.isActive) return false;
 			if(accountId != other.accountId) return false;
 			// end: Auth
 
@@ -51,8 +77,16 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			if(certificateThumbprint != other.certificateThumbprint) return false;
+			if(serialNumber != other.serialNumber) return false;
+			if(issuer != other.issuer) return false;
+			if(subject != other.subject) return false;
+			if(publicKeyHash != other.publicKeyHash) return false;
 			if(validFrom != other.validFrom) return false;
 			if(validUntil != other.validUntil) return false;
+			if(isActive != other.isActive) return false;
+			if(revocationStatus != other.revocationStatus) return false;
+			if(revocationReason != other.revocationReason) return false;
+			if(revokedAt != other.revokedAt) return false;
 
 			return true;
 		}
@@ -64,6 +98,7 @@ namespace IAM.Identities.Identity
 			var hash = new HashCode();
 			// begin: Auth
 			hash.Add(method);
+			hash.Add(isActive);
 			hash.Add(accountId);
 			// end: Auth
 
@@ -74,8 +109,16 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			hash.Add(certificateThumbprint);
+			hash.Add(serialNumber);
+			hash.Add(issuer);
+			hash.Add(subject);
+			hash.Add(publicKeyHash);
 			hash.Add(validFrom);
 			hash.Add(validUntil);
+			hash.Add(isActive);
+			hash.Add(revocationStatus);
+			hash.Add(revocationReason);
+			hash.Add(revokedAt);
 
 			return hash.ToHashCode();
 		}

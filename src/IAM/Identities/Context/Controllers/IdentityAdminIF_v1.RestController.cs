@@ -446,24 +446,24 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "getemailandpasswordauth/{accountId}/{authId}" )] 
+		[HttpPost( "setactiveforauth/{accountId}/{authId}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAndPasswordAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.AuthDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> getEmailAndPasswordAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		public async Task<IActionResult> setActiveForAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromQuery] bool isActive)
 		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getEmailAndPasswordAuth" ))
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setActiveForAuth" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
 				try
 				{
 					// calling the service function itself
-					var response = await _service.getEmailAndPasswordAuth( ctx, accountId, authId );
+					var response = await _service.setActiveForAuth( ctx, accountId, authId, isActive );
 
 					if( response.IsSuccess() == true )
 					{
@@ -473,7 +473,283 @@ namespace IAM.Identities
 						}
 						else
 						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getEmailAndPasswordAuth'" );
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setActiveForAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "createtemailauth/{accountId}/{email}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> createtEmailAuth( [FromRoute] string accountId,  [FromRoute] string email,  [FromQuery] bool initialPassword,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createtEmailAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.createtEmailAuth( ctx, accountId, email, initialPassword, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createtEmailAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "getemailauth/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> getEmailAuth( [FromRoute] string accountId,  [FromRoute] string authId)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.getEmailAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.getEmailAuth( ctx, accountId, authId );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getEmailAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "changepasswordonemailauth/{accountId}/{authId}/{etag}/{newPassword}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> changePasswordOnEmailAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromRoute] string newPassword)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.changePasswordOnEmailAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.changePasswordOnEmailAuth( ctx, accountId, authId, etag, newPassword );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.changePasswordOnEmailAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "settwofactoronemailauth/{accountId}/{authId}/{etag}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> setTwoFactorOnEmailAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setTwoFactorOnEmailAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.setTwoFactorOnEmailAuth( ctx, accountId, authId, etag, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setTwoFactorOnEmailAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "confirmemail/{token}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(bool) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> confirmEmail( [FromRoute] string token)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.confirmEmail" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.confirmEmail( ctx, token );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.confirmEmail'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "createadauth/{accountId}/{ldapDomainId}/{adUsername}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.ADAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> createADAuth( [FromRoute] string accountId,  [FromRoute] string ldapDomainId,  [FromRoute] string adUsername,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createADAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.createADAuth( ctx, accountId, ldapDomainId, adUsername, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createADAuth'" );
 						}
 					}
 					else
@@ -538,6 +814,98 @@ namespace IAM.Identities
 			}
 		}
 
+		[HttpPost( "settwofactoronadauth/{accountId}/{authId}/{etag}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.ADAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> setTwoFactorOnADAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setTwoFactorOnADAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.setTwoFactorOnADAuth( ctx, accountId, authId, etag, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setTwoFactorOnADAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "createkauauth/{accountId}/{kauUserId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.KAUAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> createKAUAuth( [FromRoute] string accountId,  [FromRoute] string kauUserId,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createKAUAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.createKAUAuth( ctx, accountId, kauUserId, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createKAUAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		[HttpPost( "getkauauth/{accountId}/{authId}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.KAUAuthDTO) )]
@@ -566,6 +934,236 @@ namespace IAM.Identities
 						else
 						{
 							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.getKAUAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "settwofactoronkauauth/{accountId}/{authId}/{etag}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.KAUAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> setTwoFactorOnKAUAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setTwoFactorOnKAUAuth" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.setTwoFactorOnKAUAuth( ctx, accountId, authId, etag, twoFactor );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setTwoFactorOnKAUAuth'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "createcertificateauthfromcsr/{accountId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> createCertificateAuthFromCSR( [FromRoute] string accountId,  [FromBody] IIdentityAdminIF_v1.CsrInputDTO data)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createCertificateAuthFromCSR" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.createCertificateAuthFromCSR( ctx, accountId, data );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.createCertificateAuthFromCSR'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "setcertificateauthactive/{accountId}/{authId}/{etag}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> setCertificateAuthActive( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromQuery] bool isActive)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setCertificateAuthActive" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.setCertificateAuthActive( ctx, accountId, authId, etag, isActive );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setCertificateAuthActive'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "revokecertificate/{accountId}/{authId}/{etag}/{reason}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> revokeCertificate( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromRoute] string reason)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.revokeCertificate" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.revokeCertificate( ctx, accountId, authId, etag, reason );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.revokeCertificate'" );
+						}
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		[HttpPost( "reissuecertificate/{accountId}/{authId}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> reissueCertificate( [FromRoute] string accountId,  [FromRoute] string authId,  [FromBody] IIdentityAdminIF_v1.CsrInputDTO data)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.reissueCertificate" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.reissueCertificate( ctx, accountId, authId, data );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							return Ok(response.Value);
+						}
+						else
+						{
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.reissueCertificate'" );
 						}
 					}
 					else

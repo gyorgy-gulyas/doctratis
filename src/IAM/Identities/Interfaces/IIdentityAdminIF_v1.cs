@@ -42,14 +42,53 @@ namespace IAM.Identities
 		/// <return>List<IIdentityAdminIF_v1.AuthDTO></return>
 		public Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> listAuthsForAccount(CallingContext ctx, string accountId);
 
-		/// <return>IIdentityAdminIF_v1.EmailAndPasswordAuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.EmailAndPasswordAuthDTO>> getEmailAndPasswordAuth(CallingContext ctx, string accountId, string authId);
+		/// <return>IIdentityAdminIF_v1.AuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive);
+
+		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, TwoFactorConfigurationDTO twoFactor);
+
+		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> getEmailAuth(CallingContext ctx, string accountId, string authId);
+
+		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword);
+
+		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, TwoFactorConfigurationDTO twoFactor);
+
+		/// <return>bool</return>
+		public Task<Response<bool>> confirmEmail(CallingContext ctx, string token);
+
+		/// <return>IIdentityAdminIF_v1.ADAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, TwoFactorConfigurationDTO twoFactor);
 
 		/// <return>IIdentityAdminIF_v1.ADAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> getADAuth(CallingContext ctx, string accountId, string authId);
 
+		/// <return>IIdentityAdminIF_v1.ADAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> setTwoFactorOnADAuth(CallingContext ctx, string accountId, string authId, string etag, TwoFactorConfigurationDTO twoFactor);
+
+		/// <return>IIdentityAdminIF_v1.KAUAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> createKAUAuth(CallingContext ctx, string accountId, string kauUserId, TwoFactorConfigurationDTO twoFactor);
+
 		/// <return>IIdentityAdminIF_v1.KAUAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> getKAUAuth(CallingContext ctx, string accountId, string authId);
+
+		/// <return>IIdentityAdminIF_v1.KAUAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> setTwoFactorOnKAUAuth(CallingContext ctx, string accountId, string authId, string etag, TwoFactorConfigurationDTO twoFactor);
+
+		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> createCertificateAuthFromCSR(CallingContext ctx, string accountId, CsrInputDTO data);
+
+		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive);
+
+		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason);
+
+		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> reissueCertificate(CallingContext ctx, string accountId, string authId, CsrInputDTO data);
 
 		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> getCertificateAuth(CallingContext ctx, string accountId, string authId);
@@ -649,7 +688,7 @@ namespace IAM.Identities
 		{
 			public enum Methods
 			{
-				EmailAndPassword,
+				Email,
 				ActiveDirectory,
 				KAU,
 				Certificate,
@@ -661,7 +700,7 @@ namespace IAM.Identities
 				{
 					return @this switch
 					{
-						IIdentityAdminIF_v1.AuthDTO.Methods.EmailAndPassword => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.EmailAndPassword,
+						IIdentityAdminIF_v1.AuthDTO.Methods.Email => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Email,
 						IIdentityAdminIF_v1.AuthDTO.Methods.ActiveDirectory => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.ActiveDirectory,
 						IIdentityAdminIF_v1.AuthDTO.Methods.KAU => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Kau,
 						IIdentityAdminIF_v1.AuthDTO.Methods.Certificate => Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Certificate,
@@ -673,7 +712,7 @@ namespace IAM.Identities
 				{
 					return @this switch
 					{
-						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.EmailAndPassword => IIdentityAdminIF_v1.AuthDTO.Methods.EmailAndPassword,
+						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Email => IIdentityAdminIF_v1.AuthDTO.Methods.Email,
 						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.ActiveDirectory => IIdentityAdminIF_v1.AuthDTO.Methods.ActiveDirectory,
 						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Kau => IIdentityAdminIF_v1.AuthDTO.Methods.KAU,
 						Protos.IdentityAdminIF_v1.AuthDTO.Types.Methods.Certificate => IIdentityAdminIF_v1.AuthDTO.Methods.Certificate,
@@ -685,6 +724,7 @@ namespace IAM.Identities
 			#endregion GrpcMapping
 			public string id { get; set; }
 			public IIdentityAdminIF_v1.AuthDTO.Methods method { get; set; }
+			public bool isActive { get; set; }
 
 			#region Clone 
 			public virtual AuthDTO Clone()
@@ -692,6 +732,7 @@ namespace IAM.Identities
 				AuthDTO clone = new();
 
 				clone.method = method;
+				clone.isActive = isActive;
 
 				return clone;
 			}
@@ -703,6 +744,7 @@ namespace IAM.Identities
 				if (other is null) return false;
 
 				if(method != other.method) return false;
+				if(isActive != other.isActive) return false;
 
 				return true;
 			}
@@ -714,6 +756,7 @@ namespace IAM.Identities
 				var hash = new HashCode();
 				hash.Add(id);
 				hash.Add(method);
+				hash.Add(isActive);
 
 				return hash.ToHashCode();
 			}
@@ -726,6 +769,7 @@ namespace IAM.Identities
 
 				result.Id = @this.id;
 				result.Method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.ToGrpc( @this.method );
+				result.IsActive = @this.isActive;
 
 				return result;
 			}
@@ -735,6 +779,7 @@ namespace IAM.Identities
 
 				result.id = @from.Id;
 				result.method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.FromGrpc( @from.Method) ;
+				result.isActive = @from.IsActive;
 
 				return result;
 			}
@@ -855,21 +900,23 @@ namespace IAM.Identities
 		}
 
 		/// Password-based authentication
-		public partial class EmailAndPasswordAuthDTO : IEquatable<EmailAndPasswordAuthDTO>
+		public partial class EmailAuthDTO : IEquatable<EmailAuthDTO>
 		{
 			public string id { get; set; }
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
+			public bool isActive { get; set; }
 			public string email { get; set; }
 			public bool isEmailConfirmed { get; set; }
 			public DateOnly passwordExpiresAt { get; set; }
 			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor { get; set; }
 
 			#region Clone 
-			public virtual EmailAndPasswordAuthDTO Clone()
+			public virtual EmailAuthDTO Clone()
 			{
-				EmailAndPasswordAuthDTO clone = new();
+				EmailAuthDTO clone = new();
 
+				clone.isActive = isActive;
 				clone.email = new string(email.ToCharArray());
 				clone.isEmailConfirmed = isEmailConfirmed;
 				clone.passwordExpiresAt = passwordExpiresAt;
@@ -882,10 +929,11 @@ namespace IAM.Identities
 			#endregion Clone 
 
 			#region Equals & HashCode 
-			public bool Equals( EmailAndPasswordAuthDTO other )
+			public bool Equals( EmailAuthDTO other )
 			{
 				if (other is null) return false;
 
+				if(isActive != other.isActive) return false;
 				if(email != other.email) return false;
 				if(isEmailConfirmed != other.isEmailConfirmed) return false;
 				if(passwordExpiresAt != other.passwordExpiresAt) return false;
@@ -897,7 +945,7 @@ namespace IAM.Identities
 				return true;
 			}
 
-			public override bool Equals(object obj) => Equals(obj as EmailAndPasswordAuthDTO);
+			public override bool Equals(object obj) => Equals(obj as EmailAuthDTO);
 
 			public override int GetHashCode()
 			{
@@ -905,6 +953,7 @@ namespace IAM.Identities
 				hash.Add(id);
 				hash.Add(etag);
 				hash.Add(LastUpdate);
+				hash.Add(isActive);
 				hash.Add(email);
 				hash.Add(isEmailConfirmed);
 				hash.Add(passwordExpiresAt);
@@ -917,13 +966,14 @@ namespace IAM.Identities
 			#endregion Equals & HashCode 
 
 			#region GrpcMapping
-			public static Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO ToGrpc( IIdentityAdminIF_v1.EmailAndPasswordAuthDTO @this )
+			public static Protos.IdentityAdminIF_v1.EmailAuthDTO ToGrpc( IIdentityAdminIF_v1.EmailAuthDTO @this )
 			{
-				Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO result = new();
+				Protos.IdentityAdminIF_v1.EmailAuthDTO result = new();
 
 				result.Id = @this.id;
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.IsActive = @this.isActive;
 				result.Email = @this.email;
 				result.IsEmailConfirmed = @this.isEmailConfirmed;
 				result.PasswordExpiresAt = @this.passwordExpiresAt.ToString( "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -931,13 +981,14 @@ namespace IAM.Identities
 
 				return result;
 			}
-			public static IIdentityAdminIF_v1.EmailAndPasswordAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.EmailAndPasswordAuthDTO @from )
+			public static IIdentityAdminIF_v1.EmailAuthDTO FromGrpc( Protos.IdentityAdminIF_v1.EmailAuthDTO @from )
 			{
-				IIdentityAdminIF_v1.EmailAndPasswordAuthDTO result = new();
+				IIdentityAdminIF_v1.EmailAuthDTO result = new();
 
 				result.id = @from.Id;
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.isActive = @from.IsActive;
 				result.email = @from.Email;
 				result.isEmailConfirmed = @from.IsEmailConfirmed;
 				result.passwordExpiresAt = DateOnly.Parse(@from.PasswordExpiresAt, CultureInfo.InvariantCulture);
@@ -1150,8 +1201,16 @@ namespace IAM.Identities
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
 			public string certificateThumbprint { get; set; }
+			public string serialNumber { get; set; }
+			public string issuer { get; set; }
+			public string subject { get; set; }
+			public string publicKeyHash { get; set; }
 			public DateTime validFrom { get; set; }
 			public DateTime validUntil { get; set; }
+			public bool isActive { get; set; }
+			public string revocationStatus { get; set; }
+			public string revocationReason { get; set; }
+			public DateTime revokedAt { get; set; }
 
 			#region Clone 
 			public virtual CertificateAuthDTO Clone()
@@ -1159,8 +1218,16 @@ namespace IAM.Identities
 				CertificateAuthDTO clone = new();
 
 				clone.certificateThumbprint = new string(certificateThumbprint.ToCharArray());
+				clone.serialNumber = new string(serialNumber.ToCharArray());
+				clone.issuer = new string(issuer.ToCharArray());
+				clone.subject = new string(subject.ToCharArray());
+				clone.publicKeyHash = new string(publicKeyHash.ToCharArray());
 				clone.validFrom = validFrom;
 				clone.validUntil = validUntil;
+				clone.isActive = isActive;
+				clone.revocationStatus = new string(revocationStatus.ToCharArray());
+				clone.revocationReason = new string(revocationReason.ToCharArray());
+				clone.revokedAt = revokedAt;
 
 				return clone;
 			}
@@ -1172,8 +1239,16 @@ namespace IAM.Identities
 				if (other is null) return false;
 
 				if(certificateThumbprint != other.certificateThumbprint) return false;
+				if(serialNumber != other.serialNumber) return false;
+				if(issuer != other.issuer) return false;
+				if(subject != other.subject) return false;
+				if(publicKeyHash != other.publicKeyHash) return false;
 				if(validFrom != other.validFrom) return false;
 				if(validUntil != other.validUntil) return false;
+				if(isActive != other.isActive) return false;
+				if(revocationStatus != other.revocationStatus) return false;
+				if(revocationReason != other.revocationReason) return false;
+				if(revokedAt != other.revokedAt) return false;
 
 				return true;
 			}
@@ -1187,8 +1262,16 @@ namespace IAM.Identities
 				hash.Add(etag);
 				hash.Add(LastUpdate);
 				hash.Add(certificateThumbprint);
+				hash.Add(serialNumber);
+				hash.Add(issuer);
+				hash.Add(subject);
+				hash.Add(publicKeyHash);
 				hash.Add(validFrom);
 				hash.Add(validUntil);
+				hash.Add(isActive);
+				hash.Add(revocationStatus);
+				hash.Add(revocationReason);
+				hash.Add(revokedAt);
 
 				return hash.ToHashCode();
 			}
@@ -1203,8 +1286,16 @@ namespace IAM.Identities
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.CertificateThumbprint = @this.certificateThumbprint;
+				result.SerialNumber = @this.serialNumber;
+				result.Issuer = @this.issuer;
+				result.Subject = @this.subject;
+				result.PublicKeyHash = @this.publicKeyHash;
 				result.ValidFrom = Timestamp.FromDateTime(@this.validFrom);
 				result.ValidUntil = Timestamp.FromDateTime(@this.validUntil);
+				result.IsActive = @this.isActive;
+				result.RevocationStatus = @this.revocationStatus;
+				result.RevocationReason = @this.revocationReason;
+				result.RevokedAt = Timestamp.FromDateTime(@this.revokedAt);
 
 				return result;
 			}
@@ -1216,8 +1307,79 @@ namespace IAM.Identities
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.certificateThumbprint = @from.CertificateThumbprint;
+				result.serialNumber = @from.SerialNumber;
+				result.issuer = @from.Issuer;
+				result.subject = @from.Subject;
+				result.publicKeyHash = @from.PublicKeyHash;
 				result.validFrom = @from.ValidFrom.ToDateTime();
 				result.validUntil = @from.ValidUntil.ToDateTime();
+				result.isActive = @from.IsActive;
+				result.revocationStatus = @from.RevocationStatus;
+				result.revocationReason = @from.RevocationReason;
+				result.revokedAt = @from.RevokedAt.ToDateTime();
+
+				return result;
+			}
+			#endregion GrpcMapping
+		}
+
+		public partial class CsrInputDTO : IEquatable<CsrInputDTO>
+		{
+			public string csrPem { get; set; }
+			/// CA profil/sablon (opcionális)
+			public string profile { get; set; }
+
+			#region Clone 
+			public virtual CsrInputDTO Clone()
+			{
+				CsrInputDTO clone = new();
+
+				clone.csrPem = new string(csrPem.ToCharArray());
+				clone.profile = new string(profile.ToCharArray());
+
+				return clone;
+			}
+			#endregion Clone 
+
+			#region Equals & HashCode 
+			public bool Equals( CsrInputDTO other )
+			{
+				if (other is null) return false;
+
+				if(csrPem != other.csrPem) return false;
+				if(profile != other.profile) return false;
+
+				return true;
+			}
+
+			public override bool Equals(object obj) => Equals(obj as CsrInputDTO);
+
+			public override int GetHashCode()
+			{
+				var hash = new HashCode();
+				hash.Add(csrPem);
+				hash.Add(profile);
+
+				return hash.ToHashCode();
+			}
+			#endregion Equals & HashCode 
+
+			#region GrpcMapping
+			public static Protos.IdentityAdminIF_v1.CsrInputDTO ToGrpc( IIdentityAdminIF_v1.CsrInputDTO @this )
+			{
+				Protos.IdentityAdminIF_v1.CsrInputDTO result = new();
+
+				result.CsrPem = @this.csrPem;
+				result.Profile = @this.profile;
+
+				return result;
+			}
+			public static IIdentityAdminIF_v1.CsrInputDTO FromGrpc( Protos.IdentityAdminIF_v1.CsrInputDTO @from )
+			{
+				IIdentityAdminIF_v1.CsrInputDTO result = new();
+
+				result.csrPem = @from.CsrPem;
+				result.profile = @from.Profile;
 
 				return result;
 			}

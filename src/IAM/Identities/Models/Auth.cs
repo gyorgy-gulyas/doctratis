@@ -14,7 +14,7 @@ namespace IAM.Identities.Identity
 	{
 		public enum Methods
 		{
-			EmailAndPassword,
+			Email,
 			ActiveDirectory,
 			KAU,
 			Certificate,
@@ -27,6 +27,7 @@ namespace IAM.Identities.Identity
 
 		/// Defines the type of authentication method
 		public Auth.Methods method { get; set; }
+		public bool isActive { get; set; }
 		public string accountId { get; set; }
 
 		#region Clone 
@@ -38,6 +39,7 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			clone.method = method;
+			clone.isActive = isActive;
 			clone.accountId = new string(accountId.ToCharArray());
 
 			return clone;
@@ -53,6 +55,7 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			if(method != other.method) return false;
+			if(isActive != other.isActive) return false;
 			if(accountId != other.accountId) return false;
 
 			return true;
@@ -70,6 +73,7 @@ namespace IAM.Identities.Identity
 			// end: BaseEntity
 
 			hash.Add(method);
+			hash.Add(isActive);
 			hash.Add(accountId);
 
 			return hash.ToHashCode();

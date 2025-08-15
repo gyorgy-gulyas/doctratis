@@ -98,6 +98,96 @@ namespace IAM.Identities.Service.Implementations
             
             return new(result.Value.Convert());
         }
+
+        Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> IIdentityAdminIF_v1.listAuthsForAccount(CallingContext ctx, string accountId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.getEmailAuth(CallingContext ctx, string accountId, string authId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.getADAuth(CallingContext ctx, string accountId, string authId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnADAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.createKAUAuth(CallingContext ctx, string accountId, string kauUserId, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.getKAUAuth(CallingContext ctx, string accountId, string authId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnKAUAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.createCertificateAuthFromCSR(CallingContext ctx, string accountId, IIdentityAdminIF_v1.CsrInputDTO data)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.reissueCertificate(CallingContext ctx, string accountId, string authId, IIdentityAdminIF_v1.CsrInputDTO data)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.getCertificateAuth(CallingContext ctx, string accountId, string authId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal static class ConversionExtensions

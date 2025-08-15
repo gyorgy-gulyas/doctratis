@@ -47,18 +47,20 @@ domain IAM {
             # Base type for all authentication methods
             entity Auth inherits Core.Base.BaseEntity {
                 enum Methods {
-                    EmailAndPassword,
+                    Email,
                     ActiveDirectory,
                     KAU,
                     Certificate
                 }
                 # Defines the type of authentication method
                 method: Methods
+                isActive: boolean
+
                 accountId: string
             }
 
             # Password-based authentication
-            entity EmailAndPasswordAuth inherits Auth {
+            entity EmailAuth inherits Auth {
                 email: string
                 isEmailConfirmed: boolean
 
@@ -88,10 +90,22 @@ domain IAM {
 
             # Certificate-based authentication
             entity CertificateAuth inherits Auth {
-                # Certificate thumbprint (unique identifier)
-                certificateThumbprint: string
+                enum RevocationStatuses {
+                    None,
+                    Revoked,
+                    Suspended,
+                }
+                certificateThumbprint: string        # csak KIADOTT cert után számolható
+                serialNumber: string
+                issuer: string
+                subject: string
+                publicKeyHash: string                # SPKI hash - CSR-ből is képezhető
                 validFrom: datetime
                 validUntil: datetime
+                isActive: boolean
+                revocationStatus: RevocationStatuses
+                revocationReason: string
+                revokedAt: datetime
             }
 
             # KAU Ügyfélkapu authentication
@@ -115,6 +129,12 @@ domain IAM {
                 accountId: string
                 accountName: string
             }
+        }
+
+        acl CertificateAuthorityACL {
+            # CSR aláírása és kész cert visszaadása
+            command signCsr(csrPem:string, profile:string) : bytes    # DER cert vagy PEM string is lehet
+            command revoke(serialNumber:string, reason:string) : boolean
         }
         
         aggregate Ldap
@@ -186,6 +206,37 @@ domain IAM {
             command getAllAccount() : List[Identity.Account]
 
             query findByName( name:string ) : Identity.Account
+        }
+
+        repository AuthRepository {
+            command createAuth( auth:Identity.Auth ) : Identity.Auth
+            command updateAuth( auth:Identity.Auth ) : Identity.Auth
+
+            query getAuth( accountId:string, authId:string ) : Identity.Auth
+            query listAuthsForAccount( accountId:string ) : List[Identity.Auth]
+            query listAuthsForAccountByMethod( accountId:string, method:Identity.Auth.Methods ) : List[Identity.Auth]
+
+            // ---- EMAIL & PASSWORD ----
+            query getEmailAuth( accountId:string, authId:string ) : Identity.EmailAuth
+            // invariáns/egyediség ellenőrzéshez
+            query findEmailAuthByEmail( email:string ) : Identity.EmailAuth
+
+            // ---- ACTIVE DIRECTORY (LDAP) ----
+            query getADAuth( accountId:string, authId:string ) : Identity.ADAuth
+            // invariáns/egyediség: domain + userName
+            query findADAuthByDomainAndUser( ldapDomainId:string, userName:string ) : Identity.ADAuth
+            query listADAuthsByDomain( ldapDomainId:string ) : List[Identity.ADAuth]
+
+            // ---- KAÜ ----
+            query getKAUAuth( accountId:string, authId:string ) : Identity.KAUAuth
+            // invariáns/egyediség: KAUUserId
+            query findKAUAuthByUserId( kauUserId:string ) : Identity.KAUAuth
+
+            // ---- CERTIFICATE ----
+            query getCertificateAuth( accountId:string, authId:string ) : Identity.CertificateAuth
+            // invariáns/egyediség: thumbprint vagy serialNumber
+            query findCertificateAuthByThumbprint( thumbprint:string ) : Identity.CertificateAuth
+            query findCertificateAuthBySerial( serialNumber:string ) : Identity.CertificateAuth
         }
 
         repository LdapDomainRepository {
@@ -315,13 +366,16 @@ domain IAM {
                 @system_field
                 id:string
                 enum Methods {
-                    EmailAndPassword,
+                    Email,
                     ActiveDirectory,
                     KAU,
                     Certificate
                 }
                 method: Methods
+                isActive: boolean
             }
+            command listAuthsForAccount( accountId:string ) : List[AuthDTO]
+            command setActiveForAuth( accountId:string, authId:string, isActive:boolean ) : AuthDTO
 
             dto TwoFactorConfigurationDTO {
                 enum Method {
@@ -339,19 +393,25 @@ domain IAM {
             }
 
             # Password-based authentication
-            dto EmailAndPasswordAuthDTO {
+            dto EmailAuthDTO {
                 @system_field
                 id:string
                 @system_field
                 etag:string
                 @system_field
                 LastUpdate:datetime
+                isActive:boolean
 
                 email: string
                 isEmailConfirmed: boolean
                 passwordExpiresAt: date
                 twoFactor: TwoFactorConfigurationDTO
             }
+            command createtEmailAuth( accountId:string, email:string, initialPassword:boolean, twoFactor: TwoFactorConfigurationDTO ) : EmailAuthDTO
+            command getEmailAuth( accountId:string, authId:string ) : EmailAuthDTO
+            command changePasswordOnEmailAuth( accountId:string, authId:string, etag:string, newPassword:string ) : EmailAuthDTO
+            command setTwoFactorOnEmailAuth(accountId:string, authId:string, etag:string, twoFactor:TwoFactorConfigurationDTO) : EmailAuthDTO
+            command confirmEmail(token:string) : boolean
 
              # Active Directory-based authentication
             dto ADAuthDTO {
@@ -371,6 +431,9 @@ domain IAM {
                  # Optional two-factor authentication settings (TOTP, SMS, Email)
                 twoFactor: TwoFactorConfigurationDTO
             }
+            command createADAuth(accountId:string, ldapDomainId:string, adUsername:string, twoFactor: TwoFactorConfigurationDTO) : ADAuthDTO
+            command getADAuth( accountId:string, authId:string ) : ADAuthDTO
+            command setTwoFactorOnADAuth(accountId:string, authId:string, etag:string, twoFactor:TwoFactorConfigurationDTO) : ADAuthDTO
 
             # KAU Ügyfélkapu authentication
             dto KAUAuthDTO  {
@@ -390,26 +453,38 @@ domain IAM {
                 # Optional two-factor authentication settings (TOTP, SMS, Email)
                 twoFactor: TwoFactorConfigurationDTO
             }
+            command createKAUAuth(accountId:string, kauUserId:string, twoFactor:TwoFactorConfigurationDTO) : KAUAuthDTO
+            command getKAUAuth( accountId:string, authId:string ) : KAUAuthDTO
+            command setTwoFactorOnKAUAuth(accountId:string, authId:string, etag:string, twoFactor:TwoFactorConfigurationDTO) : KAUAuthDTO
 
              # Certificate-based authentication
             dto CertificateAuthDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
 
                 certificateThumbprint: string
+                serialNumber: string
+                issuer: string
+                subject: string
+                publicKeyHash: string
                 validFrom: datetime
                 validUntil: datetime
+                isActive: boolean
+                revocationStatus: string
+                revocationReason: string
+                revokedAt: datetime
             }
-
-            command listAuthsForAccount( accountId:string ) : List[AuthDTO]
             
-            command getEmailAndPasswordAuth( accountId:string, authId:string ) : EmailAndPasswordAuthDTO
-            command getADAuth( accountId:string, authId:string ) : ADAuthDTO
-            command getKAUAuth( accountId:string, authId:string ) : KAUAuthDTO
+            dto CsrInputDTO {
+                csrPem: string
+                # CA profil/sablon (opcionális)
+                profile: string           
+            }
+            command createCertificateAuthFromCSR(accountId:string, data:CsrInputDTO) : CertificateAuthDTO
+            command setCertificateAuthActive(accountId:string, authId:string, etag:string, isActive:boolean) : CertificateAuthDTO
+            command revokeCertificate(accountId:string, authId:string, etag:string, reason:string ) : CertificateAuthDTO
+            command reissueCertificate(accountId:string, authId:string, data:CsrInputDTO) : CertificateAuthDTO
             command getCertificateAuth( accountId:string, authId:string ) : CertificateAuthDTO
         }
 
