@@ -446,20 +446,20 @@ message AuthDTO {
 
 message TwoFactorConfigurationDTO {
 
-	enum Method {
+	enum Methods {
 		/// Time-based One-Time Password (e.g. Google Authenticator)
-		Method_TOTP = 0;
+		Methods_TOTP = 0;
 
 		/// SMS-based OTP
-		Method_SMS = 1;
+		Methods_SMS = 1;
 
 		/// Email-based OTP
-		Method_Email = 2;
+		Methods_Email = 2;
 
 	}
 
 	bool enabled = 1;
-	Method method = 2;
+	Methods method = 2;
 	string phoneNumber = 3;
 	string email = 4;
 }
@@ -481,13 +481,14 @@ message ADAuthDTO {
 	string id = 1;
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
+	bool isActive = 4;
 	/// Active Directory domain
-	string LdapDomainId = 4;
-	string LdapDomainName = 5;
+	string LdapDomainId = 5;
+	string LdapDomainName = 6;
 	/// Active Directory username
-	string userName = 6;
+	string userName = 7;
 	/// Optional two-factor authentication settings (TOTP, SMS, Email)
-	TwoFactorConfigurationDTO twoFactor = 7;
+	TwoFactorConfigurationDTO twoFactor = 8;
 }
 
 /// KAU Ügyfélkapu authentication
@@ -495,14 +496,15 @@ message KAUAuthDTO {
 	string id = 1;
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
+	bool isActive = 4;
 	/// Government-issued unique identifier (Ügyfélkapu ID)
-	string KAUUserId = 4;
+	string KAUUserId = 5;
 	/// User’s full legal name as returned by the service
-	string legalName = 5;
+	string legalName = 6;
 	/// Email address verified by the service (optional)
-	string email = 6;
+	string email = 7;
 	/// Optional two-factor authentication settings (TOTP, SMS, Email)
-	TwoFactorConfigurationDTO twoFactor = 7;
+	TwoFactorConfigurationDTO twoFactor = 8;
 }
 
 /// Certificate-based authentication
@@ -510,15 +512,15 @@ message CertificateAuthDTO {
 	string id = 1;
 	string etag = 2;
 	google.protobuf.Timestamp LastUpdate = 3;
-	string certificateThumbprint = 4;
-	string serialNumber = 5;
-	string issuer = 6;
-	string subject = 7;
-	string publicKeyHash = 8;
-	google.protobuf.Timestamp validFrom = 9;
-	google.protobuf.Timestamp validUntil = 10;
-	bool isActive = 11;
-	string revocationStatus = 12;
+	bool isActive = 4;
+	string certificateThumbprint = 5;
+	string serialNumber = 6;
+	string issuer = 7;
+	string subject = 8;
+	string publicKeyHash = 9;
+	google.protobuf.Timestamp validFrom = 10;
+	google.protobuf.Timestamp validUntil = 11;
+	bool isRevoked = 12;
 	string revocationReason = 13;
 	google.protobuf.Timestamp revokedAt = 14;
 }

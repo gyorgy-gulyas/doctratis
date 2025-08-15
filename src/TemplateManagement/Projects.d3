@@ -25,17 +25,14 @@
                 Status:ProjectStatuses
                 SubFolders: List[ProjectFolder]
 
-                @system_field
-                CreatedAt:datetime
-                @system_field
-                CreatedById:string
-                @system_field
-                CreatedByName:string
+                @system_field CreatedAt:datetime
+                @system_field CreatedById:string
+                @system_field CreatedByName:string
             }
 
             valueobject ProjectFolder {
-                @system_field
-                id:string
+                @system_field id:string
+
                 Name:string
                 Description:string
                 SubFolders: List[ProjectFolder]
@@ -140,8 +137,7 @@
             }
 
             dto ProjectSummaryDTO {
-                @system_field
-                id:string
+                @system_field id:string
 
                 Name:string
                 Description:string
@@ -151,8 +147,8 @@
             }
 
             dto ProjectFolderDTO {
-                @system_field
-                id:string
+                @system_field id:string
+
                 Name:string
                 Description:string
                 SubFolders: List[ProjectFolderDTO]
@@ -171,12 +167,9 @@
             }
 
             dto ProjectAccessDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
 
                 IdentityId:string
                 IdentityName:string
@@ -185,12 +178,9 @@
             }
 
             dto ProjectDetailsDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
 
                 Name:string
                 Description:string

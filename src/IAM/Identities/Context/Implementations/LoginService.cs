@@ -207,7 +207,7 @@ namespace IAM.Identities.Service.Implementations
             if( ctx.Claims.TryGetValue("2faMethod", out var methodClaim) == false )
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"'2faMethod' not found in claims" });
 
-            if (Enum.TryParse<TwoFactorConfiguration.Method>(methodClaim, out var method) == false)
+            if (Enum.TryParse<TwoFactorConfiguration.Methods>(methodClaim, out var method) == false)
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Unknown 2fa method: '{method}'" });
 
             var secretBytes = Base32Encoding.ToBytes(account.accountSecret);
@@ -215,8 +215,8 @@ namespace IAM.Identities.Service.Implementations
 
             switch (method)
             {
-                case TwoFactorConfiguration.Method.SMS:
-                case TwoFactorConfiguration.Method.Email:
+                case TwoFactorConfiguration.Methods.SMS:
+                case TwoFactorConfiguration.Methods.Email:
                     {
                         var totp = new Totp(secretBytes, step: 5 * 30); // 5 perces ablak
                         if (!totp.VerifyTotp(code, out _, new VerificationWindow(previous: 1, future: 1)))
@@ -224,7 +224,7 @@ namespace IAM.Identities.Service.Implementations
                     }
                     break;
 
-                case TwoFactorConfiguration.Method.TOTP:
+                case TwoFactorConfiguration.Methods.TOTP:
                     {
                         var totp = new Totp(secretBytes, step: 30); // 30 másodperces ablak
                         if (!totp.VerifyTotp(code, out _, new VerificationWindow(previous: 1, future: 1)))
@@ -298,21 +298,21 @@ namespace IAM.Identities.Service.Implementations
 
                 switch (twoFactor.method)
                 {
-                    case TwoFactorConfiguration.Method.SMS:
+                    case TwoFactorConfiguration.Methods.SMS:
                         {
                             var totp = new Totp(secretBytes, step: 5 * 30); // 5 minutes window
                             await _smsAgent.SendOTP(ctx, twoFactor.phoneNumber, code = totp.ComputeTotp());
                             _context.AuditLog_2FASent(ctx, account, twoFactor.phoneNumber);
                         }
                         break;
-                    case TwoFactorConfiguration.Method.Email:
+                    case TwoFactorConfiguration.Methods.Email:
                         {
                             var totp = new Totp(secretBytes, step: 5 * 30); // 5 minutes window
                             await _emailAgent.SendOTP(ctx, twoFactor.email, code = totp.ComputeTotp());
                             _context.AuditLog_2FASent(ctx, account, twoFactor.email);
                         }
                         break;
-                    case TwoFactorConfiguration.Method.TOTP:
+                    case TwoFactorConfiguration.Methods.TOTP:
                         // No code needs to be sent; user already has the TOTP app
                         break;
                 }

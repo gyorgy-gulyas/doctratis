@@ -64,7 +64,7 @@ namespace IAM.Identities.Service.Implementations
             });
         }
 
-        internal void AuditLog_2FAFailed(CallingContext ctx, Account account, TwoFactorConfiguration.Method method)
+        internal void AuditLog_2FAFailed(CallingContext ctx, Account account, TwoFactorConfiguration.Methods method)
         {
             _auditEntryContainer.AddEntryForBackgrondSave(new LoginEventLog(this, ctx, "2fa_failed")
             {

@@ -30,7 +30,7 @@ domain IAM {
 
             # Two-factor authentication configuration
             valueobject TwoFactorConfiguration {
-                enum Method {
+                enum Methods {
                     # Time-based One-Time Password (e.g. Google Authenticator)
                     TOTP,
                     # SMS-based OTP
@@ -39,7 +39,7 @@ domain IAM {
                     Email
                 }
                 enabled: boolean
-                method: Method
+                method: Methods
                 phoneNumber: string
                 email:string
             }
@@ -90,20 +90,16 @@ domain IAM {
 
             # Certificate-based authentication
             entity CertificateAuth inherits Auth {
-                enum RevocationStatuses {
-                    None,
-                    Revoked,
-                    Suspended,
-                }
-                certificateThumbprint: string        # csak KIADOTT cert után számolható
+                # csak KIADOTT cert után számolható
+                certificateThumbprint: string
                 serialNumber: string
                 issuer: string
                 subject: string
-                publicKeyHash: string                # SPKI hash - CSR-ből is képezhető
+                # SPKI hash - CSR-ből is képezhető
+                publicKeyHash: string
                 validFrom: datetime
                 validUntil: datetime
-                isActive: boolean
-                revocationStatus: RevocationStatuses
+                isRevoked: boolean
                 revocationReason: string
                 revokedAt: datetime
             }
@@ -208,6 +204,30 @@ domain IAM {
             query findByName( name:string ) : Identity.Account
         }
 
+        service AccountAuthService {
+            command setAuthActive( accountId:string, authId:string, etag:string, isActive:boolean ) : Identity.Auth
+
+            // ===== Email & Password =====
+            command createEmailAuth(accountId:string, email:string, password:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.EmailAuth
+            command changePassword(accountId:string, authId:string, etag:string, newPassword:string, passwordExpiresAt:date) : Identity.EmailAuth
+            command setEmailTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.EmailAuth
+            command confirmEmail(confirmationToken:string) : boolean
+
+            // ===== Active Directory (LDAP) =====
+            command CreateADAuth(accountId:string, ldapDomainId:string, userName:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.ADAuth
+            command UpdateADAccount(accountId:string, authId:string, etag:string, ldapDomainId:string, userName:string) : Identity.ADAuth
+            command SetADTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:string, phoneNumber:string, email:string) : Identity.ADAuth
+
+            // ===== KAÜ =====
+            command CreateKAUAuth(accountId:string, kauUserId:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.KAUAuth
+            command UpdateKAUProfile(accountId:string, authId:string, etag:string, legalName:string, email:string) : Identity.KAUAuth
+            command SetKAUTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:string, phoneNumber:string, email:string) : Identity.KAUAuth
+
+            // ===== Certificate =====
+            command CreateCertificateFromCSR(accountId:string, csrPem:string, profile:string) : Identity.CertificateAuth
+            command RevokeCertificate(accountId:string, authId:string, etag:string, reason:string) : Identity.CertificateAuth
+        }
+
         repository AuthRepository {
             command createAuth( auth:Identity.Auth ) : Identity.Auth
             command updateAuth( auth:Identity.Auth ) : Identity.Auth
@@ -267,12 +287,9 @@ domain IAM {
         @public_api(rest, collection="Admin")
         interface IdentityAdminIF version 1 {
             dto LdapDomainDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
 
                 dto DomainController {
                     # Hostname or IP address of the DC
@@ -324,20 +341,16 @@ domain IAM {
             }
 
             dto AccountSummaryDTO {
-                @system_field
-                id:string
+                @system_field id:string
                 Type:AccountTypes
                 Name:string
                 isActive: boolean
             }
 
             dto AccountDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
 
                 data:AccountDataDTO
             }
@@ -363,8 +376,7 @@ domain IAM {
 
             dto AuthDTO
             {
-                @system_field
-                id:string
+                @system_field id:string
                 enum Methods {
                     Email,
                     ActiveDirectory,
@@ -378,7 +390,7 @@ domain IAM {
             command setActiveForAuth( accountId:string, authId:string, isActive:boolean ) : AuthDTO
 
             dto TwoFactorConfigurationDTO {
-                enum Method {
+                enum Methods {
                     # Time-based One-Time Password (e.g. Google Authenticator)
                     TOTP,
                     # SMS-based OTP
@@ -387,19 +399,16 @@ domain IAM {
                     Email
                 }
                 enabled: boolean
-                method: Method
+                method: Methods
                 phoneNumber: string
                 email:string
             }
 
             # Password-based authentication
             dto EmailAuthDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
                 isActive:boolean
 
                 email: string
@@ -415,12 +424,10 @@ domain IAM {
 
              # Active Directory-based authentication
             dto ADAuthDTO {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
+                isActive: boolean
 
                 # Active Directory domain
                 LdapDomainId: string
@@ -437,12 +444,10 @@ domain IAM {
 
             # KAU Ügyfélkapu authentication
             dto KAUAuthDTO  {
-                @system_field
-                id:string
-                @system_field
-                etag:string
-                @system_field
-                LastUpdate:datetime
+                @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
+                isActive: boolean
 
                 # Government-issued unique identifier (Ügyfélkapu ID)
                 KAUUserId: string
@@ -462,6 +467,7 @@ domain IAM {
                 @system_field id:string
                 @system_field etag:string
                 @system_field LastUpdate:datetime
+                isActive: boolean
 
                 certificateThumbprint: string
                 serialNumber: string
@@ -470,8 +476,7 @@ domain IAM {
                 publicKeyHash: string
                 validFrom: datetime
                 validUntil: datetime
-                isActive: boolean
-                revocationStatus: string
+                isRevoked: boolean
                 revocationReason: string
                 revokedAt: datetime
             }

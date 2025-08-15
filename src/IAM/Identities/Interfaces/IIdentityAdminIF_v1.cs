@@ -788,7 +788,7 @@ namespace IAM.Identities
 
 		public partial class TwoFactorConfigurationDTO : IEquatable<TwoFactorConfigurationDTO>
 		{
-			public enum Method
+			public enum Methods
 			{
 				/// Time-based One-Time Password (e.g. Google Authenticator)
 				TOTP,
@@ -801,26 +801,26 @@ namespace IAM.Identities
 
 			}
 			#region GrpcMapping
-			public static class MethodMappings
+			public static class MethodsMappings
 			{
-				public static Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method ToGrpc( IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method @this )
+				public static Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods ToGrpc( IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods @this )
 				{
 					return @this switch
 					{
-						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.TOTP => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Totp,
-						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.SMS => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Sms,
-						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.Email => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Email,
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Totp,
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.SMS => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Sms,
+						IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email => Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Email,
 						_ => throw new NotImplementedException(), 
 					};
 				}
 
-				public static IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method FromGrpc( Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method @this )
+				public static IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods FromGrpc( Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods @this )
 				{
 					return @this switch
 					{
-						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Totp => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.TOTP,
-						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Sms => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.SMS,
-						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Method.Email => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method.Email,
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Totp => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP,
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Sms => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.SMS,
+						Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO.Types.Methods.Email => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email,
 						_ => throw new NotImplementedException(), 
 					};
 				}
@@ -828,7 +828,7 @@ namespace IAM.Identities
 			}
 			#endregion GrpcMapping
 			public bool enabled { get; set; }
-			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Method method { get; set; }
+			public IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods method { get; set; }
 			public string phoneNumber { get; set; }
 			public string email { get; set; }
 
@@ -879,7 +879,7 @@ namespace IAM.Identities
 				Protos.IdentityAdminIF_v1.TwoFactorConfigurationDTO result = new();
 
 				result.Enabled = @this.enabled;
-				result.Method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodMappings.ToGrpc( @this.method );
+				result.Method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodsMappings.ToGrpc( @this.method );
 				result.PhoneNumber = @this.phoneNumber;
 				result.Email = @this.email;
 
@@ -890,7 +890,7 @@ namespace IAM.Identities
 				IIdentityAdminIF_v1.TwoFactorConfigurationDTO result = new();
 
 				result.enabled = @from.Enabled;
-				result.method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodMappings.FromGrpc( @from.Method) ;
+				result.method = IIdentityAdminIF_v1.TwoFactorConfigurationDTO.MethodsMappings.FromGrpc( @from.Method) ;
 				result.phoneNumber = @from.PhoneNumber;
 				result.email = @from.Email;
 
@@ -1005,6 +1005,7 @@ namespace IAM.Identities
 			public string id { get; set; }
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
+			public bool isActive { get; set; }
 			/// Active Directory domain
 			public string LdapDomainId { get; set; }
 			public string LdapDomainName { get; set; }
@@ -1018,6 +1019,7 @@ namespace IAM.Identities
 			{
 				ADAuthDTO clone = new();
 
+				clone.isActive = isActive;
 				clone.LdapDomainId = new string(LdapDomainId.ToCharArray());
 				clone.LdapDomainName = new string(LdapDomainName.ToCharArray());
 				clone.userName = new string(userName.ToCharArray());
@@ -1034,6 +1036,7 @@ namespace IAM.Identities
 			{
 				if (other is null) return false;
 
+				if(isActive != other.isActive) return false;
 				if(LdapDomainId != other.LdapDomainId) return false;
 				if(LdapDomainName != other.LdapDomainName) return false;
 				if(userName != other.userName) return false;
@@ -1053,6 +1056,7 @@ namespace IAM.Identities
 				hash.Add(id);
 				hash.Add(etag);
 				hash.Add(LastUpdate);
+				hash.Add(isActive);
 				hash.Add(LdapDomainId);
 				hash.Add(LdapDomainName);
 				hash.Add(userName);
@@ -1072,6 +1076,7 @@ namespace IAM.Identities
 				result.Id = @this.id;
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.IsActive = @this.isActive;
 				result.LdapDomainId = @this.LdapDomainId;
 				result.LdapDomainName = @this.LdapDomainName;
 				result.UserName = @this.userName;
@@ -1086,6 +1091,7 @@ namespace IAM.Identities
 				result.id = @from.Id;
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.isActive = @from.IsActive;
 				result.LdapDomainId = @from.LdapDomainId;
 				result.LdapDomainName = @from.LdapDomainName;
 				result.userName = @from.UserName;
@@ -1102,6 +1108,7 @@ namespace IAM.Identities
 			public string id { get; set; }
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
+			public bool isActive { get; set; }
 			/// Government-issued unique identifier (Ügyfélkapu ID)
 			public string KAUUserId { get; set; }
 			/// User’s full legal name as returned by the service
@@ -1116,6 +1123,7 @@ namespace IAM.Identities
 			{
 				KAUAuthDTO clone = new();
 
+				clone.isActive = isActive;
 				clone.KAUUserId = new string(KAUUserId.ToCharArray());
 				clone.legalName = new string(legalName.ToCharArray());
 				clone.email = new string(email.ToCharArray());
@@ -1132,6 +1140,7 @@ namespace IAM.Identities
 			{
 				if (other is null) return false;
 
+				if(isActive != other.isActive) return false;
 				if(KAUUserId != other.KAUUserId) return false;
 				if(legalName != other.legalName) return false;
 				if(email != other.email) return false;
@@ -1151,6 +1160,7 @@ namespace IAM.Identities
 				hash.Add(id);
 				hash.Add(etag);
 				hash.Add(LastUpdate);
+				hash.Add(isActive);
 				hash.Add(KAUUserId);
 				hash.Add(legalName);
 				hash.Add(email);
@@ -1170,6 +1180,7 @@ namespace IAM.Identities
 				result.Id = @this.id;
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.IsActive = @this.isActive;
 				result.KAUUserId = @this.KAUUserId;
 				result.LegalName = @this.legalName;
 				result.Email = @this.email;
@@ -1184,6 +1195,7 @@ namespace IAM.Identities
 				result.id = @from.Id;
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.isActive = @from.IsActive;
 				result.KAUUserId = @from.KAUUserId;
 				result.legalName = @from.LegalName;
 				result.email = @from.Email;
@@ -1200,6 +1212,7 @@ namespace IAM.Identities
 			public string id { get; set; }
 			public string etag { get; set; }
 			public DateTime LastUpdate { get; set; }
+			public bool isActive { get; set; }
 			public string certificateThumbprint { get; set; }
 			public string serialNumber { get; set; }
 			public string issuer { get; set; }
@@ -1207,8 +1220,7 @@ namespace IAM.Identities
 			public string publicKeyHash { get; set; }
 			public DateTime validFrom { get; set; }
 			public DateTime validUntil { get; set; }
-			public bool isActive { get; set; }
-			public string revocationStatus { get; set; }
+			public bool isRevoked { get; set; }
 			public string revocationReason { get; set; }
 			public DateTime revokedAt { get; set; }
 
@@ -1217,6 +1229,7 @@ namespace IAM.Identities
 			{
 				CertificateAuthDTO clone = new();
 
+				clone.isActive = isActive;
 				clone.certificateThumbprint = new string(certificateThumbprint.ToCharArray());
 				clone.serialNumber = new string(serialNumber.ToCharArray());
 				clone.issuer = new string(issuer.ToCharArray());
@@ -1224,8 +1237,7 @@ namespace IAM.Identities
 				clone.publicKeyHash = new string(publicKeyHash.ToCharArray());
 				clone.validFrom = validFrom;
 				clone.validUntil = validUntil;
-				clone.isActive = isActive;
-				clone.revocationStatus = new string(revocationStatus.ToCharArray());
+				clone.isRevoked = isRevoked;
 				clone.revocationReason = new string(revocationReason.ToCharArray());
 				clone.revokedAt = revokedAt;
 
@@ -1238,6 +1250,7 @@ namespace IAM.Identities
 			{
 				if (other is null) return false;
 
+				if(isActive != other.isActive) return false;
 				if(certificateThumbprint != other.certificateThumbprint) return false;
 				if(serialNumber != other.serialNumber) return false;
 				if(issuer != other.issuer) return false;
@@ -1245,8 +1258,7 @@ namespace IAM.Identities
 				if(publicKeyHash != other.publicKeyHash) return false;
 				if(validFrom != other.validFrom) return false;
 				if(validUntil != other.validUntil) return false;
-				if(isActive != other.isActive) return false;
-				if(revocationStatus != other.revocationStatus) return false;
+				if(isRevoked != other.isRevoked) return false;
 				if(revocationReason != other.revocationReason) return false;
 				if(revokedAt != other.revokedAt) return false;
 
@@ -1261,6 +1273,7 @@ namespace IAM.Identities
 				hash.Add(id);
 				hash.Add(etag);
 				hash.Add(LastUpdate);
+				hash.Add(isActive);
 				hash.Add(certificateThumbprint);
 				hash.Add(serialNumber);
 				hash.Add(issuer);
@@ -1268,8 +1281,7 @@ namespace IAM.Identities
 				hash.Add(publicKeyHash);
 				hash.Add(validFrom);
 				hash.Add(validUntil);
-				hash.Add(isActive);
-				hash.Add(revocationStatus);
+				hash.Add(isRevoked);
 				hash.Add(revocationReason);
 				hash.Add(revokedAt);
 
@@ -1285,6 +1297,7 @@ namespace IAM.Identities
 				result.Id = @this.id;
 				result.Etag = @this.etag;
 				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
+				result.IsActive = @this.isActive;
 				result.CertificateThumbprint = @this.certificateThumbprint;
 				result.SerialNumber = @this.serialNumber;
 				result.Issuer = @this.issuer;
@@ -1292,8 +1305,7 @@ namespace IAM.Identities
 				result.PublicKeyHash = @this.publicKeyHash;
 				result.ValidFrom = Timestamp.FromDateTime(@this.validFrom);
 				result.ValidUntil = Timestamp.FromDateTime(@this.validUntil);
-				result.IsActive = @this.isActive;
-				result.RevocationStatus = @this.revocationStatus;
+				result.IsRevoked = @this.isRevoked;
 				result.RevocationReason = @this.revocationReason;
 				result.RevokedAt = Timestamp.FromDateTime(@this.revokedAt);
 
@@ -1306,6 +1318,7 @@ namespace IAM.Identities
 				result.id = @from.Id;
 				result.etag = @from.Etag;
 				result.LastUpdate = @from.LastUpdate.ToDateTime();
+				result.isActive = @from.IsActive;
 				result.certificateThumbprint = @from.CertificateThumbprint;
 				result.serialNumber = @from.SerialNumber;
 				result.issuer = @from.Issuer;
@@ -1313,8 +1326,7 @@ namespace IAM.Identities
 				result.publicKeyHash = @from.PublicKeyHash;
 				result.validFrom = @from.ValidFrom.ToDateTime();
 				result.validUntil = @from.ValidUntil.ToDateTime();
-				result.isActive = @from.IsActive;
-				result.revocationStatus = @from.RevocationStatus;
+				result.isRevoked = @from.IsRevoked;
 				result.revocationReason = @from.RevocationReason;
 				result.revokedAt = @from.RevokedAt.ToDateTime();
 

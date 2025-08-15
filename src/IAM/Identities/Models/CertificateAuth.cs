@@ -5,30 +5,22 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-using IAM.Identities;
 
 namespace IAM.Identities.Identity
 {
 	/// Certificate-based authentication
 	public partial class CertificateAuth : Auth, IEquatable<CertificateAuth>
 	{
-		public enum RevocationStatuses
-		{
-			None,
-			Revoked,
-			Suspended,
-		}
-		public string certificateThumbprint { get; set; }
 		/// csak KIADOTT cert után számolható
+		public string certificateThumbprint { get; set; }
 		public string serialNumber { get; set; }
 		public string issuer { get; set; }
 		public string subject { get; set; }
-		public string publicKeyHash { get; set; }
 		/// SPKI hash - CSR-ből is képezhető
+		public string publicKeyHash { get; set; }
 		public DateTime validFrom { get; set; }
 		public DateTime validUntil { get; set; }
-		public bool isActive { get; set; }
-		public CertificateAuth.RevocationStatuses revocationStatus { get; set; }
+		public bool isRevoked { get; set; }
 		public string revocationReason { get; set; }
 		public DateTime revokedAt { get; set; }
 
@@ -53,8 +45,7 @@ namespace IAM.Identities.Identity
 			clone.publicKeyHash = new string(publicKeyHash.ToCharArray());
 			clone.validFrom = validFrom;
 			clone.validUntil = validUntil;
-			clone.isActive = isActive;
-			clone.revocationStatus = revocationStatus;
+			clone.isRevoked = isRevoked;
 			clone.revocationReason = new string(revocationReason.ToCharArray());
 			clone.revokedAt = revokedAt;
 
@@ -83,8 +74,7 @@ namespace IAM.Identities.Identity
 			if(publicKeyHash != other.publicKeyHash) return false;
 			if(validFrom != other.validFrom) return false;
 			if(validUntil != other.validUntil) return false;
-			if(isActive != other.isActive) return false;
-			if(revocationStatus != other.revocationStatus) return false;
+			if(isRevoked != other.isRevoked) return false;
 			if(revocationReason != other.revocationReason) return false;
 			if(revokedAt != other.revokedAt) return false;
 
@@ -115,8 +105,7 @@ namespace IAM.Identities.Identity
 			hash.Add(publicKeyHash);
 			hash.Add(validFrom);
 			hash.Add(validUntil);
-			hash.Add(isActive);
-			hash.Add(revocationStatus);
+			hash.Add(isRevoked);
 			hash.Add(revocationReason);
 			hash.Add(revokedAt);
 

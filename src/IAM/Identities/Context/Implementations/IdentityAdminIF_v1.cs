@@ -1,4 +1,6 @@
-﻿using ServiceKit.Net;
+﻿using IAM.Identities.Identity;
+using IAM.Identities.Ldap;
+using ServiceKit.Net;
 
 namespace IAM.Identities.Service.Implementations
 {
@@ -6,12 +8,18 @@ namespace IAM.Identities.Service.Implementations
     {
         private readonly IAccountService _accountService;
         private readonly IAccountRepository _accountRepository;
+        private readonly IAuthRepository _authRepository;
         private readonly ILdapDomainRepository _ldapDomainRepository;
 
-        public IdentityAdminIF_v1(IAccountService accountService, IAccountRepository accountRepository, ILdapDomainRepository ldapDomainRepository)
+        public IdentityAdminIF_v1(
+            IAccountService accountService,
+            IAccountRepository accountRepository,
+            IAuthRepository authRepository,
+            ILdapDomainRepository ldapDomainRepository)
         {
             _accountService = accountService;
             _accountRepository = accountRepository;
+            _authRepository = authRepository;
             _ldapDomainRepository = ldapDomainRepository;
         }
 
@@ -85,23 +93,25 @@ namespace IAM.Identities.Service.Implementations
             var result = await _accountService.createAccount(ctx, data);
             if (result.IsFailed())
                 return new(result.Error);
-            
+
             return new(result.Value.Convert());
         }
 
         async Task<Response<IIdentityAdminIF_v1.AccountDTO>> IIdentityAdminIF_v1.updateAccount(CallingContext ctx, string accountId, string etag, IIdentityAdminIF_v1.AccountDataDTO dto)
         {
             var data = dto.Convert();
-            var result = await _accountService.updateAccount(ctx, accountId, etag, data );
+            var result = await _accountService.updateAccount(ctx, accountId, etag, data);
             if (result.IsFailed())
                 return new(result.Error);
-            
+
             return new(result.Value.Convert());
         }
 
-        Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> IIdentityAdminIF_v1.listAuthsForAccount(CallingContext ctx, string accountId)
+        async Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> IIdentityAdminIF_v1.listAuthsForAccount(CallingContext ctx, string accountId)
         {
-            throw new NotImplementedException();
+            var auths = await _authRepository.listAuthsForAccount(ctx, accountId);
+
+            return new(auths.Value.Select(ah => ah.Convert()).ToList());
         }
 
         Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
@@ -246,7 +256,7 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static IIdentityAdminIF_v1.AccountDTO Convert(this Identity.Account @this)
+        internal static IIdentityAdminIF_v1.AccountDTO Convert(this Account @this)
         {
             return new()
             {
@@ -274,7 +284,7 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static IIdentityAdminIF_v1.AccountSummaryDTO ConvertToSummary(this Identity.Account @this)
+        internal static IIdentityAdminIF_v1.AccountSummaryDTO ConvertToSummary(this Account @this)
         {
             return new()
             {
@@ -285,7 +295,7 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static Identity.ContactInfo Convert(this IIdentityAdminIF_v1.ContactInfo @this)
+        internal static ContactInfo Convert(this IIdentityAdminIF_v1.ContactInfo @this)
         {
             return new()
             {
@@ -295,7 +305,7 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static IIdentityAdminIF_v1.ContactInfo Convert(this Identity.ContactInfo @this)
+        internal static IIdentityAdminIF_v1.ContactInfo Convert(this ContactInfo @this)
         {
             return new()
             {
@@ -305,24 +315,138 @@ namespace IAM.Identities.Service.Implementations
             };
         }
 
-        internal static Identity.Account.Types Convert(this IIdentityAdminIF_v1.AccountTypes @this)
+        internal static Account.Types Convert(this IIdentityAdminIF_v1.AccountTypes @this)
         {
             return @this switch
             {
-                IIdentityAdminIF_v1.AccountTypes.User => Identity.Account.Types.User,
-                IIdentityAdminIF_v1.AccountTypes.ExternalSystem => Identity.Account.Types.ExternalSystem,
-                IIdentityAdminIF_v1.AccountTypes.InternalService => Identity.Account.Types.InternalService,
+                IIdentityAdminIF_v1.AccountTypes.User => Account.Types.User,
+                IIdentityAdminIF_v1.AccountTypes.ExternalSystem => Account.Types.ExternalSystem,
+                IIdentityAdminIF_v1.AccountTypes.InternalService => Account.Types.InternalService,
                 _ => throw new NotImplementedException(),
             };
         }
 
-        internal static IIdentityAdminIF_v1.AccountTypes Convert(this Identity.Account.Types @this)
+        internal static IIdentityAdminIF_v1.AccountTypes Convert(this Account.Types @this)
         {
             return @this switch
             {
-                Identity.Account.Types.User => IIdentityAdminIF_v1.AccountTypes.User,
-                Identity.Account.Types.ExternalSystem => IIdentityAdminIF_v1.AccountTypes.ExternalSystem,
-                Identity.Account.Types.InternalService => IIdentityAdminIF_v1.AccountTypes.InternalService,
+                Account.Types.User => IIdentityAdminIF_v1.AccountTypes.User,
+                Account.Types.ExternalSystem => IIdentityAdminIF_v1.AccountTypes.ExternalSystem,
+                Account.Types.InternalService => IIdentityAdminIF_v1.AccountTypes.InternalService,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.AuthDTO Convert(this Auth @this)
+        {
+            return new IIdentityAdminIF_v1.AuthDTO()
+            {
+                id = @this.id,
+                isActive = @this.isActive,
+                method = @this.method.Convert(),
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.EmailAuthDTO Convert(this EmailAuth @this)
+        {
+            return new IIdentityAdminIF_v1.EmailAuthDTO()
+            {
+                id = @this.id,
+                etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
+                isActive = @this.isActive,
+
+                email = @this.email,
+                isEmailConfirmed = @this.isEmailConfirmed,
+                passwordExpiresAt = @this.passwordExpiresAt,
+                twoFactor = @this.twoFactor?.Convert()
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.ADAuthDTO Convert(this ADAuth @this, LdapDomain ldapDomain)
+        {
+            return new IIdentityAdminIF_v1.ADAuthDTO()
+            {
+                id = @this.id,
+                etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
+                isActive = @this.isActive,
+
+                LdapDomainId = @this.LdapDomainId,
+                LdapDomainName = ldapDomain?.name,
+                userName = @this.userName,
+                twoFactor = @this.twoFactor?.Convert(),
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.KAUAuthDTO Convert(this KAUAuth @this)
+        {
+            return new IIdentityAdminIF_v1.KAUAuthDTO()
+            {
+                id = @this.id,
+                etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
+                isActive = @this.isActive,
+
+                email = @this.email,
+                KAUUserId = @this.KAUUserId,
+                legalName = @this.legalName,
+                twoFactor = @this.twoFactor?.Convert(),
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.CertificateAuthDTO Convert(this CertificateAuth @this)
+        {
+            return new IIdentityAdminIF_v1.CertificateAuthDTO()
+            {
+                id = @this.id,
+                etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
+                isActive = @this.isActive,
+
+                certificateThumbprint = @this.certificateThumbprint,
+                serialNumber = @this.serialNumber,
+                issuer = @this.issuer,
+                subject = @this.subject,
+                publicKeyHash  = @this.publicKeyHash,
+                validFrom = @this.validFrom,
+                validUntil = @this.validUntil,
+                isRevoked = @this.isRevoked,
+                revocationReason = @this.revocationReason,
+                revokedAt = @this.revokedAt,
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.TwoFactorConfigurationDTO Convert(this TwoFactorConfiguration @this)
+        {
+            return new IIdentityAdminIF_v1.TwoFactorConfigurationDTO()
+            {
+                enabled = @this.enabled,
+                method = @this.method.Convert(),
+                email = @this.email,
+                phoneNumber = @this.phoneNumber,
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.AuthDTO.Methods Convert(this Auth.Methods @this)
+        {
+            return @this switch
+            {
+                Auth.Methods.Email => IIdentityAdminIF_v1.AuthDTO.Methods.Email,
+                Auth.Methods.ActiveDirectory => IIdentityAdminIF_v1.AuthDTO.Methods.ActiveDirectory,
+                Auth.Methods.KAU => IIdentityAdminIF_v1.AuthDTO.Methods.KAU,
+                Auth.Methods.Certificate => IIdentityAdminIF_v1.AuthDTO.Methods.Certificate,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        internal static IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods Convert(this TwoFactorConfiguration.Methods @this)
+        {
+            return @this switch
+            {
+                TwoFactorConfiguration.Methods.TOTP => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP,
+                TwoFactorConfiguration.Methods.SMS => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.SMS,
+                TwoFactorConfiguration.Methods.Email => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email,
                 _ => throw new NotImplementedException(),
             };
         }

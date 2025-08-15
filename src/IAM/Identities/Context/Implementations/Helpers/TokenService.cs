@@ -12,6 +12,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
         private const string _audience = "MyAppUsers";
         private const int AccessTokenValidaionTimeInMinutes = 24 * 60;
         private const int RefresokenValidaionTimeInDays = 7;
+        private const int EmailConfirmationTokenValidityInMinutes = 24 * 60;
 
         /// <summary>
         /// Access token generálása rövid lejárati idővel (pl. 15 perc)
@@ -100,6 +101,69 @@ namespace IAM.Identities.Service.Implementations.Helpers
             catch
             {
                 // Ha bármilyen hiba van (lejárt, aláírás rossz, stb.) → érvénytelen token
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Generates a short-lived token for confirming an email address.
+        /// </summary>
+        public (string token, DateTime expiresAt) GenerateEmailConfirmationToken(string accountId, string authId)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim> {
+                new Claim("accountId", accountId),
+                new Claim("authId", authId),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var expiresAt = DateTime.UtcNow.AddMinutes(EmailConfirmationTokenValidityInMinutes);
+
+            var token = new JwtSecurityToken(
+                issuer: _issuer,
+                audience: _audience,
+                claims: claims,
+                expires: expiresAt,
+                signingCredentials: creds
+            );
+
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+        }
+
+        /// <summary>
+        /// Validates an email confirmation token and returns the accountId/authId if valid.
+        /// Returns null if invalid or expired.
+        /// </summary>
+        public (string AccountId, string AuthId)? ValidateEmailConfirmationToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_secretKey);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _issuer,
+                    ValidAudience = _audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+
+                var accountId = principal.FindFirst("accountId")?.Value;
+                var authId = principal.FindFirst("authId")?.Value;
+
+                if (string.IsNullOrEmpty(accountId) || string.IsNullOrEmpty(authId))
+                    return null;
+
+                return (accountId, authId);
+            }
+            catch
+            {
                 return null;
             }
         }

@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Files", ".Solutio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TemplateManagement", "TemplateManagement", "{65DBD68F-F13D-4F6A-919F-2D3E385359C3}"
 	ProjectSection(SolutionItems) = preProject
-		src\TemplateManagement\TemplateManagement.d3 = src\TemplateManagement\TemplateManagement.d3
+		src\TemplateManagement\Projects.d3 = src\TemplateManagement\Projects.d3
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{8EBD88BD-D408-4ADD-A942-FBF05D28DDAD}"

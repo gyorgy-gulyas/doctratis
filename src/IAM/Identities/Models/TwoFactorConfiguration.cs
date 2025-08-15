@@ -12,7 +12,7 @@ namespace IAM.Identities.Identity
 	/// Two-factor authentication configuration
 	public partial class TwoFactorConfiguration : IEquatable<TwoFactorConfiguration>
 	{
-		public enum Method
+		public enum Methods
 		{
 			/// Time-based One-Time Password (e.g. Google Authenticator)
 			TOTP,
@@ -25,7 +25,7 @@ namespace IAM.Identities.Identity
 
 		}
 		public bool enabled { get; set; }
-		public TwoFactorConfiguration.Method method { get; set; }
+		public TwoFactorConfiguration.Methods method { get; set; }
 		public string phoneNumber { get; set; }
 		public string email { get; set; }
 
