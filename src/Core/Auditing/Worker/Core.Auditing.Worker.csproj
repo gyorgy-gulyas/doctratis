@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JsonDiffPatch.Net"  />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
     <PackageReference Include="ServiceKit.Net.General" />
     <PackageReference Include="ServiceKit.Net.Service" />
@@ -14,10 +20,5 @@
     <ProjectReference Include="..\Models\Core.Auditing.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JsonDiffPatch.Net"  />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.Extensions.Logging" />
-  </ItemGroup>
   
 </Project>

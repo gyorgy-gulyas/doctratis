@@ -28,9 +28,9 @@ namespace IAM.Identities.Service.Implementations
 
             var auth = _context.Auths
                 .AsQueryable()
-                .Where(a => a.method == Auth.Methods.EmailAndPassword)
+                .Where(a => a.method == Auth.Methods.Email)
                 .AsEnumerable()
-                .OfType<EmailAndPasswordAuth>()
+                .OfType<EmailAuth>()
                 .Where(a => a.email == email)
                 .FirstOrDefault();
 

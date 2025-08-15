@@ -44,9 +44,9 @@ namespace IAM.Identities.Service.Implementations
                 return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.InvalidUserNameOrPassword });
 
             var account = result.Value.account;
-            var auth = result.Value.auth as EmailAndPasswordAuth;
+            var auth = result.Value.auth as EmailAuth;
 
-            var signIn = _trySignInWithPassword(account, auth as EmailAndPasswordAuth, password);
+            var signIn = _trySignInWithPassword(account, auth as EmailAuth, password);
             if (signIn != ILoginIF_v1.SignInResult.Ok)
             {
                 _context.AuditLog_SignInFailed(ctx, account, Auth.Methods.Email, signIn);
@@ -321,7 +321,7 @@ namespace IAM.Identities.Service.Implementations
 
         /// Attempts to sign in with the given account and password
         /// Returns a SignInResult indicating success or failure reason
-        private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, EmailAndPasswordAuth auth, string password)
+        private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, EmailAuth auth, string password)
         {
             // If the account is not active, explicitly return UserIsNotActive
             if (!account.isActive)
@@ -344,7 +344,7 @@ namespace IAM.Identities.Service.Implementations
             return ILoginIF_v1.SignInResult.Ok;
 
             // --- Local helper functions ---
-            bool IsPasswordValid(string password, EmailAndPasswordAuth emailAuth)
+            bool IsPasswordValid(string password, EmailAuth emailAuth)
             {
                 var saltBytes = Convert.FromBase64String(emailAuth.passwordSalt);
                 var hashBytes = Convert.FromBase64String(emailAuth.passwordHash);
