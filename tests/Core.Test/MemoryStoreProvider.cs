@@ -8,8 +8,19 @@ namespace Core.Test
 {
     public class MemoryStoreProvider : StoreProvider
     {
-        protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
-        protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
-        protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
+        private IDocumentStore _documentStore;
+        private IBlobStore _blobStore;
+        private IColumnStore _columnStore;
+
+        public MemoryStoreProvider()
+        {
+            _documentStore = new Memory_DocumentStore("");
+            _blobStore = new Memory_BlobStore("");
+            _columnStore = new Memory_ColumnStore("");
+        }
+
+        protected override IDocumentStore GetDocumentStore() => _documentStore;
+        protected override IBlobStore GetBlobStore() => _blobStore;
+        protected override IColumnStore GetColumnStore() => _columnStore;
     }
 }

@@ -4,14 +4,15 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- PolyPersist Local packages -->
+    <PackageVersion Include="BouncyCastle.NetCore" Version="2.2.1" />
     <PackageVersion Include="PolyPersist.Net" Version="1.0.5" />
     <PackageVersion Include="PolyPersist.Net.Transactions" Version="1.0.5" />
     <PackageVersion Include="PolyPersist.Net.BlobStore.GridFS" Version="1.0.5" />
-    <PackageVersion Include="PolyPersist.Net.BlobStore.Memory" Version="1.0.5"/>
+    <PackageVersion Include="PolyPersist.Net.BlobStore.Memory" Version="1.0.5" />
     <PackageVersion Include="PolyPersist.Net.DocumentStore.MongoDB" Version="1.0.5" />
-    <PackageVersion Include="PolyPersist.Net.DocumentStore.Memory" Version="1.0.5"/>
-    <PackageVersion Include="PolyPersist.Net.ColumnStore.Cassandra" Version="1.0.5"/>
-    <PackageVersion Include="PolyPersist.Net.ColumnStore.Memory" Version="1.0.5"/>
+    <PackageVersion Include="PolyPersist.Net.DocumentStore.Memory" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.ColumnStore.Cassandra" Version="1.0.5" />
+    <PackageVersion Include="PolyPersist.Net.ColumnStore.Memory" Version="1.0.5" />
     <!-- ServiceKit.Net Local packages -->
     <PackageVersion Include="ServiceKit.Net.General" Version="1.1.2" />
     <PackageVersion Include="ServiceKit.Net.Service" Version="1.1.2" />

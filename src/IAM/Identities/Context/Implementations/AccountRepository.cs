@@ -23,6 +23,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<Account>> IAccountRepository.updateAccount(CallingContext ctx, Account account)
         {
+            var original = await _context.Accounts.Find(account.PartitionKey, account.id);
+            if (original == null)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Account '{account.id}' does not exist" });
+
             await _context.Accounts.Update(account);
             _context.Audit_Account(Core.Auditing.TrailOperations.Update, ctx, account);
 
@@ -33,7 +37,7 @@ namespace IAM.Identities.Service.Implementations
         {
             var account = await _context.Accounts.Find(id, id);
             if (account == null)
-                return new(new Error() { Status = Statuses.NotFound, MessageText = $"LDAP domain '{id}' does not exist" });
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Account '{id}' does not exist" });
 
             return new(account);
         }

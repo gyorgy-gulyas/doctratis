@@ -102,6 +102,7 @@ namespace IAM.Identities.Service.Implementations
 
             var account = new Account()
             {
+                id = Guid.NewGuid().ToString(),
                 Name = data.Name,
                 Type = data.Type,
                 contacts = data.contacts,
@@ -131,7 +132,9 @@ namespace IAM.Identities.Service.Implementations
                 isActive = true,
                 accountSecret = Guid.NewGuid().ToString(),
             };
-            await _accountRepository.updateAccount(ctx, account);
+            var update = await _accountRepository.updateAccount(ctx, account);
+            if(update.IsFailed())
+                return new(update.Error);
 
             return new(account);
         }
