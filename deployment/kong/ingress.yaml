@@ -4,24 +4,24 @@ metadata:
   name: apps-gateway
   namespace: docratis
   annotations:
-    konghq.com/strip-path: "true"
+    konghq.com/strip-path: "false"
     konghq.com/override: "default-timeouts"
 spec:
   ingressClassName: kong
   rules:
   - http:
       paths:
-      - path: /core/identities
+      - path: /iam
         pathType: Prefix
         backend:
           service:
-            name: identitymanagement
+            name: identity-and-access-management
             port:
-              number: 80
-      - path: /template-management
+              name: http
+      - path: /templatemanagement
         pathType: Prefix
         backend:
           service:
-            name: templatemanagement
+            name: template-management
             port:
-              number: 80
+              name: http

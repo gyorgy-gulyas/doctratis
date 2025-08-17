@@ -78,7 +78,7 @@ namespace TemplateManagement.Projects
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "updateProject" );
 
 				// build content
@@ -129,7 +129,7 @@ namespace TemplateManagement.Projects
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
 				ctx.FillHttpRequest( request, "TemplateManagementProjectsProjectIF_v1", "listAccessibleProjects" );
 
 				// call http client 

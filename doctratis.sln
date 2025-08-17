@@ -84,6 +84,43 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identities", "Identities", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deployment", "deployment", "{8EA60131-525E-48DF-B185-DA39D71B98A6}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\Dockerfile = deployment\Dockerfile
+		deployment\readme.md = deployment\readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kong", "kong", "{95CFD9E7-C394-48AC-9D21-0EFCB6906B26}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\kong\ingress.yaml = deployment\kong\ingress.yaml
+		deployment\kong\kong-metrics-service.yaml = deployment\kong\kong-metrics-service.yaml
+		deployment\kong\kong-prometheus-plugin.yaml = deployment\kong\kong-prometheus-plugin.yaml
+		deployment\kong\ui-paths.yaml = deployment\kong\ui-paths.yaml
+		deployment\kong\values.yaml = deployment\kong\values.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docratis-services", "docratis-services", "{E0A97513-5AAE-48F4-9003-A20590D17987}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\docratis-services\.helmignore = deployment\docratis-services\.helmignore
+		deployment\docratis-services\Chart.yaml = deployment\docratis-services\Chart.yaml
+		deployment\docratis-services\values.yaml = deployment\docratis-services\values.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{9829B496-9192-4C63-818D-3215BEEC6C95}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\docratis-services\templates\deployment.yaml = deployment\docratis-services\templates\deployment.yaml
+		deployment\docratis-services\templates\ingress.yaml = deployment\docratis-services\templates\ingress.yaml
+		deployment\docratis-services\templates\NOTES.txt = deployment\docratis-services\templates\NOTES.txt
+		deployment\docratis-services\templates\service.yaml = deployment\docratis-services\templates\service.yaml
+		deployment\docratis-services\templates\serviceaccount.yaml = deployment\docratis-services\templates\serviceaccount.yaml
+		deployment\docratis-services\templates\_helpers.tpl = deployment\docratis-services\templates\_helpers.tpl
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monitoring", "monitoring", "{5BC93B6D-01A6-4149-B26F-E99697576B88}"
+	ProjectSection(SolutionItems) = preProject
+		deployment\monitoring\values.yaml = deployment\monitoring\values.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -349,6 +386,11 @@ Global
 		{09433C59-1890-43DC-84A7-B84D61156BB4} = {C2CC73F8-5E64-453D-A776-FC272CC96C3C}
 		{15A55916-0CF7-41F4-B6A8-0A9F79D63014} = {D400ABC1-9CDA-49C9-A359-643C156A482B}
 		{C2CC73F8-5E64-453D-A776-FC272CC96C3C} = {D400ABC1-9CDA-49C9-A359-643C156A482B}
+		{8EA60131-525E-48DF-B185-DA39D71B98A6} = {41500286-EC99-4144-8C50-FA625976875B}
+		{95CFD9E7-C394-48AC-9D21-0EFCB6906B26} = {8EA60131-525E-48DF-B185-DA39D71B98A6}
+		{E0A97513-5AAE-48F4-9003-A20590D17987} = {8EA60131-525E-48DF-B185-DA39D71B98A6}
+		{9829B496-9192-4C63-818D-3215BEEC6C95} = {E0A97513-5AAE-48F4-9003-A20590D17987}
+		{5BC93B6D-01A6-4149-B26F-E99697576B88} = {8EA60131-525E-48DF-B185-DA39D71B98A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C074C67E-A13B-4F7B-A375-8EC8A5BDFC1F}

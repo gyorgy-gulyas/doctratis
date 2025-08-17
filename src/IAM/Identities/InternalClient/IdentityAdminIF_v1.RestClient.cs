@@ -30,7 +30,7 @@ namespace IAM.Identities
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/registerldapdomain" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "RegisterLdapDomain" );
 
 				// build content
@@ -81,7 +81,7 @@ namespace IAM.Identities
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/getallregisteredldapdomain" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "GetAllRegisteredLdapDomain" );
 
 				// call http client 
@@ -177,7 +177,7 @@ namespace IAM.Identities
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/updateregisteredldapdomain" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "UpdateRegisteredLdapDomain" );
 
 				// build content
@@ -228,7 +228,7 @@ namespace IAM.Identities
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/getallaccount" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "getAllAccount" );
 
 				// call http client 

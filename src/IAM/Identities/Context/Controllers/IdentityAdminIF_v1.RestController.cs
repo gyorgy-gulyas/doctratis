@@ -31,7 +31,7 @@ namespace IAM.Identities
 			_service = service; 
 		}
 
-		[HttpPost( "None" )] 
+		[HttpPost( "registerldapdomain" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.LdapDomainDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -77,7 +77,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpGet( "None" )] 
+		[HttpGet( "getallregisteredldapdomain" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IIdentityAdminIF_v1.LdapDomainSummaryDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -169,7 +169,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "None" )] 
+		[HttpPost( "updateregisteredldapdomain" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.LdapDomainDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -215,7 +215,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "None" )] 
+		[HttpPost( "getallaccount" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IIdentityAdminIF_v1.AccountSummaryDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]

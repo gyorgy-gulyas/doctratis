@@ -10,15 +10,16 @@ using ServiceKit.Net;
 using ServiceKit.Net.Communicators;
 
 
-BaseServiceHost.Create<IdentityManagementServiceHost>(args, new BaseServiceHost.Options()
+BaseServiceHost.Create<IAMServiceHost>(args, new BaseServiceHost.Options()
 {
     WithAuthentication = false,
     WithGrpc = true,
     WithRest = true,
     WithReponseCompression = false,
+    PathBase = "/iam"
 }).Run();
 
-public class IdentityManagementServiceHost : BaseServiceHost
+public class IAMServiceHost : BaseServiceHost
 {
     protected override void _BeforeAddServices(IServiceCollection services, Options options)
     {
@@ -37,23 +38,25 @@ public class IdentityManagementServiceHost : BaseServiceHost
         services.AddSingleton<TokenAgent>();
         services.AddSingleton<PasswordAgent>();
         services.AddSingleton<CertificateAgent>();
+
         services.AddSingleton<LdapAuthenticator>();
         services.AddHttpClient<KAUAuthenticator>();
         services.AddSingleton<KAUAuthenticator>();
-
-        services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_AD>();
-        //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_HasiCorp>();
 
         // interfaces
         services.AddSingleton<ILoginIF_v1, LoginIF_v1>();
         services.AddSingleton<IIdentityAdminIF_v1, IdentityAdminIF_v1>();
         // repositories
         services.AddSingleton<IAccountRepository, AccountRepository>();
+        services.AddSingleton<IAuthRepository, AuthRepository>();
         services.AddSingleton<ILdapDomainRepository, LdapDomainRepository>();
         // services
         services.AddSingleton<IAccountService, AccountService>();
+        services.AddSingleton<IAccountAuthService, AccountAuthService>();
         services.AddSingleton<ILoginService, LoginService>();
         // acls
+        services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_AD>();
+        //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_HasiCorp>();
     }
 
     protected override void _BeforeBuild(IServiceCollection services, Options options)

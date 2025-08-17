@@ -24,7 +24,7 @@ namespace Admin.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/registerldapdomain" ) );
 
 						// build content
 						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>( ldap ));
@@ -73,7 +73,7 @@ namespace Admin.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/getallregisteredldapdomain" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.GetAllRegisteredLdapDomain" );
@@ -165,7 +165,7 @@ namespace Admin.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/updateregisteredldapdomain" ) );
 
 						// build content
 						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>( ldap ));
@@ -214,7 +214,7 @@ namespace Admin.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/getallaccount" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.getAllAccount" );

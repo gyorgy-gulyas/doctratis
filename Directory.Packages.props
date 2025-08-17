@@ -13,10 +13,10 @@
     <PackageVersion Include="PolyPersist.Net.ColumnStore.Cassandra" Version="1.0.5"/>
     <PackageVersion Include="PolyPersist.Net.ColumnStore.Memory" Version="1.0.5"/>
     <!-- ServiceKit.Net Local packages -->
-    <PackageVersion Include="ServiceKit.Net.General" Version="1.1.1" />
-    <PackageVersion Include="ServiceKit.Net.Service" Version="1.1.1" />
-    <PackageVersion Include="ServiceKit.Net.Communicators" Version="1.1.1" />
-    <PackageVersion Include="ServiceKit.Net.ServiceHost" Version="1.1.1" />
+    <PackageVersion Include="ServiceKit.Net.General" Version="1.1.2" />
+    <PackageVersion Include="ServiceKit.Net.Service" Version="1.1.2" />
+    <PackageVersion Include="ServiceKit.Net.Communicators" Version="1.1.2" />
+    <PackageVersion Include="ServiceKit.Net.ServiceHost" Version="1.1.2" />
     <!-- Microsoft packages -->
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0" />

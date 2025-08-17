@@ -70,7 +70,7 @@ namespace BFF.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/updateproject" ) );
 
 						// build content
 						request.Content = new StringContent( JsonSerializer.Serialize<TemplateManagement.Projects.IProjectIF_v1.ProjectDetailsDTO>( project ));
@@ -119,7 +119,7 @@ namespace BFF.ApiClientKit
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/None" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Get, WebUtility.UrlEncode( $"/templatemanagement/projects/projectif/v1/listaccessibleprojects" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "TemplateManagement.Projects.ProjectIF.V1.listAccessibleProjects" );

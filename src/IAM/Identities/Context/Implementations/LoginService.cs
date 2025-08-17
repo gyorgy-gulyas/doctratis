@@ -4,7 +4,6 @@ using IAM.Identities.Service.Implementations.Helpers;
 using OtpNet;
 using ServiceKit.Net;
 using System.Security.Claims;
-using System.Security.Cryptography;
 
 namespace IAM.Identities.Service.Implementations
 {

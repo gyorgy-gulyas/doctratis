@@ -12,6 +12,7 @@ BaseServiceHost.Create<TemplateManagementServiceHost>(args, new BaseServiceHost.
     WithGrpc = true,
     WithRest = true,
     WithReponseCompression = false,
+    PathBase = "/templatemanagement"
 }).Run();
 
 public class TemplateManagementServiceHost : BaseServiceHost

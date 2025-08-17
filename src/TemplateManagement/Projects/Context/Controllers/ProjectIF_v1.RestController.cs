@@ -77,7 +77,7 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpPost( "None" )] 
+		[HttpPost( "updateproject" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IProjectIF_v1.ProjectDetailsDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -123,7 +123,7 @@ namespace TemplateManagement.Projects
 			}
 		}
 
-		[HttpGet( "None" )] 
+		[HttpGet( "listaccessibleprojects" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(List<IProjectIF_v1.ProjectIdentityAssignmentDTO>) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
