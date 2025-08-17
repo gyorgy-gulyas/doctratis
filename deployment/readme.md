@@ -6,7 +6,7 @@ kubectl create namespace docratis-infra
 kubectl config set-context --current --namespace=doctratis
 
 helm upgrade --install template-management ./deployment/docratis-services --values ./deployment/docratis-services/values.yaml --values ./src/TemplateManagement/Service/deployment/values.yaml --namespace docratis
-helm upgrade --install identity-management ./deployment/docratis-services --values ./deployment/docratis-services/values.yaml --values ./src/IAM/Service/deployment/values.yaml --namespace docratis
+helm upgrade --install identity-and-access-management ./deployment/docratis-services --values ./deployment/docratis-services/values.yaml --values ./src/IAM/Service/deployment/values.yaml --namespace docratis
 
 -- KONG Ingress --
 helm repo add kong https://charts.konghq.com
@@ -49,7 +49,9 @@ kubectl get events -n docratis --field-selector "involvedObject.kind=Ingress,inv
 kubectl run -it --rm curl --image=curlimages/curl -n docratis -- sh -lc "set -x; curl -i http://template-management:8080/projects/projectif/v1/listaccessibleprojects; echo; curl -i http://template-management:8080/templatemanagement/projects/projectif/v1/listaccessibleprojects; echo; curl -i http://template-management:8080/swagger/index.html || true"
 
 
+http://localhost/templatemanagement/projects/projectif/v1/listaccessibleprojects
 http://template-management:8080/templatemanagement/projects/projectif/v1/listaccessibleprojects
 
 
-http://template-management:8080/templatemanagement/projects/projectif/v1/listaccessibleprojects
+kubectl get deploy -n docratis template-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
+kubectl get deploy -n docratis identity-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'

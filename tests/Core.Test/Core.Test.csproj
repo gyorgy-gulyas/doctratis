@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.BlobStore.GridFS" />
+    <PackageReference Include="PolyPersist.Net.BlobStore.Memory" />
+    <PackageReference Include="PolyPersist.Net.DocumentStore.MongoDB" />
+    <PackageReference Include="PolyPersist.Net.DocumentStore.Memory" />
+    <PackageReference Include="PolyPersist.Net.ColumnStore.Cassandra" />
+    <PackageReference Include="PolyPersist.Net.ColumnStore.Memory" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
+    <PackageReference Include="ServiceKit.Net.Communicators" />
+    <PackageReference Include="ServiceKit.Net.ServiceHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\Auditing\Worker\Core.Auditing.Worker.csproj" />
+  </ItemGroup>
+</Project>

@@ -42,7 +42,6 @@ namespace Core.Auditing.Worker
 
     public static class AuditWorkerExtensions
     {
-
         public static void AddAuditWorker(this IServiceCollection services)
         {
             // add audit worker itself
@@ -50,7 +49,7 @@ namespace Core.Auditing.Worker
             // add for implement the IAuditEntryContainer service
             services.AddSingleton<IAuditEntryContainer>(sp => sp.GetRequiredService<AuditWorker>());
             // add for background service
-            services.AddHostedService(sp => sp.GetRequiredService<AuditWorker>());            
+            services.AddHostedService(sp => sp.GetRequiredService<AuditWorker>());
         }
     }
 }
