@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IAM.Identities.Service.Implementations.Helpers
 {
-    public class TokenService
+    public class TokenAgent
     {
         private const string _secretKey = "EzEgyTitkosKulcsLegalabb32Karakter";
         private const string _issuer = "docratis";

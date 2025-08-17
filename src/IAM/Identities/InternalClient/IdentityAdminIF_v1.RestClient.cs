@@ -514,12 +514,12 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, string initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/createtemailauth/{accountId}/{email}?initialPassword={initialPassword.ToString().ToLowerInvariant()}" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/createtemailauth/{accountId}/{email}/{initialPassword}" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "createtEmailAuth" );
 
 				// build content
@@ -1111,54 +1111,6 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
-		{
-			try
-			{
-				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/setcertificateauthactive/{accountId}/{authId}/{etag}?isActive={isActive.ToString().ToLowerInvariant()}" ) );
-				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "setCertificateAuthActive" );
-
-				// call http client 
-				HttpResponseMessage response = await _httpClient.SendAsync( request );
-
-				if (response.IsSuccessStatusCode)
-				{
-					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.CertificateAuthDTO>();
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-				}
-				else if( response.Content != null )
-				{
-					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( error );
-				}
-				else
-				{
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_setCertificateAuthActive'",
-					} );
-				}
-			}
-			catch (HttpRequestException ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
 		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
 		{
 			try
@@ -1185,57 +1137,6 @@ namespace IAM.Identities
 					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
 						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_revokeCertificate'",
-					} );
-				}
-			}
-			catch (HttpRequestException ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.reissueCertificate(CallingContext ctx, string accountId, string authId, IIdentityAdminIF_v1.CsrInputDTO data)
-		{
-			try
-			{
-				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/reissuecertificate/{accountId}/{authId}" ) );
-				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "reissueCertificate" );
-
-				// build content
-				request.Content = new StringContent( JsonSerializer.Serialize<IIdentityAdminIF_v1.CsrInputDTO>( data ));
-
-				// call http client 
-				HttpResponseMessage response = await _httpClient.SendAsync( request );
-
-				if (response.IsSuccessStatusCode)
-				{
-					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.CertificateAuthDTO>();
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-				}
-				else if( response.Content != null )
-				{
-					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( error );
-				}
-				else
-				{
-					return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_reissueCertificate'",
 					} );
 				}
 			}

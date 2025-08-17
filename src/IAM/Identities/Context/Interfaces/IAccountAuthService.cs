@@ -19,7 +19,7 @@ namespace IAM.Identities
 		public Task<Response<Identity.EmailAuth>> createEmailAuth(CallingContext ctx, string accountId, string email, string password, bool enableTwoFactor, Identity.TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail);
 
 		/// <return>Identity.EmailAuth</return>
-		public Task<Response<Identity.EmailAuth>> changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword, DateOnly passwordExpiresAt);
+		public Task<Response<Identity.EmailAuth>> changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword);
 
 		/// <return>Identity.EmailAuth</return>
 		public Task<Response<Identity.EmailAuth>> setEmailTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, Identity.TwoFactorConfiguration.Methods method, string phoneNumber, string email);
@@ -34,16 +34,13 @@ namespace IAM.Identities
 		public Task<Response<Identity.ADAuth>> UpdateADAccount(CallingContext ctx, string accountId, string authId, string etag, string ldapDomainId, string userName);
 
 		/// <return>Identity.ADAuth</return>
-		public Task<Response<Identity.ADAuth>> SetADTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, string method, string phoneNumber, string email);
+		public Task<Response<Identity.ADAuth>> SetADTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, Identity.TwoFactorConfiguration.Methods method, string phoneNumber, string email);
 
 		/// <return>Identity.KAUAuth</return>
 		public Task<Response<Identity.KAUAuth>> CreateKAUAuth(CallingContext ctx, string accountId, string kauUserId, bool enableTwoFactor, Identity.TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail);
 
 		/// <return>Identity.KAUAuth</return>
-		public Task<Response<Identity.KAUAuth>> UpdateKAUProfile(CallingContext ctx, string accountId, string authId, string etag, string legalName, string email);
-
-		/// <return>Identity.KAUAuth</return>
-		public Task<Response<Identity.KAUAuth>> SetKAUTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, string method, string phoneNumber, string email);
+		public Task<Response<Identity.KAUAuth>> SetKAUTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, Identity.TwoFactorConfiguration.Methods method, string phoneNumber, string email);
 
 		/// <return>Identity.CertificateAuth</return>
 		public Task<Response<Identity.CertificateAuth>> CreateCertificateFromCSR(CallingContext ctx, string accountId, string csrPem, string profile);

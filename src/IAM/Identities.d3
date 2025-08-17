@@ -209,19 +209,18 @@ domain IAM {
 
             // ===== Email & Password =====
             command createEmailAuth(accountId:string, email:string, password:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.EmailAuth
-            command changePassword(accountId:string, authId:string, etag:string, newPassword:string, passwordExpiresAt:date) : Identity.EmailAuth
+            command changePassword(accountId:string, authId:string, etag:string, newPassword:string) : Identity.EmailAuth
             command setEmailTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.EmailAuth
             command confirmEmail(confirmationToken:string) : boolean
 
             // ===== Active Directory (LDAP) =====
             command CreateADAuth(accountId:string, ldapDomainId:string, userName:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.ADAuth
             command UpdateADAccount(accountId:string, authId:string, etag:string, ldapDomainId:string, userName:string) : Identity.ADAuth
-            command SetADTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:string, phoneNumber:string, email:string) : Identity.ADAuth
+            command SetADTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.ADAuth
 
             // ===== KAÜ =====
             command CreateKAUAuth(accountId:string, kauUserId:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.KAUAuth
-            command UpdateKAUProfile(accountId:string, authId:string, etag:string, legalName:string, email:string) : Identity.KAUAuth
-            command SetKAUTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:string, phoneNumber:string, email:string) : Identity.KAUAuth
+            command SetKAUTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.KAUAuth
 
             // ===== Certificate =====
             command CreateCertificateFromCSR(accountId:string, csrPem:string, profile:string) : Identity.CertificateAuth
@@ -416,7 +415,7 @@ domain IAM {
                 passwordExpiresAt: date
                 twoFactor: TwoFactorConfigurationDTO
             }
-            command createtEmailAuth( accountId:string, email:string, initialPassword:boolean, twoFactor: TwoFactorConfigurationDTO ) : EmailAuthDTO
+            command createtEmailAuth( accountId:string, email:string, initialPassword:string, twoFactor: TwoFactorConfigurationDTO ) : EmailAuthDTO
             command getEmailAuth( accountId:string, authId:string ) : EmailAuthDTO
             command changePasswordOnEmailAuth( accountId:string, authId:string, etag:string, newPassword:string ) : EmailAuthDTO
             command setTwoFactorOnEmailAuth(accountId:string, authId:string, etag:string, twoFactor:TwoFactorConfigurationDTO) : EmailAuthDTO
@@ -487,9 +486,7 @@ domain IAM {
                 profile: string           
             }
             command createCertificateAuthFromCSR(accountId:string, data:CsrInputDTO) : CertificateAuthDTO
-            command setCertificateAuthActive(accountId:string, authId:string, etag:string, isActive:boolean) : CertificateAuthDTO
             command revokeCertificate(accountId:string, authId:string, etag:string, reason:string ) : CertificateAuthDTO
-            command reissueCertificate(accountId:string, authId:string, data:CsrInputDTO) : CertificateAuthDTO
             command getCertificateAuth( accountId:string, authId:string ) : CertificateAuthDTO
         }
 

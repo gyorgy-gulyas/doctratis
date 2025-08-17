@@ -1,7 +1,7 @@
 using Core.Auditing.Worker;
-using Core.Base;
 using Core.Base.Agents.Communication;
 using IAM.Identities;
+using IAM.Identities.Context.Implementations;
 using IAM.Identities.Service;
 using IAM.Identities.Service.Implementations;
 using IAM.Identities.Service.Implementations.Helpers;
@@ -34,10 +34,15 @@ public class IdentityManagementServiceHost : BaseServiceHost
         services.AddSingleton<SmsAgent>();
         services.UseEmail_Graph();
         services.AddSingleton<EmailAgent>();
-
+        services.AddSingleton<TokenAgent>();
+        services.AddSingleton<PasswordAgent>();
+        services.AddSingleton<CertificateAgent>();
         services.AddSingleton<LdapAuthenticator>();
         services.AddHttpClient<KAUAuthenticator>();
-        services.AddSingleton<KAUAuthenticator>(); 
+        services.AddSingleton<KAUAuthenticator>();
+
+        services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_AD>();
+        //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_HasiCorp>();
 
         // interfaces
         services.AddSingleton<ILoginIF_v1, LoginIF_v1>();
@@ -62,13 +67,10 @@ public class IdentityManagementServiceHost : BaseServiceHost
 
 namespace IAM.Identities.Service
 {
-    using PolyPersist.Net.BlobStore.GridFS;
     using PolyPersist.Net.BlobStore.Memory;
-    using PolyPersist.Net.ColumnStore.Cassandra;
     using PolyPersist.Net.ColumnStore.Memory;
     using PolyPersist.Net.Core;
     using PolyPersist.Net.DocumentStore.Memory;
-    using PolyPersist.Net.DocumentStore.MongoDB;
 
     public class IdentityStoreProvider : StoreProvider
     {

@@ -488,12 +488,12 @@ namespace Admin.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(string accountId, string email, bool initialPassword, IAM.Identities.IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(string accountId, string email, string initialPassword, IAM.Identities.IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/createtemailauth/{accountId}/{email}?initialPassword={initialPassword.ToString().ToLowerInvariant()}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/createtemailauth/{accountId}/{email}/{initialPassword}" ) );
 
 						// build content
 						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.TwoFactorConfigurationDTO>( twoFactor ));
@@ -1061,52 +1061,6 @@ namespace Admin.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>> setCertificateAuthActive(string accountId, string authId, string etag, bool isActive)
-				{
-					try
-					{
-						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/setcertificateauthactive/{accountId}/{authId}/{etag}?isActive={isActive.ToString().ToLowerInvariant()}" ) );
-
-						// call rest client 
-						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.setCertificateAuthActive" );
-
-						if (response.IsSuccessStatusCode)
-						{
-							var value = await response.Content.ReadFromJsonAsync<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-						}
-						else if( response.Content != null )
-						{
-							var error = await response.Content.ReadFromJsonAsync<Error>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( error );
-						}
-						else
-						{
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-								Status = response.StatusCode.FromHttp(),
-								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_setCertificateAuthActive'",
-							} );
-						}
-					}
-					catch (HttpRequestException ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-					catch (Exception ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-				}
-
 				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>> revokeCertificate(string accountId, string authId, string etag, string reason)
 				{
 					try
@@ -1132,55 +1086,6 @@ namespace Admin.ApiClientKit
 							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
 								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_revokeCertificate'",
-							} );
-						}
-					}
-					catch (HttpRequestException ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-					catch (Exception ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-				}
-
-				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>> reissueCertificate(string accountId, string authId, IAM.Identities.IIdentityAdminIF_v1.CsrInputDTO data)
-				{
-					try
-					{
-						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/reissuecertificate/{accountId}/{authId}" ) );
-
-						// build content
-						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.CsrInputDTO>( data ));
-
-						// call rest client 
-						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.reissueCertificate" );
-
-						if (response.IsSuccessStatusCode)
-						{
-							var value = await response.Content.ReadFromJsonAsync<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-						}
-						else if( response.Content != null )
-						{
-							var error = await response.Content.ReadFromJsonAsync<Error>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( error );
-						}
-						else
-						{
-							return Response<IAM.Identities.IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-								Status = response.StatusCode.FromHttp(),
-								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_reissueCertificate'",
 							} );
 						}
 					}

@@ -3,32 +3,38 @@ using IAM.Identities.Identity;
 using IAM.Identities.Service.Implementations.Helpers;
 using Microsoft.Extensions.Configuration;
 using ServiceKit.Net;
-using System.Security.Cryptography;
 
 namespace IAM.Identities.Service.Implementations
 {
     public class AccountAuthService : IAccountAuthService
     {
-        private readonly IdentityStoreContext _context;
         private readonly IAccountRepository _accountRepository;
         private readonly IAuthRepository _authRepository;
-        private readonly TokenService _tokenService;
+        private readonly TokenAgent _tokenAgent;
         private readonly EmailAgent _emailAgent;
+        private readonly PasswordAgent _passwordAgent;
+        private readonly CertificateAgent _certificateAgent;
         private readonly IConfiguration _configuration;
+        private readonly ICertificateAuthorityACL _certificateAuthorityACL;
 
         public AccountAuthService(
             IdentityStoreContext context,
             IAccountRepository accountRepository,
             IAuthRepository authRepository,
-            TokenService tokenService,
+            ICertificateAuthorityACL certificateAuthorityACL,
+            TokenAgent tokenAgent,
             EmailAgent emailAgent,
+            PasswordAgent passwordAgent,
+            CertificateAgent certificateAgent,
             IConfiguration configuration)
         {
-            _context = context;
             _accountRepository = accountRepository;
             _authRepository = authRepository;
-            _tokenService = tokenService;
+            _certificateAuthorityACL = certificateAuthorityACL;
+            _tokenAgent = tokenAgent;
             _emailAgent = emailAgent;
+            _passwordAgent = passwordAgent;
+            _certificateAgent = certificateAgent;
             _configuration = configuration;
         }
 
@@ -56,7 +62,7 @@ namespace IAM.Identities.Service.Implementations
             if (already.HasValue())
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Account authorization is alerady exist with email: '{email}'", AdditionalInformation = $"Conflicted user: {already.Value.accountId} " });
 
-            var passwordErrors = PasswordRules.Validate(password, accountName: email, email: email);
+            var passwordErrors = _passwordAgent.ValidatePasswordRules(password, accountName: email, email: email);
             if (passwordErrors.Count > 0)
             {
                 return new(new Error
@@ -72,9 +78,10 @@ namespace IAM.Identities.Service.Implementations
             if (validate.IsFailed())
                 return new(validate.Error);
 
-            var salt = RandomNumberGenerator.GetBytes(PasswordRules.Salt_Length);
-            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, PasswordRules.Hash_Iterations, HashAlgorithmName.SHA256);
-            var passwordHash = pbkdf2.GetBytes(PasswordRules.Hash_KeySize);
+            var salt = _passwordAgent.CreateLifetimeSalt();
+            var passwordHash = _passwordAgent.GeneratePasswordHash(password, salt);
+            if(passwordHash.IsFailed())
+                return new(passwordHash.Error);
 
             var auth = new EmailAuth()
             {
@@ -84,9 +91,9 @@ namespace IAM.Identities.Service.Implementations
                 email = email,
                 isActive = true,
                 isEmailConfirmed = false,
-                passwordExpiresAt = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(PasswordRules.ExpirationDays),
-                passwordSalt = Convert.ToBase64String(salt),
-                passwordHash = Convert.ToBase64String(passwordHash),
+                passwordExpiresAt = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(_passwordAgent.GetExpirationDays()),
+                passwordSalt = salt,
+                passwordHash = passwordHash.Value,
                 passwordHistory = [],
                 twoFactor = new TwoFactorConfiguration()
                 {
@@ -101,13 +108,13 @@ namespace IAM.Identities.Service.Implementations
             if (result.IsFailed())
                 return new(result.Error);
 
-            (string token, DateTime expiresAt) = _tokenService.GenerateEmailConfirmationToken(auth.accountId, auth.id);
+            (string token, DateTime expiresAt) = _tokenAgent.GenerateEmailConfirmationToken(auth.accountId, auth.id);
             await _emailAgent.SendEmailConfirmation(ctx, email, token, expiresAt, _configuration["FrontEnd:EmailConfirmationURL"]);
 
             return new(auth);
         }
 
-        async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword, DateOnly passwordExpiresAt)
+        async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
             // Loading
             var get = await _authRepository.getEmailAuth(ctx, accountId, authId).ConfigureAwait(false);
@@ -116,8 +123,7 @@ namespace IAM.Identities.Service.Implementations
 
             var auth = get.Value;
 
-
-            var passwordErrors = PasswordRules.Validate(newPassword, accountName: auth.email, email: auth.email);
+            var passwordErrors = _passwordAgent.ValidatePasswordRules(newPassword, accountName: auth.email, email: auth.email);
             if (passwordErrors.Count > 0)
             {
                 return new(new Error
@@ -140,74 +146,23 @@ namespace IAM.Identities.Service.Implementations
                 return new(new Error { Status = Statuses.InternalError, MessageText = "Stored password salt is invalid (Base64 decode failed)." });
             }
 
-            using var pbkdf2 = new Rfc2898DeriveBytes(newPassword, saltBytes, PasswordRules.Hash_Iterations, HashAlgorithmName.SHA256);
-            byte[] newHashBytes = pbkdf2.GetBytes(PasswordRules.Hash_KeySize);
+            var newPasswordHash = _passwordAgent.GeneratePasswordHash(newPassword, auth.passwordSalt);
+            if(newPasswordHash.IsFailed())
+                return new(newPasswordHash.Error);
 
-            // Don't use the same password as your CURRENT password
-            try
-            {
-                var currentHashBytes = Convert.FromBase64String(auth.passwordHash);
-                if (CryptographicOperations.FixedTimeEquals(newHashBytes, currentHashBytes))
-                {
-                    return new(new Error
-                    {
-                        Status = Statuses.BadRequest,
-                        MessageText = "New password must be different from the current password."
-                    });
-                }
-            }
-            catch (FormatException)
-            {
-                return new(new Error { Status = Statuses.InternalError, MessageText = "Stored password hash is invalid (Base64 decode failed)." });
-            }
+            var current = _passwordAgent.CheckCurrentPassword(newPassword, lifetimeSalt: auth.passwordSalt, currentPasswordHash: auth.passwordHash);
+            if (current.IsFailed())
+                return new(current.Error);
 
-            // Do not use any of your previous passwords
-            if (auth.passwordHistory != null && auth.passwordHistory.Count > 0)
-            {
-                foreach (var prevHashB64 in auth.passwordHistory)
-                {
-                    if (string.IsNullOrWhiteSpace(prevHashB64))
-                        continue;
+            var history = _passwordAgent.CheckPasswordHistory(newPassword, lifetimeSalt: auth.passwordSalt, passwordHistory: auth.passwordHistory);
+            if (history.IsFailed())
+                return new(history.Error);
 
-                    byte[] prevHashBytes;
-                    try
-                    {
-                        prevHashBytes = Convert.FromBase64String(prevHashB64);
-                    }
-                    catch
-                    {
-                        // Damaged history: you can consider it a mistake; let's skip it here.
-                        continue;
-                    }
-
-                    if (CryptographicOperations.FixedTimeEquals(newHashBytes, prevHashBytes))
-                    {
-                        return new(new Error
-                        {
-                            Status = Statuses.BadRequest,
-                            MessageText = "New password must not match any of the previously used passwords."
-                        });
-                    }
-                }
-            }
-
-            // History update (current hash in, FIFO limit optional)
-            auth.passwordHistory ??= [];
-            if (!string.IsNullOrEmpty(auth.passwordHash))
-            {
-                auth.passwordHistory.Add(auth.passwordHash);
-
-                if (PasswordRules.History_MaxCount > 0 && auth.passwordHistory.Count > PasswordRules.History_MaxCount)
-                {
-                    // tartsuk az utolsó N-et
-                    var toRemove = auth.passwordHistory.Count - PasswordRules.History_MaxCount;
-                    auth.passwordHistory.RemoveRange(0, toRemove);
-                }
-            }
+            _passwordAgent.AppendToHistory(auth.passwordHistory, currentPasswordHash: auth.passwordHash, newPasswordHash: newPasswordHash.Value);
 
             // Set new hash (salt does NOT change!)
-            auth.passwordHash = Convert.ToBase64String(newHashBytes);
-            auth.passwordExpiresAt = passwordExpiresAt;
+            auth.passwordHash = newPasswordHash.Value;
+            auth.passwordExpiresAt = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(_passwordAgent.GetExpirationDays());
 
             var update = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
             if (update.IsFailed())
@@ -252,7 +207,7 @@ namespace IAM.Identities.Service.Implementations
         async Task<Response<bool>> IAccountAuthService.confirmEmail(CallingContext ctx, string confirmationToken)
         {
             // Validate and decode the confirmation token to extract accountId and authId
-            var tokenData = _tokenService.ValidateEmailConfirmationToken(confirmationToken);
+            var tokenData = _tokenAgent.ValidateEmailConfirmationToken(confirmationToken);
             if (tokenData == null)
             {
                 return new(new Error
@@ -283,44 +238,270 @@ namespace IAM.Identities.Service.Implementations
             return new(true);
         }
 
-        Task<Response<ADAuth>> IAccountAuthService.CreateADAuth(CallingContext ctx, string accountId, string ldapDomainId, string userName, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
+        async Task<Response<ADAuth>> IAccountAuthService.CreateADAuth(CallingContext ctx, string accountId, string ldapDomainId, string userName, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
         {
-            throw new NotImplementedException();
+            // Uniqueness: (ldapDomainId, userName)
+            var exists = await _authRepository.findADAuthByDomainAndUser(ctx, ldapDomainId, userName).ConfigureAwait(false);
+            if (exists.IsFailed())
+                return new(exists.Error);
+            if (exists.HasValue())
+                return new(new Error
+                {
+                    Status = Statuses.BadRequest,
+                    MessageText = $"AD auth already exists for domain '{ldapDomainId}' and user '{userName}'.",
+                    AdditionalInformation = $"Conflicted authId: {exists.Value.id}, accountId: {exists.Value.accountId}"
+                });
+
+            // 2FA validation
+            var twoFa = _ValidateTwoFactorInputs(twoFactorMethod, enableTwoFactor, twoFactorPhoneNumber, twoFactorEmail);
+            if (twoFa.IsFailed())
+                return new(twoFa.Error);
+
+            var auth = new ADAuth
+            {
+                method = Auth.Methods.ActiveDirectory,
+                accountId = accountId,
+                isActive = true,
+
+                LdapDomainId = ldapDomainId,
+                userName = userName,
+
+                twoFactor = new TwoFactorConfiguration
+                {
+                    enabled = enableTwoFactor,
+                    method = twoFactorMethod,
+                    phoneNumber = twoFactorPhoneNumber,
+                    email = twoFactorEmail
+                }
+            };
+
+            var create = await _authRepository.createAuth(ctx, auth).ConfigureAwait(false);
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(auth);
         }
 
-        Task<Response<ADAuth>> IAccountAuthService.UpdateADAccount(CallingContext ctx, string accountId, string authId, string etag, string ldapDomainId, string userName)
+        async Task<Response<ADAuth>> IAccountAuthService.UpdateADAccount(CallingContext ctx, string accountId, string authId, string etag, string ldapDomainId, string userName)
         {
-            throw new NotImplementedException();
+            // Load current record
+            var get = await _authRepository.getADAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+            if (!get.HasValue())
+                return new(new Error { Status = Statuses.NotFound, MessageText = $"AD auth not found for account '{accountId}', auth '{authId}'." });
+
+            var auth = get.Value;
+
+            // If domain/user changes, enforce uniqueness
+            var domainChanged = !string.Equals(auth.LdapDomainId, ldapDomainId, StringComparison.Ordinal);
+            var userChanged = !string.Equals(auth.userName, userName, StringComparison.Ordinal);
+            if (domainChanged || userChanged)
+            {
+                var exists = await _authRepository.findADAuthByDomainAndUser(ctx, ldapDomainId, userName).ConfigureAwait(false);
+                if (exists.IsFailed())
+                    return new(exists.Error);
+                if (exists.HasValue() && !string.Equals(exists.Value.id, authId, StringComparison.Ordinal))
+                {
+                    return new(new Error
+                    {
+                        Status = Statuses.BadRequest,
+                        MessageText = $"Another AD auth already exists for domain '{ldapDomainId}' and user '{userName}'.",
+                        AdditionalInformation = $"Conflicted authId: {exists.Value.id}, accountId: {exists.Value.accountId}"
+                    });
+                }
+            }
+
+            auth.etag = etag;
+            auth.LdapDomainId = ldapDomainId;
+            auth.userName = userName;
+
+            var update = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
+            if (update.IsFailed())
+                return new(update.Error);
+
+            return new(auth);
         }
 
-        Task<Response<ADAuth>> IAccountAuthService.SetADTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, string method, string phoneNumber, string email)
+        async Task<Response<ADAuth>> IAccountAuthService.SetADTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
-            throw new NotImplementedException();
+            // Load existing EmailAuth
+            var get = await _authRepository.getADAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+            if (!get.HasValue())
+                return new(new Error
+                {
+                    Status = Statuses.NotFound,
+                    MessageText = $"Ad auth not found for account '{accountId}' with auth '{authId}'."
+                });
+
+            var auth = get.Value;
+
+            var validate = _ValidateTwoFactorInputs(method, enabled, phoneNumber, email);
+            if (validate.IsFailed())
+                return new(validate.Error);
+
+            // Update twoFactor settings
+            auth.twoFactor ??= new TwoFactorConfiguration();
+            auth.twoFactor.enabled = enabled;
+            auth.twoFactor.method = method;
+            auth.twoFactor.phoneNumber = phoneNumber;
+            auth.twoFactor.email = email;
+
+            var update = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
+            if (update.IsFailed())
+                return new(update.Error);
+
+            return new(auth);
         }
 
-        Task<Response<KAUAuth>> IAccountAuthService.CreateKAUAuth(CallingContext ctx, string accountId, string kauUserId, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
+        async Task<Response<KAUAuth>> IAccountAuthService.CreateKAUAuth(CallingContext ctx, string accountId, string kauUserId, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
         {
-            throw new NotImplementedException();
+            // Uniqueness by KAU user id
+            var exists = await _authRepository.findKAUAuthByUserId(ctx, kauUserId).ConfigureAwait(false);
+            if (exists.IsFailed())
+                return new(exists.Error);
+            if (exists.HasValue())
+                return new(new Error
+                {
+                    Status = Statuses.BadRequest,
+                    MessageText = $"KAU auth already exists for KAUUserId '{kauUserId}'.",
+                    AdditionalInformation = $"Conflicted authId: {exists.Value.id}, accountId: {exists.Value.accountId}"
+                });
+
+            // 2FA validation
+            var twoFa = _ValidateTwoFactorInputs(twoFactorMethod, enableTwoFactor, twoFactorPhoneNumber, twoFactorEmail);
+            if (twoFa.IsFailed())
+                return new(twoFa.Error);
+
+            var auth = new KAUAuth
+            {
+                method = Auth.Methods.KAU,
+                accountId = accountId,
+                isActive = true,
+
+                KAUUserId = kauUserId,
+                // legalName / email initially empty; can be filled after first successful KAU login or via UpdateKAUProfile
+                legalName = null,
+                email = null,
+
+                twoFactor = new TwoFactorConfiguration
+                {
+                    enabled = enableTwoFactor,
+                    method = twoFactorMethod,
+                    phoneNumber = twoFactorPhoneNumber,
+                    email = twoFactorEmail
+                }
+            };
+
+            var create = await _authRepository.createAuth(ctx, auth).ConfigureAwait(false);
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(auth);
         }
 
-        Task<Response<KAUAuth>> IAccountAuthService.UpdateKAUProfile(CallingContext ctx, string accountId, string authId, string etag, string legalName, string email)
+        async Task<Response<KAUAuth>> IAccountAuthService.SetKAUTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
-            throw new NotImplementedException();
+            // Load existing EmailAuth
+            var get = await _authRepository.getKAUAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+            if (!get.HasValue())
+                return new(new Error
+                {
+                    Status = Statuses.NotFound,
+                    MessageText = $"KAU not found for account '{accountId}' with auth '{authId}'."
+                });
+
+            var auth = get.Value;
+
+            var validate = _ValidateTwoFactorInputs(method, enabled, phoneNumber, email);
+            if (validate.IsFailed())
+                return new(validate.Error);
+
+            // Update twoFactor settings
+            auth.twoFactor ??= new TwoFactorConfiguration();
+            auth.twoFactor.enabled = enabled;
+            auth.twoFactor.method = method;
+            auth.twoFactor.phoneNumber = phoneNumber;
+            auth.twoFactor.email = email;
+
+            var update = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
+            if (update.IsFailed())
+                return new(update.Error);
+
+            return new(auth);
         }
 
-        Task<Response<KAUAuth>> IAccountAuthService.SetKAUTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, string method, string phoneNumber, string email)
+        async Task<Response<CertificateAuth>> IAccountAuthService.CreateCertificateFromCSR(CallingContext ctx, string accountId, string csrPem, string profile)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(csrPem))
+                return new(new Error { Status = Statuses.BadRequest, MessageText = "CSR PEM must be provided." });
+
+            var signed = await _certificateAgent.SignCsrAndParseAsync(ctx, csrPem, profile).ConfigureAwait(false);
+            if (signed.IsFailed())
+                return new(signed.Error);
+
+            var certification = signed.Value;
+
+            var auth = new CertificateAuth
+            {
+                method = Auth.Methods.Certificate,
+                accountId = accountId,
+                isActive = true,
+                
+                certificateThumbprint = certification.ThumbprintSha256,
+                validFrom = certification.NotBeforeUtc,
+                validUntil = certification.NotAfterUtc,
+
+                // ha ezek a mezők léteznek a modelledben, állítsd:
+                serialNumber = certification.SerialNumber,
+                issuer = certification.Issuer,
+                subject = certification.Subject,
+                publicKeyHash = certification.SpkiSha256,
+
+                isRevoked = false,
+                revocationReason = string.Empty,
+                revokedAt = DateTime.MinValue,
+            };
+
+            var create = await _authRepository.createAuth(ctx, auth).ConfigureAwait(false);
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(auth);
         }
 
-        Task<Response<CertificateAuth>> IAccountAuthService.CreateCertificateFromCSR(CallingContext ctx, string accountId, string csrPem, string profile)
+        async Task<Response<CertificateAuth>> IAccountAuthService.RevokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
         {
-            throw new NotImplementedException();
-        }
+            if (string.IsNullOrWhiteSpace(reason))
+                return new(new Error { Status = Statuses.BadRequest, MessageText = "Revocation reason is required." });
 
-        Task<Response<CertificateAuth>> IAccountAuthService.RevokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
-        {
-            throw new NotImplementedException();
+            var get = await _authRepository.getCertificateAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+            if (!get.HasValue())
+                return new(new Error { Status = Statuses.NotFound, MessageText = $"Certificate auth not found for account '{accountId}', auth '{authId}'." });
+
+            var auth = get.Value;
+
+            // revoke a CA-n
+            var rev = await _certificateAgent.RevokeBySerialAsync(ctx, auth.serialNumber, reason).ConfigureAwait(false);
+            if (rev.IsFailed())
+                return new(rev.Error);
+
+            auth.etag = etag;
+            auth.isRevoked = true;
+            auth.revocationReason = reason;
+            auth.revokedAt = DateTime.UtcNow;
+
+            var upd = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
+            if (upd.IsFailed())
+                return new(upd.Error);
+
+            return new(auth);
         }
 
         private static Response _ValidateTwoFactorInputs(TwoFactorConfiguration.Methods method, bool enabled, string phoneNumber, string email)

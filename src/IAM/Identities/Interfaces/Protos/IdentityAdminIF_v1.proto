@@ -40,9 +40,7 @@ service IdentityAdminIF_v1 {
 	rpc getKAUAuth(IdentityAdminIF_v1_getKAUAuthRequest) returns (IdentityAdminIF_v1_getKAUAuthResponse);
 	rpc setTwoFactorOnKAUAuth(IdentityAdminIF_v1_setTwoFactorOnKAUAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnKAUAuthResponse);
 	rpc createCertificateAuthFromCSR(IdentityAdminIF_v1_createCertificateAuthFromCSRRequest) returns (IdentityAdminIF_v1_createCertificateAuthFromCSRResponse);
-	rpc setCertificateAuthActive(IdentityAdminIF_v1_setCertificateAuthActiveRequest) returns (IdentityAdminIF_v1_setCertificateAuthActiveResponse);
 	rpc revokeCertificate(IdentityAdminIF_v1_revokeCertificateRequest) returns (IdentityAdminIF_v1_revokeCertificateResponse);
-	rpc reissueCertificate(IdentityAdminIF_v1_reissueCertificateRequest) returns (IdentityAdminIF_v1_reissueCertificateResponse);
 	rpc getCertificateAuth(IdentityAdminIF_v1_getCertificateAuthRequest) returns (IdentityAdminIF_v1_getCertificateAuthResponse);
 }
 
@@ -154,7 +152,7 @@ message IdentityAdminIF_v1_setActiveForAuthResponse {
 message IdentityAdminIF_v1_createtEmailAuthRequest {
 	string accountId = 1;
 	string email = 2;
-	bool initialPassword = 3;
+	string initialPassword = 3;
 	TwoFactorConfigurationDTO twoFactor = 4;
 }
 
@@ -307,20 +305,6 @@ message IdentityAdminIF_v1_createCertificateAuthFromCSRResponse {
 	}
 }
 
-message IdentityAdminIF_v1_setCertificateAuthActiveRequest {
-	string accountId = 1;
-	string authId = 2;
-	string etag = 3;
-	bool isActive = 4;
-}
-
-message IdentityAdminIF_v1_setCertificateAuthActiveResponse {
-	oneof result {
-		CertificateAuthDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
 message IdentityAdminIF_v1_revokeCertificateRequest {
 	string accountId = 1;
 	string authId = 2;
@@ -329,19 +313,6 @@ message IdentityAdminIF_v1_revokeCertificateRequest {
 }
 
 message IdentityAdminIF_v1_revokeCertificateResponse {
-	oneof result {
-		CertificateAuthDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
-message IdentityAdminIF_v1_reissueCertificateRequest {
-	string accountId = 1;
-	string authId = 2;
-	CsrInputDTO data = 3;
-}
-
-message IdentityAdminIF_v1_reissueCertificateResponse {
 	oneof result {
 		CertificateAuthDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;

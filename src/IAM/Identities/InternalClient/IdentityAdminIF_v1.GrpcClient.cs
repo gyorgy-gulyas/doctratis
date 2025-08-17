@@ -560,7 +560,7 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, string initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 		{
 			try
 			{
@@ -1220,62 +1220,6 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_setCertificateAuthActiveRequest();
-				request.AccountId = accountId;
-				request.AuthId = authId;
-				request.Etag = etag;
-				request.IsActive = isActive;
-
-				// calling grpc client
-				var grpc_response = await _client.setCertificateAuthActiveAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "setCertificateAuthActive" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_setCertificateAuthActiveResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.CertificateAuthDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-
-					case IdentityAdminIF_v1_setCertificateAuthActiveResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_setCertificateAuthActiveResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_setCertificateAuthActive'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
 		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
 		{
 			try
@@ -1310,61 +1254,6 @@ namespace IAM.Identities
 						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_revokeCertificate'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.reissueCertificate(CallingContext ctx, string accountId, string authId, IIdentityAdminIF_v1.CsrInputDTO data)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_reissueCertificateRequest();
-				request.AccountId = accountId;
-				request.AuthId = authId;
-				request.Data = data != null ? IIdentityAdminIF_v1.CsrInputDTO.ToGrpc( data ) : null;
-
-				// calling grpc client
-				var grpc_response = await _client.reissueCertificateAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "reissueCertificate" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_reissueCertificateResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.CertificateAuthDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Success( value );
-
-					case IdentityAdminIF_v1_reissueCertificateResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_reissueCertificateResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.CertificateAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_reissueCertificate'",
 						} );
 				}
 			}

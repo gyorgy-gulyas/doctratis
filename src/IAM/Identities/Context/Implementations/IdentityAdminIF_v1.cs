@@ -7,17 +7,20 @@ namespace IAM.Identities.Service.Implementations
     public class IdentityAdminIF_v1 : IIdentityAdminIF_v1
     {
         private readonly IAccountService _accountService;
+        private readonly IAccountAuthService _accountAuthService;
         private readonly IAccountRepository _accountRepository;
         private readonly IAuthRepository _authRepository;
         private readonly ILdapDomainRepository _ldapDomainRepository;
 
         public IdentityAdminIF_v1(
             IAccountService accountService,
+            IAccountAuthService accountAuthService,
             IAccountRepository accountRepository,
             IAuthRepository authRepository,
             ILdapDomainRepository ldapDomainRepository)
         {
             _accountService = accountService;
+            _accountAuthService = accountAuthService;
             _accountRepository = accountRepository;
             _authRepository = authRepository;
             _ldapDomainRepository = ldapDomainRepository;
@@ -109,94 +112,200 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> IIdentityAdminIF_v1.listAuthsForAccount(CallingContext ctx, string accountId)
         {
-            var auths = await _authRepository.listAuthsForAccount(ctx, accountId);
+            var result = await _authRepository.listAuthsForAccount(ctx, accountId);
+            if (result.IsFailed())
+                return new(result.Error);
 
-            return new(auths.Value.Select(ah => ah.Convert()).ToList());
+            return new(result.Value.Select(ah => ah.Convert()).ToList());
         }
 
-        Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
+        async Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
         {
-            throw new NotImplementedException();
+            var result = await _accountAuthService.setAuthActive(ctx, accountId, authId, etag: null, isActive).ConfigureAwait(false);
+            if (result.IsFailed())
+                return new(result.Error);
+
+            return new(result.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.createtEmailAuth(CallingContext ctx, string accountId, string email, string initialPassword, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            var create = await _accountAuthService.createEmailAuth(
+                ctx,
+                accountId,
+                email,
+                initialPassword,
+                enableTwoFactor: twoFactor?.enabled ?? false,
+                twoFactorMethod: (twoFactor?.method ?? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email).Convert(),
+                twoFactorPhoneNumber: twoFactor?.phoneNumber,
+                twoFactorEmail: twoFactor?.email
+            ).ConfigureAwait(false);
+
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(create.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.getEmailAuth(CallingContext ctx, string accountId, string authId)
+        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.getEmailAuth(CallingContext ctx, string accountId, string authId)
         {
-            throw new NotImplementedException();
+            var get = await _authRepository.getEmailAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+
+            return new(get.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
+        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
-            throw new NotImplementedException();
+            var change = await _accountAuthService.changePassword(ctx, accountId, authId, etag, newPassword).ConfigureAwait(false);
+            if (change.IsFailed())
+                return new(change.Error);
+
+            return new(change.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            var set2FA = await _accountAuthService.setEmailTwoFactor(
+                ctx, accountId, authId, etag,
+                enabled: twoFactor.enabled,
+                method: twoFactor.method.Convert(),
+                phoneNumber: twoFactor.phoneNumber,
+                email: twoFactor.email
+            ).ConfigureAwait(false);
+
+            if (set2FA.IsFailed())
+                return new(set2FA.Error);
+
+            return new(set2FA.Value.Convert());
         }
 
-        Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
+        async Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
         {
-            throw new NotImplementedException();
+            var confirm = await _accountAuthService.confirmEmail(ctx, token).ConfigureAwait(false);
+            if (confirm.IsFailed())
+                return new(confirm.Error);
+
+            return new(confirm.Value);
         }
 
-        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            // Ldap domain betöltése a DTO-hoz (név miatt)
+            var ldap = await _ldapDomainRepository.getLdapDomain(ctx, ldapDomainId).ConfigureAwait(false);
+            if( ldap.IsFailed() )
+                return new(ldap.Error);
+
+            var create = await _accountAuthService.CreateADAuth(
+                ctx, accountId, ldapDomainId, adUsername,
+                enableTwoFactor: twoFactor?.enabled ?? false,
+                twoFactorMethod: (twoFactor?.method ?? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP).Convert(),
+                twoFactorPhoneNumber: twoFactor?.phoneNumber,
+                twoFactorEmail: twoFactor?.email
+            ).ConfigureAwait(false);
+
+            return new(create.Value.Convert(ldap.Value));
         }
 
-        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.getADAuth(CallingContext ctx, string accountId, string authId)
+        async Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.getADAuth(CallingContext ctx, string accountId, string authId)
         {
-            throw new NotImplementedException();
+            var get = await _authRepository.getADAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+
+            var ldap = await _ldapDomainRepository.getLdapDomain(ctx, get.Value.LdapDomainId).ConfigureAwait(false);
+            if (ldap.IsFailed())
+                return new(ldap.Error);
+
+            return new(get.Value.Convert(ldap.Value));
         }
 
-        Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnADAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnADAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            var set2FA = await _accountAuthService.SetADTwoFactor(
+                ctx, accountId, authId, etag,
+                enabled: twoFactor.enabled,
+                method: twoFactor.method.Convert(),
+                phoneNumber: twoFactor.phoneNumber,
+                email: twoFactor.email
+            ).ConfigureAwait(false);
+
+            if (set2FA.IsFailed())
+                return new(set2FA.Error);
+
+            var ldap = await _ldapDomainRepository.getLdapDomain(ctx, set2FA.Value.LdapDomainId).ConfigureAwait(false);
+            if (ldap.IsFailed())
+                return new(ldap.Error);
+
+            return new(set2FA.Value.Convert(ldap.Value));
         }
 
-        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.createKAUAuth(CallingContext ctx, string accountId, string kauUserId, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.createKAUAuth(CallingContext ctx, string accountId, string kauUserId, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            var create = await _accountAuthService.CreateKAUAuth(
+                ctx, accountId, kauUserId,
+                enableTwoFactor: twoFactor?.enabled ?? false,
+                twoFactorMethod: (twoFactor?.method ?? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email).Convert(),
+                twoFactorPhoneNumber: twoFactor?.phoneNumber,
+                twoFactorEmail: twoFactor?.email
+            ).ConfigureAwait(false);
+
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(create.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.getKAUAuth(CallingContext ctx, string accountId, string authId)
+        async Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.getKAUAuth(CallingContext ctx, string accountId, string authId)
         {
-            throw new NotImplementedException();
+            var get = await _authRepository.getKAUAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+
+            return new(get.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnKAUAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+        async Task<Response<IIdentityAdminIF_v1.KAUAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnKAUAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
-            throw new NotImplementedException();
+            var set2FA = await _accountAuthService.SetKAUTwoFactor(
+                ctx, accountId, authId, etag,
+                enabled: twoFactor.enabled,
+                method: twoFactor.method.Convert(),
+                phoneNumber: twoFactor.phoneNumber,
+                email: twoFactor.email
+            ).ConfigureAwait(false);
+
+            if (set2FA.IsFailed())
+                return new(set2FA.Error);
+
+            return new(set2FA.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.createCertificateAuthFromCSR(CallingContext ctx, string accountId, IIdentityAdminIF_v1.CsrInputDTO data)
+        async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.createCertificateAuthFromCSR(CallingContext ctx, string accountId, IIdentityAdminIF_v1.CsrInputDTO data)
         {
-            throw new NotImplementedException();
+            var create = await _accountAuthService.CreateCertificateFromCSR(ctx, accountId, data.csrPem, data.profile).ConfigureAwait(false);
+            if (create.IsFailed())
+                return new(create.Error);
+
+            return new(create.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
+        async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
         {
-            throw new NotImplementedException();
+            var revoke = await _accountAuthService.RevokeCertificate(ctx, accountId, authId, etag, reason).ConfigureAwait(false);
+            if (revoke.IsFailed())
+                return new(revoke.Error);
+
+            return new(revoke.Value.Convert());
         }
 
-        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
+        async Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.getCertificateAuth(CallingContext ctx, string accountId, string authId)
         {
-            throw new NotImplementedException();
-        }
-
-        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.reissueCertificate(CallingContext ctx, string accountId, string authId, IIdentityAdminIF_v1.CsrInputDTO data)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> IIdentityAdminIF_v1.getCertificateAuth(CallingContext ctx, string accountId, string authId)
-        {
-            throw new NotImplementedException();
+            var get = await _authRepository.getCertificateAuth(ctx, accountId, authId).ConfigureAwait(false);
+            if (get.IsFailed())
+                return new(get.Error);
+            return new(get.Value.Convert());
         }
     }
 
@@ -447,6 +556,17 @@ namespace IAM.Identities.Service.Implementations
                 TwoFactorConfiguration.Methods.TOTP => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP,
                 TwoFactorConfiguration.Methods.SMS => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.SMS,
                 TwoFactorConfiguration.Methods.Email => IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        internal static TwoFactorConfiguration.Methods Convert(this IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods @this)
+        {
+            return @this switch
+            {
+                IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP => TwoFactorConfiguration.Methods.TOTP,
+                IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.SMS => TwoFactorConfiguration.Methods.SMS,
+                IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.Email => TwoFactorConfiguration.Methods.Email,
                 _ => throw new NotImplementedException(),
             };
         }

@@ -634,7 +634,7 @@ namespace IAM.Identities
 					accountId = request.AccountId;
 					string email;
 					email = request.Email;
-					bool initialPassword;
+					string initialPassword;
 					initialPassword = request.InitialPassword;
 					IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor;
 					twoFactor = request.TwoFactor != null ? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.FromGrpc( request.TwoFactor ) : null;
@@ -1379,71 +1379,6 @@ namespace IAM.Identities
 			}
 		}
 
-		public override async Task<IdentityAdminIF_v1_setCertificateAuthActiveResponse> setCertificateAuthActive( IdentityAdminIF_v1_setCertificateAuthActiveRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setCertificateAuthActive" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					string accountId;
-					accountId = request.AccountId;
-					string authId;
-					authId = request.AuthId;
-					string etag;
-					etag = request.Etag;
-					bool isActive;
-					isActive = request.IsActive;
-
-					// calling the service function itself
-					var response = await _service.setCertificateAuthActive( ctx , accountId, authId, etag, isActive );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_setCertificateAuthActiveResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_setCertificateAuthActiveResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.setCertificateAuthActive'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_setCertificateAuthActiveResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_setCertificateAuthActiveResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
 		public override async Task<IdentityAdminIF_v1_revokeCertificateResponse> revokeCertificate( IdentityAdminIF_v1_revokeCertificateRequest request, ServerCallContext grpcContext)
 		{
 			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.revokeCertificate" ))
@@ -1495,69 +1430,6 @@ namespace IAM.Identities
 				catch(Exception ex)
 				{
 					return new IdentityAdminIF_v1_revokeCertificateResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		public override async Task<IdentityAdminIF_v1_reissueCertificateResponse> reissueCertificate( IdentityAdminIF_v1_reissueCertificateRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.reissueCertificate" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					string accountId;
-					accountId = request.AccountId;
-					string authId;
-					authId = request.AuthId;
-					IIdentityAdminIF_v1.CsrInputDTO data;
-					data = request.Data != null ? IIdentityAdminIF_v1.CsrInputDTO.FromGrpc( request.Data ) : null;
-
-					// calling the service function itself
-					var response = await _service.reissueCertificate( ctx , accountId, authId, data );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_reissueCertificateResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.CertificateAuthDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_reissueCertificateResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.reissueCertificate'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_reissueCertificateResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_reissueCertificateResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

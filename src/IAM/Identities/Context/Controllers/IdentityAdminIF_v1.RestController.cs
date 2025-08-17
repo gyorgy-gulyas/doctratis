@@ -492,7 +492,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "createtemailauth/{accountId}/{email}" )] 
+		[HttpPost( "createtemailauth/{accountId}/{email}/{initialPassword}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -501,7 +501,7 @@ namespace IAM.Identities
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> createtEmailAuth( [FromRoute] string accountId,  [FromRoute] string email,  [FromQuery] bool initialPassword,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
+		public async Task<IActionResult> createtEmailAuth( [FromRoute] string accountId,  [FromRoute] string email,  [FromRoute] string initialPassword,  [FromBody] IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 		{
 			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.createtEmailAuth" ))
 			{
@@ -1044,52 +1044,6 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "setcertificateauthactive/{accountId}/{authId}/{etag}" )] 
-		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
-		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> setCertificateAuthActive( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromQuery] bool isActive)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setCertificateAuthActive" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
-				try
-				{
-					// calling the service function itself
-					var response = await _service.setCertificateAuthActive( ctx, accountId, authId, etag, isActive );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							return Ok(response.Value);
-						}
-						else
-						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.setCertificateAuthActive'" );
-						}
-					}
-					else
-					{
-						return StatusCode(response.Error.Status.ToHttp(), response.Error);
-					}
-				}
-				catch(Exception ex)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
 		[HttpPost( "revokecertificate/{accountId}/{authId}/{etag}/{reason}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
@@ -1118,52 +1072,6 @@ namespace IAM.Identities
 						else
 						{
 							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.revokeCertificate'" );
-						}
-					}
-					else
-					{
-						return StatusCode(response.Error.Status.ToHttp(), response.Error);
-					}
-				}
-				catch(Exception ex)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		[HttpPost( "reissuecertificate/{accountId}/{authId}" )] 
-		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.CertificateAuthDTO) )]
-		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> reissueCertificate( [FromRoute] string accountId,  [FromRoute] string authId,  [FromBody] IIdentityAdminIF_v1.CsrInputDTO data)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.reissueCertificate" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
-				try
-				{
-					// calling the service function itself
-					var response = await _service.reissueCertificate( ctx, accountId, authId, data );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							return Ok(response.Value);
-						}
-						else
-						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.reissueCertificate'" );
 						}
 					}
 					else

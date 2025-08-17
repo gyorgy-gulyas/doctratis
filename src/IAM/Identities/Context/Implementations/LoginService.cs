@@ -14,7 +14,8 @@ namespace IAM.Identities.Service.Implementations
         private readonly IAccountService _accountService;
         private readonly SmsAgent _smsAgent;
         private readonly EmailAgent _emailAgent;
-        private readonly TokenService _tokenService = new();
+        private readonly TokenAgent _tokenAgent;
+        private readonly PasswordAgent _passwordAgent;
         private readonly LdapAuthenticator _ldapAuthenticator;
         private readonly KAUAuthenticator _kauAuthenticator;
 
@@ -22,6 +23,8 @@ namespace IAM.Identities.Service.Implementations
             , IAccountService accountService
             , SmsAgent smsAgent
             , EmailAgent emailAgent
+            , TokenAgent tokenAgent
+            , PasswordAgent passwordAgent
             , LdapAuthenticator ldapAuthenticator
             , KAUAuthenticator kauAuthenticator)
         {
@@ -29,6 +32,8 @@ namespace IAM.Identities.Service.Implementations
             _accountService = accountService;
             _smsAgent = smsAgent;
             _emailAgent = emailAgent;
+            _tokenAgent = tokenAgent;
+            _passwordAgent = passwordAgent;
             _ldapAuthenticator = ldapAuthenticator;
             _kauAuthenticator = kauAuthenticator;
         }
@@ -180,14 +185,14 @@ namespace IAM.Identities.Service.Implementations
         private ILoginIF_v1.TokensDTO _Login(CallingContext ctx, Account account)
         {
             // Access token generate
-            var (accessToken, accessTokenExpiresAt) = _tokenService.GenerateAccessToken(
+            var (accessToken, accessTokenExpiresAt) = _tokenAgent.GenerateAccessToken(
                 userId: account.id,
                 userName: account.Name,
                 roles: ["User"]
             );
 
             // refresh token generate
-            var (refreshToken, refreshTokenExpiresAt) = _tokenService.GenerateRefreshToken(account.id);
+            var (refreshToken, refreshTokenExpiresAt) = _tokenAgent.GenerateRefreshToken(account.id);
 
             return new ILoginIF_v1.TokensDTO()
             {
@@ -246,7 +251,7 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<ILoginIF_v1.TokensDTO>> ILoginService.RefreshTokens(CallingContext ctx, string refreshToken)
         {
-            var userId = _tokenService.ValidateRefreshToken(refreshToken);
+            var userId = _tokenAgent.ValidateRefreshToken(refreshToken);
             if (userId != ctx.IdentityId)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"invalid token" });
 
@@ -262,7 +267,7 @@ namespace IAM.Identities.Service.Implementations
         private async Task<Response<ILoginIF_v1.LoginResultDTO>> _Generate2FaTokensAndSendCode(CallingContext ctx, Account account, TwoFactorConfiguration twoFactor)
         {
             // Access token for 2FA verification (valid only for 5 minutes)
-            var (accessToken, expiresAt) = _tokenService.GenerateAccessToken(
+            var (accessToken, expiresAt) = _tokenAgent.GenerateAccessToken(
                 userId: account.id,
                 userName: account.Name,
                 roles: ["User"],
@@ -337,29 +342,11 @@ namespace IAM.Identities.Service.Implementations
 
             // If password does not match, return InvalidUserNameOrPassword
             // to avoid leaking information about valid usernames
-            if (!IsPasswordValid(password, auth))
+            if (_passwordAgent.IsPasswordValid(password, auth.passwordSalt, auth.passwordHash ) == false )
                 return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
 
             // Successful sign-in
             return ILoginIF_v1.SignInResult.Ok;
-
-            // --- Local helper functions ---
-            bool IsPasswordValid(string password, EmailAuth emailAuth)
-            {
-                var saltBytes = Convert.FromBase64String(emailAuth.passwordSalt);
-                var hashBytes = Convert.FromBase64String(emailAuth.passwordHash);
-
-                using var pbkdf2 = new Rfc2898DeriveBytes(
-                    password,
-                    saltBytes,
-                    PasswordRules.Hash_Iterations,
-                    HashAlgorithmName.SHA256);
-
-                var computedHash = pbkdf2.GetBytes(PasswordRules.Hash_KeySize);
-
-                // Constant-time comparison to prevent timing attacks
-                return CryptographicOperations.FixedTimeEquals(computedHash, hashBytes);
-            }
         }
     }
 }

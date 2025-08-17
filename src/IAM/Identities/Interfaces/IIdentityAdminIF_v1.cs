@@ -46,7 +46,7 @@ namespace IAM.Identities
 		public Task<Response<IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive);
 
 		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(CallingContext ctx, string accountId, string email, bool initialPassword, TwoFactorConfigurationDTO twoFactor);
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(CallingContext ctx, string accountId, string email, string initialPassword, TwoFactorConfigurationDTO twoFactor);
 
 		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> getEmailAuth(CallingContext ctx, string accountId, string authId);
@@ -82,13 +82,7 @@ namespace IAM.Identities
 		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> createCertificateAuthFromCSR(CallingContext ctx, string accountId, CsrInputDTO data);
 
 		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> setCertificateAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive);
-
-		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> revokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason);
-
-		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> reissueCertificate(CallingContext ctx, string accountId, string authId, CsrInputDTO data);
 
 		/// <return>IIdentityAdminIF_v1.CertificateAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.CertificateAuthDTO>> getCertificateAuth(CallingContext ctx, string accountId, string authId);
