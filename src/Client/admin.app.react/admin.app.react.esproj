@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2752196">
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2752196">
   <PropertyGroup>
     <StartupCommand>npm run dev</StartupCommand>
     <JavaScriptTestRoot>src\</JavaScriptTestRoot>
@@ -8,7 +8,8 @@
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include=".vscode\launch.json" />
-  </ItemGroup>
+
+  <Target Name="TypeCheck" BeforeTargets="Build">
+    <Exec Command="npm run typecheck" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
 </Project>
