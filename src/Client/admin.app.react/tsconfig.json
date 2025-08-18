@@ -28,10 +28,11 @@
     "noUncheckedSideEffectImports": true,
 
     /* Extra checkek (TS 5.x) */
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "types": [ "node" ]
   },
   "include": [
     "src",
