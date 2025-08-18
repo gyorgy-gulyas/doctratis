@@ -80,6 +80,59 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
+		async Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> IIdentityAdminIF_v1.UpdateRegisteredLdapDomain(CallingContext ctx, IIdentityAdminIF_v1.LdapDomainDTO ldap)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest();
+				request.Ldap = ldap != null ? IIdentityAdminIF_v1.LdapDomainDTO.ToGrpc( ldap ) : null;
+
+				// calling grpc client
+				var grpc_response = await _client.UpdateRegisteredLdapDomainAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "UpdateRegisteredLdapDomain" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.LdapDomainDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.LdapDomainDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Success( value );
+
+					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.None:
+					default:
+						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_UpdateRegisteredLdapDomain'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
 		async Task<Response<List<IIdentityAdminIF_v1.LdapDomainSummaryDTO>>> IIdentityAdminIF_v1.GetAllRegisteredLdapDomain(CallingContext ctx)
 		{
 			try
@@ -163,59 +216,6 @@ namespace IAM.Identities
 						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_GetRegisteredLdapDomain'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> IIdentityAdminIF_v1.UpdateRegisteredLdapDomain(CallingContext ctx, IIdentityAdminIF_v1.LdapDomainDTO ldap)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest();
-				request.Ldap = ldap != null ? IIdentityAdminIF_v1.LdapDomainDTO.ToGrpc( ldap ) : null;
-
-				// calling grpc client
-				var grpc_response = await _client.UpdateRegisteredLdapDomainAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "UpdateRegisteredLdapDomain" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.LdapDomainDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.LdapDomainDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Success( value );
-
-					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_UpdateRegisteredLdapDomain'",
 						} );
 				}
 			}
@@ -505,7 +505,7 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
+		async Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
 		{
 			try
 			{
@@ -513,6 +513,7 @@ namespace IAM.Identities
 				var request = new IdentityAdminIF_v1_setActiveForAuthRequest();
 				request.AccountId = accountId;
 				request.AuthId = authId;
+				request.Etag = etag;
 				request.IsActive = isActive;
 
 				// calling grpc client

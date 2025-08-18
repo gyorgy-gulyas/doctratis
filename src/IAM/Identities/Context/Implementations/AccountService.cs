@@ -1,8 +1,9 @@
-﻿using System.Diagnostics.Tracing;
-using IAM.Identities.Identity;
+﻿using IAM.Identities.Identity;
 using IAM.Identities.Ldap;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
+using System.Diagnostics.Tracing;
+using System.Security.Cryptography;
 
 namespace IAM.Identities.Service.Implementations
 {
@@ -31,7 +32,7 @@ namespace IAM.Identities.Service.Implementations
                 .Where(a => a.method == Auth.Methods.Email)
                 .AsEnumerable()
                 .OfType<EmailAuth>()
-                .Where(a => a.email == email)
+                .Where(a => a.email.ToLower() == email)
                 .FirstOrDefault();
 
             if (auth == null)
@@ -107,9 +108,11 @@ namespace IAM.Identities.Service.Implementations
                 Type = data.Type,
                 contacts = data.contacts,
                 isActive = true,
-                accountSecret = Guid.NewGuid().ToString(),
+                accountSecret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)),
             };
-            await _accountRepository.createAccount(ctx, account);
+            var create = await _accountRepository.createAccount(ctx, account);
+            if(create.IsFailed())
+                return new(create.Error);
 
             return new(account);
         }
@@ -122,6 +125,10 @@ namespace IAM.Identities.Service.Implementations
             if (already.Value != null && already.Value.id != accountId)
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Account with name '{data.Name}' is already exist" });
 
+            var original = await _accountRepository.getAccount(ctx, accountId);
+            if (original.IsFailed())
+                return new(already.Error);
+
             var account = new Account()
             {
                 id = accountId,
@@ -129,8 +136,8 @@ namespace IAM.Identities.Service.Implementations
                 Name = data.Name,
                 Type = data.Type,
                 contacts = data.contacts,
-                isActive = true,
-                accountSecret = Guid.NewGuid().ToString(),
+                isActive = original.Value.isActive,
+                accountSecret = original.Value.accountSecret,
             };
             var update = await _accountRepository.updateAccount(ctx, account);
             if(update.IsFailed())

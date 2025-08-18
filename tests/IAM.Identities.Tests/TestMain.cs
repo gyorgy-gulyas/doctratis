@@ -1,5 +1,6 @@
 ﻿using Core.Auditing.Worker;
 using Core.Base.Agents.Communication;
+using IAM.Identities.Identity;
 using IAM.Identities.Service.Implementations;
 using IAM.Identities.Service.Implementations.Helpers;
 using IAM.Identities.Tests.Mock;
@@ -61,6 +62,7 @@ namespace IAM.Identities.Tests
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IAccountAuthService, AccountAuthService>();
             services.AddSingleton<ILoginService, LoginService>();
+            services.AddSingleton<ILdapDomainService, LdapDomainService>();
             // acls
             //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_AD>();
             //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_HasiCorp>();

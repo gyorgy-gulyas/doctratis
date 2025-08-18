@@ -19,9 +19,9 @@ import "servicekit/error.proto";
 
 service IdentityAdminIF_v1 {
 	rpc RegisterLdapDomain(IdentityAdminIF_v1_RegisterLdapDomainRequest) returns (IdentityAdminIF_v1_RegisterLdapDomainResponse);
+	rpc UpdateRegisteredLdapDomain(IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest) returns (IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse);
 	rpc GetAllRegisteredLdapDomain(google.protobuf.Empty) returns (IdentityAdminIF_v1_GetAllRegisteredLdapDomainResponse);
 	rpc GetRegisteredLdapDomain(IdentityAdminIF_v1_GetRegisteredLdapDomainRequest) returns (IdentityAdminIF_v1_GetRegisteredLdapDomainResponse);
-	rpc UpdateRegisteredLdapDomain(IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest) returns (IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse);
 	rpc getAllAccount(google.protobuf.Empty) returns (IdentityAdminIF_v1_getAllAccountResponse);
 	rpc getAccount(IdentityAdminIF_v1_getAccountRequest) returns (IdentityAdminIF_v1_getAccountResponse);
 	rpc createAccount(IdentityAdminIF_v1_createAccountRequest) returns (IdentityAdminIF_v1_createAccountResponse);
@@ -54,6 +54,17 @@ message IdentityAdminIF_v1_RegisterLdapDomainResponse {
 		ServiceKit.Protos.Error Error = 2;
 	}
 }
+
+message IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest {
+	LdapDomainDTO ldap = 1;
+}
+
+message IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
+	oneof result {
+		LdapDomainDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
 message IdentityAdminIF_v1_GetAllRegisteredLdapDomainResponse {
 	oneof result {
 		list_LdapDomainSummaryDTO Value = 1;
@@ -66,17 +77,6 @@ message IdentityAdminIF_v1_GetRegisteredLdapDomainRequest {
 }
 
 message IdentityAdminIF_v1_GetRegisteredLdapDomainResponse {
-	oneof result {
-		LdapDomainDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
-message IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest {
-	LdapDomainDTO ldap = 1;
-}
-
-message IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
 	oneof result {
 		LdapDomainDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
@@ -139,7 +139,8 @@ message IdentityAdminIF_v1_listAuthsForAccountResponse {
 message IdentityAdminIF_v1_setActiveForAuthRequest {
 	string accountId = 1;
 	string authId = 2;
-	bool isActive = 3;
+	string etag = 3;
+	bool isActive = 4;
 }
 
 message IdentityAdminIF_v1_setActiveForAuthResponse {
@@ -411,8 +412,10 @@ message AuthDTO {
 	}
 
 	string id = 1;
-	Methods method = 2;
-	bool isActive = 3;
+	string etag = 2;
+	google.protobuf.Timestamp LastUpdate = 3;
+	Methods method = 4;
+	bool isActive = 5;
 }
 
 message TwoFactorConfigurationDTO {

@@ -1,4 +1,5 @@
 using IAM.Identities.Identity;
+using PolyPersist.Net.Common;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
 
@@ -11,11 +12,24 @@ namespace IAM.Identities.Service.Implementations
         public AuthRepository(IdentityStoreContext context)
         {
             _context = context;
+
+            PolymorphismHandler.Register<Auth, EmailAuth>();
+            PolymorphismHandler.Register<Auth, ADAuth>();
+            PolymorphismHandler.Register<Auth, KAUAuth>();
+            PolymorphismHandler.Register<Auth, CertificateAuth>();
         }
 
         async Task<Response<Auth>> IAuthRepository.createAuth(CallingContext ctx, Auth auth)
         {
-            await _context.Auths.Insert(auth);
+            try
+            {
+                await _context.Auths.Insert(auth);
+            }
+            catch (Exception ex)
+            {
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = ex.Message, AdditionalInformation = ex.ToString() });
+            }
+
             _context.Audit_Account(Core.Auditing.TrailOperations.Create, ctx, accountId: auth.accountId);
 
             return new(auth);
@@ -23,7 +37,15 @@ namespace IAM.Identities.Service.Implementations
 		
 		async Task<Response<Auth>> IAuthRepository.updateAuth(CallingContext ctx, Auth auth)
         {
-            await _context.Auths.Insert(auth);
+            try
+            {
+                await _context.Auths.Update(auth);
+            }
+            catch (Exception ex)
+            {
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = ex.Message, AdditionalInformation = ex.ToString() });
+            }
+
             _context.Audit_Account(Core.Auditing.TrailOperations.Update, ctx, accountId: auth.accountId);
 
             return new(auth);
@@ -76,13 +98,13 @@ namespace IAM.Identities.Service.Implementations
 
 		Task<Response<EmailAuth>> IAuthRepository.findEmailAuthByEmail(CallingContext ctx, string email)
         {
-            email = email.Normalize().Trim();
+            email = email.Normalize().Trim().ToLower();
 
             var auth = _context
                 .Auths
                 .AsQueryable()
                 .OfType<EmailAuth>()
-                .Where(ah => ah.email == email )
+                .Where(ah => ah.email.ToLower() == email )
                 .FirstOrDefault();
 
             return Response<EmailAuth>.Success(auth).AsTask();
@@ -102,7 +124,7 @@ namespace IAM.Identities.Service.Implementations
 
 		Task<Response<ADAuth>> IAuthRepository.findADAuthByDomainAndUser(CallingContext ctx, string ldapDomainId, string userName)
         {
-            userName = userName.Normalize().Trim();
+            userName = userName.Normalize().Trim().ToLower();
 
             var auth = _context
                 .Auths
@@ -110,7 +132,7 @@ namespace IAM.Identities.Service.Implementations
                 .OfType<ADAuth>()
                 .Where(ah =>
                     ah.LdapDomainId == ldapDomainId && 
-                    ah.userName == userName)
+                    ah.userName.ToLower() == userName)
                 .FirstOrDefault();
 
             return Response<ADAuth>.Success(auth).AsTask();

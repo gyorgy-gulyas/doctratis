@@ -86,6 +86,65 @@ namespace IAM.Identities
 			}
 		}
 
+		public override async Task<IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse> UpdateRegisteredLdapDomain( IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.UpdateRegisteredLdapDomain" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					IIdentityAdminIF_v1.LdapDomainDTO ldap;
+					ldap = request.Ldap != null ? IIdentityAdminIF_v1.LdapDomainDTO.FromGrpc( request.Ldap ) : null;
+
+					// calling the service function itself
+					var response = await _service.UpdateRegisteredLdapDomain( ctx , ldap );
+
+					if( response.IsSuccess() == true )
+					{
+						if( response.HasValue() == true )
+						{
+							var result = new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.LdapDomainDTO.ToGrpc( response.Value ) : null;
+							return result;
+						}
+						else
+						{
+							return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
+								Error = new () {
+									Status = ServiceKit.Protos.Statuses.NotImplemented,
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.UpdateRegisteredLdapDomain'",
+								}
+							};
+						}
+					}
+					else
+					{
+						return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+				}
+				catch(Exception ex)
+				{
+					return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		public override async Task<IdentityAdminIF_v1_GetAllRegisteredLdapDomainResponse> GetAllRegisteredLdapDomain( Empty request, ServerCallContext grpcContext)
 		{
 			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.GetAllRegisteredLdapDomain" ))
@@ -188,65 +247,6 @@ namespace IAM.Identities
 				catch(Exception ex)
 				{
 					return new IdentityAdminIF_v1_GetRegisteredLdapDomainResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
-		public override async Task<IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse> UpdateRegisteredLdapDomain( IdentityAdminIF_v1_UpdateRegisteredLdapDomainRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.UpdateRegisteredLdapDomain" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					IIdentityAdminIF_v1.LdapDomainDTO ldap;
-					ldap = request.Ldap != null ? IIdentityAdminIF_v1.LdapDomainDTO.FromGrpc( request.Ldap ) : null;
-
-					// calling the service function itself
-					var response = await _service.UpdateRegisteredLdapDomain( ctx , ldap );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.LdapDomainDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.UpdateRegisteredLdapDomain'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_UpdateRegisteredLdapDomainResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,
@@ -571,11 +571,13 @@ namespace IAM.Identities
 					accountId = request.AccountId;
 					string authId;
 					authId = request.AuthId;
+					string etag;
+					etag = request.Etag;
 					bool isActive;
 					isActive = request.IsActive;
 
 					// calling the service function itself
-					var response = await _service.setActiveForAuth( ctx , accountId, authId, isActive );
+					var response = await _service.setActiveForAuth( ctx , accountId, authId, etag, isActive );
 
 					if( response.IsSuccess() == true )
 					{

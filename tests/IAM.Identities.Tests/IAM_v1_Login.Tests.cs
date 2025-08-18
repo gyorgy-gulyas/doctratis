@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace IAM.Identities.Tests
 {
     [TestClass]
-    public partial class IdentityAdminIF_v1_Tests
+    public partial class LoginIF_v1_Tests
     {
-        private IIdentityAdminIF_v1 Sut =>
-           TestMain.ServiceProvider.GetRequiredService<IIdentityAdminIF_v1>();
+        private ILoginIF_v1 Sut => TestMain.ServiceProvider.GetRequiredService<ILoginIF_v1>();
+        private IIdentityAdminIF_v1 Admin => TestMain.ServiceProvider.GetRequiredService<IIdentityAdminIF_v1>();
 
         [TestInitialize]
         public async Task Setup()
@@ -21,7 +22,6 @@ namespace IAM.Identities.Tests
 
             return Task.CompletedTask;
         }
-
     }
 }
 

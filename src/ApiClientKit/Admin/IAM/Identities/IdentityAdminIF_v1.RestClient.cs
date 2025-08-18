@@ -68,6 +68,55 @@ namespace Admin.ApiClientKit
 					}
 				}
 
+				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>> UpdateRegisteredLdapDomain(IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO ldap)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/updateregisteredldapdomain" ) );
+
+						// build content
+						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>( ldap ));
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.UpdateRegisteredLdapDomain" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							var value = await response.Content.ReadFromJsonAsync<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>();
+							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Success( value );
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( error );
+						}
+						else
+						{
+							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_UpdateRegisteredLdapDomain'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
 				public static async Task<Response<List<IAM.Identities.IIdentityAdminIF_v1.LdapDomainSummaryDTO>>> GetAllRegisteredLdapDomain()
 				{
 					try
@@ -139,55 +188,6 @@ namespace Admin.ApiClientKit
 							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
 								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_GetRegisteredLdapDomain'",
-							} );
-						}
-					}
-					catch (HttpRequestException ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-					catch (Exception ex)
-					{
-						return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString(),
-						} );
-					}
-				}
-
-				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>> UpdateRegisteredLdapDomain(IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO ldap)
-				{
-					try
-					{
-						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/updateregisteredldapdomain" ) );
-
-						// build content
-						request.Content = new StringContent( JsonSerializer.Serialize<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>( ldap ));
-
-						// call rest client 
-						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.UpdateRegisteredLdapDomain" );
-
-						if (response.IsSuccessStatusCode)
-						{
-							var value = await response.Content.ReadFromJsonAsync<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Success( value );
-						}
-						else if( response.Content != null )
-						{
-							var error = await response.Content.ReadFromJsonAsync<Error>();
-							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( error );
-						}
-						else
-						{
-							return Response<IAM.Identities.IIdentityAdminIF_v1.LdapDomainDTO>.Failure( new ServiceKit.Net.Error() {
-								Status = response.StatusCode.FromHttp(),
-								MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_UpdateRegisteredLdapDomain'",
 							} );
 						}
 					}
@@ -442,12 +442,12 @@ namespace Admin.ApiClientKit
 					}
 				}
 
-				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(string accountId, string authId, bool isActive)
+				public static async Task<Response<IAM.Identities.IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(string accountId, string authId, string etag, bool isActive)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/setactiveforauth/{accountId}/{authId}?isActive={isActive.ToString().ToLowerInvariant()}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/setactiveforauth/{accountId}/{authId}/{etag}?isActive={isActive.ToString().ToLowerInvariant()}" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.IdentityAdminIF.V1.setActiveForAuth" );

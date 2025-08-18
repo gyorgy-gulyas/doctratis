@@ -18,14 +18,14 @@ namespace IAM.Identities
 		/// <return>IIdentityAdminIF_v1.LdapDomainDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> RegisterLdapDomain(CallingContext ctx, LdapDomainDTO ldap);
 
+		/// <return>IIdentityAdminIF_v1.LdapDomainDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> UpdateRegisteredLdapDomain(CallingContext ctx, LdapDomainDTO ldap);
+
 		/// <return>List<IIdentityAdminIF_v1.LdapDomainSummaryDTO></return>
 		public Task<Response<List<IIdentityAdminIF_v1.LdapDomainSummaryDTO>>> GetAllRegisteredLdapDomain(CallingContext ctx);
 
 		/// <return>IIdentityAdminIF_v1.LdapDomainDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> GetRegisteredLdapDomain(CallingContext ctx, string id);
-
-		/// <return>IIdentityAdminIF_v1.LdapDomainDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.LdapDomainDTO>> UpdateRegisteredLdapDomain(CallingContext ctx, LdapDomainDTO ldap);
 
 		/// <return>List<IIdentityAdminIF_v1.AccountSummaryDTO></return>
 		public Task<Response<List<IIdentityAdminIF_v1.AccountSummaryDTO>>> getAllAccount(CallingContext ctx);
@@ -43,7 +43,7 @@ namespace IAM.Identities
 		public Task<Response<List<IIdentityAdminIF_v1.AuthDTO>>> listAuthsForAccount(CallingContext ctx, string accountId);
 
 		/// <return>IIdentityAdminIF_v1.AuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive);
+		public Task<Response<IIdentityAdminIF_v1.AuthDTO>> setActiveForAuth(CallingContext ctx, string accountId, string authId, string etag, bool isActive);
 
 		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> createtEmailAuth(CallingContext ctx, string accountId, string email, string initialPassword, TwoFactorConfigurationDTO twoFactor);
@@ -717,6 +717,8 @@ namespace IAM.Identities
 			}
 			#endregion GrpcMapping
 			public string id { get; set; }
+			public string etag { get; set; }
+			public DateTime LastUpdate { get; set; }
 			public IIdentityAdminIF_v1.AuthDTO.Methods method { get; set; }
 			public bool isActive { get; set; }
 
@@ -749,6 +751,8 @@ namespace IAM.Identities
 			{
 				var hash = new HashCode();
 				hash.Add(id);
+				hash.Add(etag);
+				hash.Add(LastUpdate);
 				hash.Add(method);
 				hash.Add(isActive);
 
@@ -762,6 +766,8 @@ namespace IAM.Identities
 				Protos.IdentityAdminIF_v1.AuthDTO result = new();
 
 				result.Id = @this.id;
+				result.Etag = @this.etag;
+				result.LastUpdate = Timestamp.FromDateTime(@this.LastUpdate);
 				result.Method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.ToGrpc( @this.method );
 				result.IsActive = @this.isActive;
 
@@ -772,6 +778,8 @@ namespace IAM.Identities
 				IIdentityAdminIF_v1.AuthDTO result = new();
 
 				result.id = @from.Id;
+				result.etag = @from.Etag;
+				result.LastUpdate = @from.LastUpdate.ToDateTime();
 				result.method = IIdentityAdminIF_v1.AuthDTO.MethodsMappings.FromGrpc( @from.Method) ;
 				result.isActive = @from.IsActive;
 

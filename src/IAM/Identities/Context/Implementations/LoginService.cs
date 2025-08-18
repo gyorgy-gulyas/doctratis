@@ -41,7 +41,11 @@ namespace IAM.Identities.Service.Implementations
         {
             var result = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
             if (result.IsFailed())
-                return new(result.Error);
+                // if the auth not found, do not tell on api, just InvalidUserNameOrPassword, to avoid the guess the username
+                if (result.Error.Status == Statuses.NotFound)
+                    return new(new ILoginIF_v1.LoginResultDTO() { result = ILoginIF_v1.SignInResult.InvalidUserNameOrPassword });
+                else
+                    return new(result.Error);
 
             // if the user not found, do not tell on api, just InvalidUserNameOrPassword, to avoid the guess the username
             if (result.HasValue() == false)
@@ -161,7 +165,7 @@ namespace IAM.Identities.Service.Implementations
                 });
         }
 
-        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth.Methods authMethod, TwoFactorConfiguration twoFactor )
+        private async Task<Response<ILoginIF_v1.LoginResultDTO>> _HandleSuccessSignIn(CallingContext ctx, Account account, Auth.Methods authMethod, TwoFactorConfiguration twoFactor)
         {
             if (twoFactor?.enabled == true)
             {
@@ -208,13 +212,13 @@ namespace IAM.Identities.Service.Implementations
             if (account == null)
                 return new(new Error() { Status = Statuses.NotFound, MessageText = $"User with account id:'{ctx.IdentityId}:{ctx.IdentityName}' not found" });
 
-            if( ctx.Claims.TryGetValue("2faMethod", out var methodClaim) == false )
+            if (ctx.Claims.TryGetValue("2faMethod", out var methodClaim) == false)
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"'2faMethod' not found in claims" });
 
             if (Enum.TryParse<TwoFactorConfiguration.Methods>(methodClaim, out var method) == false)
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Unknown 2fa method: '{method}'" });
 
-            var secretBytes = Base32Encoding.ToBytes(account.accountSecret);
+            var secretBytes = Convert.FromBase64String(account.accountSecret);
             code = code.Trim().Replace(" ", "");
 
             switch (method)
@@ -296,8 +300,8 @@ namespace IAM.Identities.Service.Implementations
             // --- Local helper function ---
             async Task SendTwoFactorCode(string secret)
             {
-                var secretBytes = Base32Encoding.ToBytes(secret);
-
+                var secretBytes = Convert.FromBase64String(secret);
+                
                 string code;
 
                 switch (twoFactor.method)
@@ -328,7 +332,7 @@ namespace IAM.Identities.Service.Implementations
         private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, EmailAuth auth, string password)
         {
             // If the account is not active, explicitly return UserIsNotActive
-            if (!account.isActive)
+            if (!account.isActive || auth.isActive == false)
                 return ILoginIF_v1.SignInResult.UserIsNotActive;
 
             // If the email is not confirmed, explicitly return EmailNotConfirmed
@@ -341,7 +345,7 @@ namespace IAM.Identities.Service.Implementations
 
             // If password does not match, return InvalidUserNameOrPassword
             // to avoid leaking information about valid usernames
-            if (_passwordAgent.IsPasswordValid(password, auth.passwordSalt, auth.passwordHash ) == false )
+            if (_passwordAgent.IsPasswordValid(password, auth.passwordSalt, auth.passwordHash) == false)
                 return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
 
             // Successful sign-in

@@ -258,6 +258,11 @@ domain IAM {
             query findCertificateAuthBySerial( serialNumber:string ) : Identity.CertificateAuth
         }
 
+        service LdapDomainService {
+            command RegisterLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
+            command UpdateRegisteredLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
+        }
+
         repository LdapDomainRepository {
             command insertLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
             command updateLdapDomain( ldapDomain:Ldap.LdapDomain ) : Ldap.LdapDomain
@@ -329,9 +334,9 @@ domain IAM {
             }
 
             command RegisterLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
+            command UpdateRegisteredLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
             query GetAllRegisteredLdapDomain() : List[LdapDomainSummaryDTO]
             query GetRegisteredLdapDomain( id:string ) : LdapDomainDTO
-            query UpdateRegisteredLdapDomain( ldap:LdapDomainDTO ) : LdapDomainDTO
 
             enum AccountTypes {
                 User,
@@ -376,6 +381,9 @@ domain IAM {
             dto AuthDTO
             {
                 @system_field id:string
+                @system_field etag:string
+                @system_field LastUpdate:datetime
+
                 enum Methods {
                     Email,
                     ActiveDirectory,
@@ -386,7 +394,7 @@ domain IAM {
                 isActive: boolean
             }
             command listAuthsForAccount( accountId:string ) : List[AuthDTO]
-            command setActiveForAuth( accountId:string, authId:string, isActive:boolean ) : AuthDTO
+            command setActiveForAuth( accountId:string, authId:string, etag:string,  isActive:boolean ) : AuthDTO
 
             dto TwoFactorConfigurationDTO {
                 enum Methods {

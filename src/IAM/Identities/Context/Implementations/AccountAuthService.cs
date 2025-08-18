@@ -40,6 +40,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<Auth>> IAccountAuthService.setAuthActive(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             var get = await _authRepository.getAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
                 return new(get.Error);
@@ -56,11 +60,15 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<EmailAuth>> IAccountAuthService.createEmailAuth(CallingContext ctx, string accountId, string email, string password, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             var already = await _authRepository.findEmailAuthByEmail(ctx, email).ConfigureAwait(false);
             if (already.IsFailed())
                 return new(already.Error);
             if (already.HasValue())
-                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Account authorization is alerady exist with email: '{email}'", AdditionalInformation = $"Conflicted user: {already.Value.accountId} " });
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Account authorization is already exist with email: '{email}'", AdditionalInformation = $"Conflicted user: {already.Value.accountId} " });
 
             var passwordErrors = _passwordAgent.ValidatePasswordRules(password, accountName: email, email: email);
             if (passwordErrors.Count > 0)
@@ -116,6 +124,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Loading
             var get = await _authRepository.getEmailAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
@@ -161,6 +173,7 @@ namespace IAM.Identities.Service.Implementations
             _passwordAgent.AppendToHistory(auth.passwordHistory, currentPasswordHash: auth.passwordHash, newPasswordHash: newPasswordHash.Value);
 
             // Set new hash (salt does NOT change!)
+            auth.etag = etag;
             auth.passwordHash = newPasswordHash.Value;
             auth.passwordExpiresAt = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(_passwordAgent.GetExpirationDays());
 
@@ -173,6 +186,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<EmailAuth>> IAccountAuthService.setEmailTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Load existing EmailAuth
             var get = await _authRepository.getEmailAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
@@ -191,6 +208,7 @@ namespace IAM.Identities.Service.Implementations
                 return new(validate.Error);
 
             // Update twoFactor settings
+            auth.etag = etag;
             auth.twoFactor ??= new TwoFactorConfiguration();
             auth.twoFactor.enabled = enabled;
             auth.twoFactor.method = method;
@@ -240,6 +258,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<ADAuth>> IAccountAuthService.CreateADAuth(CallingContext ctx, string accountId, string ldapDomainId, string userName, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Uniqueness: (ldapDomainId, userName)
             var exists = await _authRepository.findADAuthByDomainAndUser(ctx, ldapDomainId, userName).ConfigureAwait(false);
             if (exists.IsFailed())
@@ -284,6 +306,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<ADAuth>> IAccountAuthService.UpdateADAccount(CallingContext ctx, string accountId, string authId, string etag, string ldapDomainId, string userName)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Load current record
             var get = await _authRepository.getADAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
@@ -325,6 +351,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<ADAuth>> IAccountAuthService.SetADTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Load existing EmailAuth
             var get = await _authRepository.getADAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
@@ -343,6 +373,7 @@ namespace IAM.Identities.Service.Implementations
                 return new(validate.Error);
 
             // Update twoFactor settings
+            auth.etag = etag;
             auth.twoFactor ??= new TwoFactorConfiguration();
             auth.twoFactor.enabled = enabled;
             auth.twoFactor.method = method;
@@ -358,6 +389,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<KAUAuth>> IAccountAuthService.CreateKAUAuth(CallingContext ctx, string accountId, string kauUserId, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Uniqueness by KAU user id
             var exists = await _authRepository.findKAUAuthByUserId(ctx, kauUserId).ConfigureAwait(false);
             if (exists.IsFailed())
@@ -404,6 +439,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<KAUAuth>> IAccountAuthService.SetKAUTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             // Load existing EmailAuth
             var get = await _authRepository.getKAUAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
@@ -422,6 +461,7 @@ namespace IAM.Identities.Service.Implementations
                 return new(validate.Error);
 
             // Update twoFactor settings
+            auth.etag = etag;
             auth.twoFactor ??= new TwoFactorConfiguration();
             auth.twoFactor.enabled = enabled;
             auth.twoFactor.method = method;
@@ -437,6 +477,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<CertificateAuth>> IAccountAuthService.CreateCertificateFromCSR(CallingContext ctx, string accountId, string csrPem, string profile)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             if (string.IsNullOrWhiteSpace(csrPem))
                 return new(new Error { Status = Statuses.BadRequest, MessageText = "CSR PEM must be provided." });
 
@@ -476,6 +520,10 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<CertificateAuth>> IAccountAuthService.RevokeCertificate(CallingContext ctx, string accountId, string authId, string etag, string reason)
         {
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
+
             if (string.IsNullOrWhiteSpace(reason))
                 return new(new Error { Status = Statuses.BadRequest, MessageText = "Revocation reason is required." });
 
@@ -486,6 +534,8 @@ namespace IAM.Identities.Service.Implementations
                 return new(new Error { Status = Statuses.NotFound, MessageText = $"Certificate auth not found for account '{accountId}', auth '{authId}'." });
 
             var auth = get.Value;
+            if(auth.isRevoked == true)
+                return new(new Error { Status = Statuses.BadRequest, MessageText = $"Certificate auth is alerady revoked '{accountId}', auth '{authId}'." });
 
             // revoke a CA-n
             var rev = await _certificateAgent.RevokeBySerialAsync(ctx, auth.serialNumber, reason).ConfigureAwait(false);

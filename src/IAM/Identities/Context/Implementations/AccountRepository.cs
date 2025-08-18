@@ -15,7 +15,15 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<Account>> IAccountRepository.createAccount(CallingContext ctx, Account account)
         {
-            await _context.Accounts.Insert(account);
+            try
+            {
+                await _context.Accounts.Insert(account);
+            }
+            catch (Exception ex)
+            {
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = ex.Message, AdditionalInformation = ex.ToString() });
+            }
+
             _context.Audit_Account(Core.Auditing.TrailOperations.Create, ctx, account);
 
             return new(account);
@@ -27,7 +35,15 @@ namespace IAM.Identities.Service.Implementations
             if (original == null)
                 return new(new Error() { Status = Statuses.NotFound, MessageText = $"Account '{account.id}' does not exist" });
 
-            await _context.Accounts.Update(account);
+            try
+            {
+                await _context.Accounts.Update(account);
+            }
+            catch (Exception ex)
+            {
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = ex.Message, AdditionalInformation = ex.ToString() });
+            }
+
             _context.Audit_Account(Core.Auditing.TrailOperations.Update, ctx, account);
 
             return new(account);

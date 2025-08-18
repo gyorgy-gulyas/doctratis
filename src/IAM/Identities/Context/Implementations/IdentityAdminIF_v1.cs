@@ -10,6 +10,7 @@ namespace IAM.Identities.Service.Implementations
         private readonly IAccountAuthService _accountAuthService;
         private readonly IAccountRepository _accountRepository;
         private readonly IAuthRepository _authRepository;
+        private readonly ILdapDomainService _ldapDomainService;
         private readonly ILdapDomainRepository _ldapDomainRepository;
 
         public IdentityAdminIF_v1(
@@ -17,12 +18,14 @@ namespace IAM.Identities.Service.Implementations
             IAccountAuthService accountAuthService,
             IAccountRepository accountRepository,
             IAuthRepository authRepository,
+            ILdapDomainService ldapDomainService,
             ILdapDomainRepository ldapDomainRepository)
         {
             _accountService = accountService;
             _accountAuthService = accountAuthService;
             _accountRepository = accountRepository;
             _authRepository = authRepository;
+            _ldapDomainService = ldapDomainService;
             _ldapDomainRepository = ldapDomainRepository;
         }
 
@@ -30,7 +33,7 @@ namespace IAM.Identities.Service.Implementations
         {
             var domain = ldap.Convert();
 
-            var result = await _ldapDomainRepository.insertLdapDomain(ctx, domain).ConfigureAwait(false);
+            var result = await _ldapDomainService.RegisterLdapDomain(ctx, domain).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -41,7 +44,7 @@ namespace IAM.Identities.Service.Implementations
         {
             var domain = ldap.Convert();
 
-            var result = await _ldapDomainRepository.updateLdapDomain(ctx, domain).ConfigureAwait(false);
+            var result = await _ldapDomainService.UpdateRegisteredLdapDomain(ctx, domain).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -119,9 +122,9 @@ namespace IAM.Identities.Service.Implementations
             return new(result.Value.Select(ah => ah.Convert()).ToList());
         }
 
-        async Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, bool isActive)
+        async Task<Response<IIdentityAdminIF_v1.AuthDTO>> IIdentityAdminIF_v1.setActiveForAuth(CallingContext ctx, string accountId, string authId, string etag, bool isActive)
         {
-            var result = await _accountAuthService.setAuthActive(ctx, accountId, authId, etag: null, isActive).ConfigureAwait(false);
+            var result = await _accountAuthService.setAuthActive(ctx, accountId, authId, etag, isActive).ConfigureAwait(false);
             if (result.IsFailed())
                 return new(result.Error);
 
@@ -198,12 +201,17 @@ namespace IAM.Identities.Service.Implementations
                 return new(ldap.Error);
 
             var create = await _accountAuthService.CreateADAuth(
-                ctx, accountId, ldapDomainId, adUsername,
+                ctx, 
+                accountId, 
+                ldapDomainId, 
+                adUsername,
                 enableTwoFactor: twoFactor?.enabled ?? false,
                 twoFactorMethod: (twoFactor?.method ?? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP).Convert(),
                 twoFactorPhoneNumber: twoFactor?.phoneNumber,
                 twoFactorEmail: twoFactor?.email
             ).ConfigureAwait(false);
+            if(create.IsFailed())
+                return new(create.Error);
 
             return new(create.Value.Convert(ldap.Value));
         }
@@ -451,6 +459,8 @@ namespace IAM.Identities.Service.Implementations
             return new IIdentityAdminIF_v1.AuthDTO()
             {
                 id = @this.id,
+                etag = @this.etag,
+                LastUpdate = @this.LastUpdate,
                 isActive = @this.isActive,
                 method = @this.method.Convert(),
             };
