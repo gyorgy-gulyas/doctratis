@@ -89,6 +89,7 @@ export interface ProjectIdentityAssignmentDTO {
 export interface ProjectAccessDTO {
 	id:string;
 	etag:string;
+	LastUpdate:Date;
 	IdentityId:string;
 	IdentityName:string;
 	Role:ProjectAccessRoles;
@@ -98,6 +99,7 @@ export interface ProjectAccessDTO {
 export interface ProjectDetailsDTO {
 	id:string;
 	etag:string;
+	LastUpdate:Date;
 	Name:string;
 	Description:string;
 	Tags:string[];

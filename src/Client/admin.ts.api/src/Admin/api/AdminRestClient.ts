@@ -3,8 +3,8 @@ import type { AxiosInstance, AxiosHeaderValue } from "axios";
 import { v4 as uuidv4 } from "uuid"; // ha nincs, npm install uuid
 import type { ApiError } from "../../ApiError";
 
-export class BFFRestClient {
-    private static instance: BFFRestClient;
+export class AdminRestClient {
+    private static instance: AdminRestClient;
     public axios: AxiosInstance;
 
     private constructor() {
@@ -17,11 +17,11 @@ export class BFFRestClient {
         });
     }
 
-    public static getInstance(): BFFRestClient {
-        if (!BFFRestClient.instance) {
-            BFFRestClient.instance = new BFFRestClient();
+    public static getInstance(): AdminRestClient {
+        if (!AdminRestClient.instance) {
+            AdminRestClient.instance = new AdminRestClient();
         }
-        return BFFRestClient.instance;
+        return AdminRestClient.instance;
     }
 
     /**
@@ -29,7 +29,7 @@ export class BFFRestClient {
      */
     public init(baseURL: string, client_language: string, app_name: string, app_version: string): void {
         this.axios.defaults.baseURL = baseURL;
-        console.log(`[BFFRestClient] baseURL set to: ${baseURL}`);
+        console.log(`[AdminRestClient] baseURL set to: ${baseURL}`);
 
         this.axios.defaults.headers.common["client-language"] = client_language;
         this.axios.defaults.headers.common["client-application"] = app_name;

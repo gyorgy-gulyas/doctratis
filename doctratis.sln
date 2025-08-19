@@ -129,6 +129,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Test", "tests\Core.Tes
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "admin.app.react", "src\Client\admin.app.react\admin.app.react.esproj", "{0BE54E42-210C-9D49-CB45-6A688B20CA5C}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "admin.ts.api", "src\Client\admin.ts.api\admin.ts.api.esproj", "{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -409,6 +411,24 @@ Global
 		{0BE54E42-210C-9D49-CB45-6A688B20CA5C}.Release|x86.ActiveCfg = Release|Any CPU
 		{0BE54E42-210C-9D49-CB45-6A688B20CA5C}.Release|x86.Build.0 = Release|Any CPU
 		{0BE54E42-210C-9D49-CB45-6A688B20CA5C}.Release|x86.Deploy.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x64.Build.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x86.Build.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x64.ActiveCfg = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x64.Build.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x64.Deploy.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x86.ActiveCfg = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x86.Build.0 = Release|Any CPU
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -445,6 +465,7 @@ Global
 		{FDEA5C75-B353-4453-8049-848975D82BB2} = {8D626EA8-CB54-BC41-363A-217881BEBA6E}
 		{F92EC5FC-52BB-38DB-831A-C00CA72CFF08} = {FDEA5C75-B353-4453-8049-848975D82BB2}
 		{0BE54E42-210C-9D49-CB45-6A688B20CA5C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{26AE91AC-A5F9-13A3-6D40-15233EF5EE0F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C074C67E-A13B-4F7B-A375-8EC8A5BDFC1F}

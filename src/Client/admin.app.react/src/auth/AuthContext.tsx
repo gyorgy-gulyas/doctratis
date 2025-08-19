@@ -1,9 +1,9 @@
+import { LoginIF, SignInResult } from "docratis.ts.api";
 import { createContext, useContext, useState } from "react";
-import axios from "axios";
 
 type Auth = {
     isAuth: boolean;
-    token: string | null; // "eyJ..."
+    token: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
 };
@@ -19,9 +19,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
 
     const login = async (email: string, password: string) => {
-        const r = await axios.post("/api/login", { email, password });
-        // feltételezve, hogy { token: "..." }
-        setToken(r.data.token);
+        const loginResult = await LoginIF.V1.LoginWithEmailPassword(email, password);
+
+        if (loginResult.result == SignInResult.Ok)
+            setToken(loginResult.tokens.AccessToken);
     };
 
     const logout = () => setToken(null);
