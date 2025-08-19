@@ -7,13 +7,13 @@ using System.Security.Cryptography;
 
 namespace IAM.Service.Seed
 {
-    internal class AdminUserSeed
+    public class AdminUserSeed
     {
         private readonly ILogger<AdminUserSeed> _logger;
         private readonly IdentityStoreContext _context;
         private readonly PasswordAgent _passwordAgent;
 
-        internal AdminUserSeed(
+        public AdminUserSeed(
             ILogger<AdminUserSeed> logger,
             IdentityStoreContext context,
             PasswordAgent passwordAgent)

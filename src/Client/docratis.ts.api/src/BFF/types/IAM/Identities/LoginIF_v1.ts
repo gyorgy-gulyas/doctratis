@@ -56,6 +56,6 @@ export interface LoginResultDTO {
 	/// Tokens returned when login is successful
 	tokens:TokensDTO;
 	/// Indicates whether two-factor authentication is required
-	requires2FA:bool;
+	requires2FA:boolean;
 }
 

@@ -14,10 +14,13 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectIF = void 0;
+exports.LoginIF = exports.ProjectIF = void 0;
 __exportStar(require("./src/ApiError"), exports);
 __exportStar(require("./src/BFF/api/BFFRestClient"), exports);
 var ProjectIF_v1_RestClient_1 = require("./src/BFF/api/TemplateManagement/Projects/ProjectIF_v1.RestClient");
 Object.defineProperty(exports, "ProjectIF", { enumerable: true, get: function () { return ProjectIF_v1_RestClient_1.ProjectIF; } });
 __exportStar(require("./src/BFF/types/TemplateManagement/Projects/ProjectIF_v1"), exports);
+var LoginIF_v1_RestClient_1 = require("./src/BFF/api/IAM/Identities/LoginIF_v1.RestClient");
+Object.defineProperty(exports, "LoginIF", { enumerable: true, get: function () { return LoginIF_v1_RestClient_1.LoginIF; } });
+__exportStar(require("./src/BFF/types/IAM/Identities/LoginIF_v1"), exports);
 //# sourceMappingURL=app.js.map

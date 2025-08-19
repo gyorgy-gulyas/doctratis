@@ -131,7 +131,7 @@ exports.IdentityAdminIF = {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
                     const extraHeaders = rest.getRequestHeaders("IAM.Identities.setActiveForAuth");
-                    const response = yield rest.axios.post(`/iam/identities/identityadminif/v1/setactiveforauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}?isActive={isActive.toString()}`, { headers: extraHeaders });
+                    const response = yield rest.axios.post(`/iam/identities/identityadminif/v1/setactiveforauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}?isActive=${isActive.toString()}`, { headers: extraHeaders });
                     return response.data;
                 }
                 catch (error) {

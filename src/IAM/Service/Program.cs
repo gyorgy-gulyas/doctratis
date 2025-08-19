@@ -54,12 +54,14 @@ public class IAMServiceHost : BaseServiceHost
         services.AddSingleton<IAccountService, AccountService>();
         services.AddSingleton<IAccountAuthService, AccountAuthService>();
         services.AddSingleton<ILoginService, LoginService>();
+        services.AddSingleton<ILdapDomainService, LdapDomainService>();
+        
         // acls
         //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_AD>();
         //services.AddHttpClient<ICertificateAuthorityACL, CertificateAuthorityACL_HasiCorp>();
         services.AddSingleton<ICertificateAuthorityACL, CertificateAuthorityACL_BouncyCastle>();
     }
-
+    
     protected override void _BeforeBuild(WebApplication app, Options options)
     {
     }

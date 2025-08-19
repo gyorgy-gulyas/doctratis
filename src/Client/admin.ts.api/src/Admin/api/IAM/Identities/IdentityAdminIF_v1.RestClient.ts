@@ -5,8 +5,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-import * as IdentityAdminIF_v1 from "../../../types/IAM/Identities/IdentityAdminIF_v1";
 import { AxiosError } from 'axios';
+import * as IdentityAdminIF_v1 from "../../../types/IAM/Identities/IdentityAdminIF_v1";
 import { AdminRestClient } from "../../../api/AdminRestClient";
 
 const rest = AdminRestClient.getInstance()
@@ -165,7 +165,7 @@ export const IdentityAdminIF = {
 				const extraHeaders = rest.getRequestHeaders("IAM.Identities.setActiveForAuth");
 
 				const response = await rest.axios.post<IdentityAdminIF_v1.AuthDTO>(
-					`/iam/identities/identityadminif/v1/setactiveforauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}?isActive={isActive.toString()}`,
+					`/iam/identities/identityadminif/v1/setactiveforauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}?isActive=${isActive.toString()}`,
 					{ headers: extraHeaders }
 				);
 
@@ -407,5 +407,5 @@ export const IdentityAdminIF = {
 			}
 		}
 		,
-		}
+	}
 }

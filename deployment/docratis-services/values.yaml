@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   registryPrefix: docratis    
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: latest
 
 service:

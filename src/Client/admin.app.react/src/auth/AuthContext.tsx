@@ -1,4 +1,5 @@
-import { LoginIF, SignInResult } from "docratis.ts.api";
+import { LoginIF  } from "docratis.ts.api";
+import { SignInResult } from "docratis.ts.api";
 import { createContext, useContext, useState } from "react";
 
 type Auth = {
