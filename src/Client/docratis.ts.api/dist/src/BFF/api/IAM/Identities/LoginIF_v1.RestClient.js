@@ -32,6 +32,30 @@ exports.LoginIF = {
                 }
             });
         },
+        ChangePassword(oldPassword, newPassword) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ChangePassword");
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/changepassword/${encodeURIComponent(oldPassword)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
+                    return response.data;
+                }
+                catch (error) {
+                    throw rest.mapApiError(error, "ChangePassword");
+                }
+            });
+        },
+        ForgottPassword(email) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ForgottPassword");
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/forgottpassword/${encodeURIComponent(email)}`, { headers: extraHeaders });
+                    return response.data;
+                }
+                catch (error) {
+                    throw rest.mapApiError(error, "ForgottPassword");
+                }
+            });
+        },
         /// Complete login with Active Directory
         LoginWithAD(username, password) {
             return __awaiter(this, void 0, void 0, function* () {

@@ -80,6 +80,163 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
+		async Task<Response> ILoginIF_v1.ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_ChangePasswordRequest();
+				request.Email = email;
+				request.OldPassword = oldPassword;
+				request.NewPassword = newPassword;
+
+				// calling grpc client
+				var grpc_response = await _client.ChangePasswordAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesLoginIF_v1", "ChangePassword" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_ChangePasswordResponse.ResultOneofCase.Success:
+						return Response.Success();
+
+					case LoginIF_v1_ChangePasswordResponse.ResultOneofCase.Error:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_ChangePasswordResponse.ResultOneofCase.None:
+					default:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ChangePassword'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response> ILoginIF_v1.ForgottPassword(CallingContext ctx, string email, string url)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_ForgottPasswordRequest();
+				request.Email = email;
+				request.Url = url;
+
+				// calling grpc client
+				var grpc_response = await _client.ForgottPasswordAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesLoginIF_v1", "ForgottPassword" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.Success:
+						return Response.Success();
+
+					case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.Error:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.None:
+					default:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ForgottPassword'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
+		async Task<Response> ILoginIF_v1.ResetPassword(CallingContext ctx, string token, string newPassword)
+		{
+			try
+			{
+				// fill grpc request
+				var request = new LoginIF_v1_ResetPasswordRequest();
+				request.Token = token;
+				request.NewPassword = newPassword;
+
+				// calling grpc client
+				var grpc_response = await _client.ResetPasswordAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesLoginIF_v1", "ResetPassword" ))).ResponseAsync;
+
+				// fill response
+				switch( grpc_response.ResultCase )
+				{
+					case LoginIF_v1_ResetPasswordResponse.ResultOneofCase.Success:
+						return Response.Success();
+
+					case LoginIF_v1_ResetPasswordResponse.ResultOneofCase.Error:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = grpc_response.Error.MessageText,
+							AdditionalInformation = grpc_response.Error.AdditionalInformation,
+						} );
+
+					case LoginIF_v1_ResetPasswordResponse.ResultOneofCase.None:
+					default:
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = grpc_response.Error.Status.FromGrpc(),
+							MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ResetPassword'",
+						} );
+				}
+			}
+			catch (RpcException ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.FromGrpc(),
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
 		async Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginIF_v1.LoginWithAD(CallingContext ctx, string username, string password)
 		{
 			try

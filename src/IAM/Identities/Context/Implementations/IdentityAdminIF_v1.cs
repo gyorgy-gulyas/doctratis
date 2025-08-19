@@ -161,7 +161,7 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
-            var change = await _accountAuthService.changePassword(ctx, accountId, authId, etag, newPassword).ConfigureAwait(false);
+            var change = await _accountAuthService.changePassword(ctx, accountId, authId, etag, oldPassword:string.Empty, newPassword).ConfigureAwait(false);
             if (change.IsFailed())
                 return new(change.Error);
 

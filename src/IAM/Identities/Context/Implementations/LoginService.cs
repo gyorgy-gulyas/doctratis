@@ -18,14 +18,15 @@ namespace IAM.Identities.Service.Implementations
         private readonly LdapAuthenticator _ldapAuthenticator;
         private readonly KAUAuthenticator _kauAuthenticator;
 
-        public LoginService(IdentityStoreContext context
-            , IAccountService accountService
-            , SmsAgent smsAgent
-            , EmailAgent emailAgent
-            , TokenAgent tokenAgent
-            , PasswordAgent passwordAgent
-            , LdapAuthenticator ldapAuthenticator
-            , KAUAuthenticator kauAuthenticator)
+        public LoginService(
+            IdentityStoreContext context, 
+            IAccountService accountService, 
+            SmsAgent smsAgent, 
+            EmailAgent emailAgent, 
+            TokenAgent tokenAgent, 
+            PasswordAgent passwordAgent, 
+            LdapAuthenticator ldapAuthenticator,
+            KAUAuthenticator kauAuthenticator)
         {
             _context = context;
             _accountService = accountService;

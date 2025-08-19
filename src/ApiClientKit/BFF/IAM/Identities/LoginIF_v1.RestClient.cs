@@ -65,6 +65,141 @@ namespace BFF.ApiClientKit
 					}
 				}
 
+				public static async Task<Response> ChangePassword(string email, string oldPassword, string newPassword)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/changepassword/{email}/{oldPassword}/{newPassword}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ChangePassword" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							return Response.Success();
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response.Failure( error );
+						}
+						else
+						{
+							return Response.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ChangePassword'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+				public static async Task<Response> ForgottPassword(string email, string url)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/forgottpassword/{email}/{url}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ForgottPassword" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							return Response.Success();
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response.Failure( error );
+						}
+						else
+						{
+							return Response.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ForgottPassword'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
+				public static async Task<Response> ResetPassword(string token, string newPassword)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/resetpassword/{token}/{newPassword}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ResetPassword" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							return Response.Success();
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response.Failure( error );
+						}
+						else
+						{
+							return Response.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ResetPassword'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
 			/// Complete login with Active Directory
 				public static async Task<Response<IAM.Identities.ILoginIF_v1.LoginResultDTO>> LoginWithAD(string username, string password)
 				{

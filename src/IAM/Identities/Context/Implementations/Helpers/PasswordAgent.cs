@@ -55,7 +55,6 @@ namespace IAM.Identities.Service.Implementations.Helpers
             return new(Convert.ToBase64String(passwordHash));
         }
 
-        // --- Local helper functions ---
         public bool IsPasswordValid(string password, string lifetimeSalt, string currentPasswordHash )
         {
             byte[] saltBytes;

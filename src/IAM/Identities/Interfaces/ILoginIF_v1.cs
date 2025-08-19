@@ -19,6 +19,12 @@ namespace IAM.Identities
 		/// <return>ILoginIF_v1.LoginResultDTO</return>
 		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
 
+		public Task<Response> ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword);
+
+		public Task<Response> ForgottPassword(CallingContext ctx, string email, string url);
+
+		public Task<Response> ResetPassword(CallingContext ctx, string token, string newPassword);
+
 		/// <summary>
 		///  Complete login with Active Directory
 		/// </summary>

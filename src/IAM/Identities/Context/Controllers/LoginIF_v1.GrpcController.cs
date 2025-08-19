@@ -86,6 +86,158 @@ namespace IAM.Identities
 			}
 		}
 
+		public override async Task<LoginIF_v1_ChangePasswordResponse> ChangePassword( LoginIF_v1_ChangePasswordRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ChangePassword" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string email;
+					email = request.Email;
+					string oldPassword;
+					oldPassword = request.OldPassword;
+					string newPassword;
+					newPassword = request.NewPassword;
+
+					// calling the service function itself
+					var response = await _service.ChangePassword( ctx , email, oldPassword, newPassword );
+
+					if( response.IsSuccess() == true )
+					{
+						return new LoginIF_v1_ChangePasswordResponse {
+							Success = new Empty()
+						};
+					}
+					else
+					{
+						return new LoginIF_v1_ChangePasswordResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+					
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_ChangePasswordResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<LoginIF_v1_ForgottPasswordResponse> ForgottPassword( LoginIF_v1_ForgottPasswordRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ForgottPassword" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string email;
+					email = request.Email;
+					string url;
+					url = request.Url;
+
+					// calling the service function itself
+					var response = await _service.ForgottPassword( ctx , email, url );
+
+					if( response.IsSuccess() == true )
+					{
+						return new LoginIF_v1_ForgottPasswordResponse {
+							Success = new Empty()
+						};
+					}
+					else
+					{
+						return new LoginIF_v1_ForgottPasswordResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+					
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_ForgottPasswordResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
+		public override async Task<LoginIF_v1_ResetPasswordResponse> ResetPassword( LoginIF_v1_ResetPasswordRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ResetPassword" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string token;
+					token = request.Token;
+					string newPassword;
+					newPassword = request.NewPassword;
+
+					// calling the service function itself
+					var response = await _service.ResetPassword( ctx , token, newPassword );
+
+					if( response.IsSuccess() == true )
+					{
+						return new LoginIF_v1_ResetPasswordResponse {
+							Success = new Empty()
+						};
+					}
+					else
+					{
+						return new LoginIF_v1_ResetPasswordResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+					
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_ResetPasswordResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		public override async Task<LoginIF_v1_LoginWithADResponse> LoginWithAD( LoginIF_v1_LoginWithADRequest request, ServerCallContext grpcContext)
 		{
 			using(LogContext.PushProperty( "Scope", "LoginIF_v1.LoginWithAD" ))

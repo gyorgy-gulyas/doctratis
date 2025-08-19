@@ -13,12 +13,16 @@ option java_multiple_files = true;
 
 package IAM.Identities;
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "servicekit/error.proto";
 
 service LoginIF_v1 {
 	/// Login using email and password credentials
 	rpc LoginWithEmailPassword(LoginIF_v1_LoginWithEmailPasswordRequest) returns (LoginIF_v1_LoginWithEmailPasswordResponse);
+	rpc ChangePassword(LoginIF_v1_ChangePasswordRequest) returns (LoginIF_v1_ChangePasswordResponse);
+	rpc ForgottPassword(LoginIF_v1_ForgottPasswordRequest) returns (LoginIF_v1_ForgottPasswordResponse);
+	rpc ResetPassword(LoginIF_v1_ResetPasswordRequest) returns (LoginIF_v1_ResetPasswordResponse);
 	/// Complete login with Active Directory
 	rpc LoginWithAD(LoginIF_v1_LoginWithADRequest) returns (LoginIF_v1_LoginWithADResponse);
 	/// Complete login with two-factor authentication (TOTP)
@@ -47,6 +51,43 @@ message LoginIF_v1_LoginWithEmailPasswordRequest {
 message LoginIF_v1_LoginWithEmailPasswordResponse {
 	oneof result {
 		LoginResultDTO Value = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message LoginIF_v1_ChangePasswordRequest {
+	string email = 1;
+	string oldPassword = 2;
+	string newPassword = 3;
+}
+
+message LoginIF_v1_ChangePasswordResponse {
+	oneof result {
+		google.protobuf.Empty Success = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message LoginIF_v1_ForgottPasswordRequest {
+	string email = 1;
+	string url = 2;
+}
+
+message LoginIF_v1_ForgottPasswordResponse {
+	oneof result {
+		google.protobuf.Empty Success = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
+message LoginIF_v1_ResetPasswordRequest {
+	string token = 1;
+	string newPassword = 2;
+}
+
+message LoginIF_v1_ResetPasswordResponse {
+	oneof result {
+		google.protobuf.Empty Success = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }

@@ -122,7 +122,7 @@ namespace IAM.Identities.Service.Implementations
             return new(auth);
         }
 
-        async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
+        async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string oldPasword, string newPassword)
         {
             var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
             if (account.IsFailed())
@@ -134,6 +134,19 @@ namespace IAM.Identities.Service.Implementations
                 return new(get.Error);
 
             var auth = get.Value;
+
+            if (string.IsNullOrEmpty(oldPasword) == false)
+            {
+                bool valid = _passwordAgent.IsPasswordValid(oldPasword, auth.passwordSalt, auth.passwordHash);
+                if (valid == false)
+                {
+                    return new(new Error
+                    {
+                        Status = Statuses.BadRequest,
+                        MessageText = "old password is invalid",
+                    });
+                }
+            }
 
             var passwordErrors = _passwordAgent.ValidatePasswordRules(newPassword, accountName: auth.email, email: auth.email);
             if (passwordErrors.Count > 0)
@@ -182,6 +195,16 @@ namespace IAM.Identities.Service.Implementations
                 return new(update.Error);
 
             return new(auth);
+        }
+
+        Task<Response<bool>> IAccountAuthService.ForgottPassword(CallingContext ctx, string accountId, string authId, string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Response<bool>> IAccountAuthService.ResetPassword(CallingContext ctx, string token, string newPassword)
+        {
+            throw new NotImplementedException();
         }
 
         async Task<Response<EmailAuth>> IAccountAuthService.setEmailTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)

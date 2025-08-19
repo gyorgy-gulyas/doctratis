@@ -1,27 +1,57 @@
 import { Routes, Route } from "react-router-dom";
-import RequireAuth from "./auth/RequireAuth";
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import './App.css'
+import { useEffect } from "react";
+import "./App.css";
+
 import { BFFRestClient } from "docratis.ts.api";
 import { AdminRestClient } from "../../admin.ts.api/app";
+
+import RequireAuth from "./auth/RequireAuth";
+import HomePage from "./pages/HomePage";
+
+import LoginMethodPage from "./pages/login/LoginMethodPage";
+import EmailPasswordLoginPage from "./pages/login/EmailPasswordLoginPage";
+import TwoFactorPage from "./pages/login/TwoFactorPage";
+import PasswordChangePage from "./pages/login/PasswordChangePage";
+import KAULoginPage from "./pages/login/KAULoginPage";
+import ADLoginPage from "./pages/login/ADLoginPage";
 
 function App() {
     const backendAddress_dockerLocal = "http://localhost/";
 
-    BFFRestClient.getInstance().init(backendAddress_dockerLocal, "hu", "docratis", "v.0.1.0");
-    AdminRestClient.getInstance().init(backendAddress_dockerLocal, "hu", "docratis", "v.0.1.0");
+    // inicializálás csak egyszer
+    useEffect(() => {
+        BFFRestClient.getInstance().init(
+            backendAddress_dockerLocal,
+            "hu",
+            "docratis",
+            "v.0.1.0"
+        );
+        AdminRestClient.getInstance().init(
+            backendAddress_dockerLocal,
+            "hu",
+            "docratis",
+            "v.0.1.0"
+        );
+    }, []);
 
     return (
         <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            {/* Login flow gyökér */}
+            <Route path="/login" element={<LoginMethodPage />} />
+            <Route path="/login/email" element={<EmailPasswordLoginPage />} />
+            <Route path="/login/kau" element={<KAULoginPage />} />
+            <Route path="/login/ad" element={<ADLoginPage />} />
+            <Route path="/login/2fa" element={<TwoFactorPage />} />
+            <Route path="/login/password-change" element={<PasswordChangePage />} />
+
+            {/* Védett útvonalak */}
             <Route element={<RequireAuth />}>
                 <Route path="/" element={<HomePage />} />
-                {
-                    /* ide jönnek a védett oldalak */
-                }
+                {/* ide jöhetnek további védett oldalak */}
             </Route>
-            <Route path="*" element={<LoginPage />} />
+
+            {/* Fallback */}
+            <Route path="*" element={<LoginMethodPage />} />
         </Routes>
     )
 }

@@ -5,8 +5,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-import { BFFRestClient } from "../../../api/BFFRestClient";
 import { AxiosError } from 'axios';
+import { BFFRestClient } from "../../../api/BFFRestClient";
 import * as LoginIF_v1 from "../../../types/IAM/Identities/LoginIF_v1";
 
 const rest = BFFRestClient.getInstance()
@@ -27,6 +27,38 @@ export const LoginIF = {
 			}
 			catch (error: unknown) {
 				throw rest.mapApiError(error as AxiosError, "LoginWithEmailPassword");
+			}
+		}
+		,
+		async ChangePassword(oldPassword: string, newPassword: string): Promise<boolean> {
+			try {
+				const extraHeaders = rest.getRequestHeaders("IAM.Identities.ChangePassword");
+
+				const response = await rest.axios.post<boolean>(
+					`/iam/identities/loginif/v1/changepassword/${encodeURIComponent(oldPassword)}/${encodeURIComponent(newPassword)}`,
+					{ headers: extraHeaders }
+				);
+
+				return response.data;
+			}
+			catch (error: unknown) {
+				throw rest.mapApiError(error as AxiosError, "ChangePassword");
+			}
+		}
+		,
+		async ForgottPassword(email: string): Promise<{}> {
+			try {
+				const extraHeaders = rest.getRequestHeaders("IAM.Identities.ForgottPassword");
+
+				const response = await rest.axios.post(
+					`/iam/identities/loginif/v1/forgottpassword/${encodeURIComponent(email)}`,
+					{ headers: extraHeaders }
+				);
+
+				return response.data;
+			}
+			catch (error: unknown) {
+				throw rest.mapApiError(error as AxiosError, "ForgottPassword");
 			}
 		}
 		,

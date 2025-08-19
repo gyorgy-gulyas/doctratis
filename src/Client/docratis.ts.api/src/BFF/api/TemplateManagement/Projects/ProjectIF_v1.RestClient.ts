@@ -5,9 +5,9 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-import * as ProjectIF_v1 from "../../../types/TemplateManagement/Projects/ProjectIF_v1";
-import { BFFRestClient } from "../../../api/BFFRestClient";
 import { AxiosError } from 'axios';
+import { BFFRestClient } from "../../../api/BFFRestClient";
+import * as ProjectIF_v1 from "../../../types/TemplateManagement/Projects/ProjectIF_v1";
 
 const rest = BFFRestClient.getInstance()
 

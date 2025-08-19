@@ -209,9 +209,11 @@ domain IAM {
 
             // ===== Email & Password =====
             command createEmailAuth(accountId:string, email:string, password:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.EmailAuth
-            command changePassword(accountId:string, authId:string, etag:string, newPassword:string) : Identity.EmailAuth
+            command changePassword(accountId:string, authId:string, etag:string, oldPassword:string, newPassword:string) : Identity.EmailAuth
             command setEmailTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.EmailAuth
             command confirmEmail(confirmationToken:string) : boolean
+            command ForgottPassword( accountId:string, authId:string, url:string ) : boolean
+            command ResetPassword( token:string, newPassword:string ) : boolean
 
             // ===== Active Directory (LDAP) =====
             command CreateADAuth(accountId:string, ldapDomainId:string, userName:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.ADAuth
@@ -273,8 +275,8 @@ domain IAM {
         service LoginService {
             command LoginWithEmailPassword( email:string, password:string ) : LoginIF.v1.LoginResultDTO
             command LoginWithAD( username:string, password:string ) : LoginIF.v1.LoginResultDTO
-
             command Login2FA( code:string ) : LoginIF.v1.TokensDTO
+
             command RefreshTokens( totp:string ) : LoginIF.v1.TokensDTO
 
             query GetKAULoginURL( redirectUrl:string, backendCallbackUrl:string ) : string
@@ -550,6 +552,10 @@ domain IAM {
 
             # Login using email and password credentials
             command LoginWithEmailPassword( email:string, password:string ) : LoginResultDTO
+            command ChangePassword( email:string, oldPassword:string, newPassword:string )
+            command ForgottPassword( email:string, url:string )
+            command ResetPassword( token:string, newPassword:string )
+
             # Complete login with Active Directory
             command LoginWithAD( username:string, password:string ) : LoginResultDTO
 
