@@ -31,12 +31,17 @@ public class TemplateManagementServiceHost : BaseServiceHost
         services.AddSingleton<IProjectService, ProjectService>();
     }
 
-    protected override void _BeforeBuild(IServiceCollection services, Options options)
+    protected override void _BeforeBuild(WebApplication app, Options options)
     {
     }
 
-    protected override void _AfterBuild(IServiceCollection services, Options options)
+    protected override void _AfterBuild(WebApplication app, Options options)
     {
+    }
+
+    protected override Task _BeforeRun(WebApplication app, Options options)
+    {
+        return Task.CompletedTask;
     }
 }
 

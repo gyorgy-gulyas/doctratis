@@ -5,10 +5,10 @@ using IAM.Identities.Context.Implementations;
 using IAM.Identities.Service;
 using IAM.Identities.Service.Implementations;
 using IAM.Identities.Service.Implementations.Helpers;
+using IAM.Service.Seed;
 using PolyPersist;
 using ServiceKit.Net;
 using ServiceKit.Net.Communicators;
-
 
 BaseServiceHost.Create<IAMServiceHost>(args, new BaseServiceHost.Options()
 {
@@ -23,6 +23,8 @@ public class IAMServiceHost : BaseServiceHost
 {
     protected override void _BeforeAddServices(IServiceCollection services, Options options)
     {
+        services.UseSms_Twilio();
+        services.UseEmail_Graph();
     }
 
     protected override void _AfterAddServices(IServiceCollection services, Options options)
@@ -31,14 +33,12 @@ public class IAMServiceHost : BaseServiceHost
         services.AddSingleton<IdentityStoreContext>();
         services.AddAuditWorker();
 
-        services.UseSms_Twilio();
+        // helpers
         services.AddSingleton<SmsAgent>();
-        services.UseEmail_Graph();
         services.AddSingleton<EmailAgent>();
         services.AddSingleton<TokenAgent>();
         services.AddSingleton<PasswordAgent>();
         services.AddSingleton<CertificateAgent>();
-
         services.AddSingleton<LdapAuthenticator>();
         services.AddHttpClient<KAUAuthenticator>();
         services.AddSingleton<KAUAuthenticator>();
@@ -60,12 +60,18 @@ public class IAMServiceHost : BaseServiceHost
         services.AddSingleton<ICertificateAuthorityACL, CertificateAuthorityACL_BouncyCastle>();
     }
 
-    protected override void _BeforeBuild(IServiceCollection services, Options options)
+    protected override void _BeforeBuild(WebApplication app, Options options)
     {
     }
 
-    protected override void _AfterBuild(IServiceCollection services, Options options)
+    protected override void _AfterBuild(WebApplication app, Options options)
     {
+    }
+
+    protected override async Task _BeforeRun(WebApplication app, Options options)
+    {
+        var adminSeed = ActivatorUtilities.CreateInstance<AdminUserSeed>(app.Services);
+        await adminSeed.Execute();
     }
 }
 

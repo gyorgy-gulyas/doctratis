@@ -1,6 +1,5 @@
 ﻿using Core.Auditing.Worker;
 using Core.Base.Agents.Communication;
-using IAM.Identities.Identity;
 using IAM.Identities.Service.Implementations;
 using IAM.Identities.Service.Implementations.Helpers;
 using IAM.Identities.Tests.Mock;

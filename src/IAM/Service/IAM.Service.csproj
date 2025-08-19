@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="PolyPersist.Net" />
+    <PackageReference Include="PolyPersist.Net.Transactions" />
     <PackageReference Include="PolyPersist.Net.BlobStore.GridFS" />
     <PackageReference Include="PolyPersist.Net.BlobStore.Memory" />
     <PackageReference Include="PolyPersist.Net.DocumentStore.MongoDB" />

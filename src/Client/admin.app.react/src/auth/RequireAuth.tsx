@@ -3,5 +3,7 @@ import { useAuth } from "./AuthContext";
 
 export default function RequireAuth() {
     const { isAuth } = useAuth();
-    return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
+    return isAuth
+        ? <Outlet />
+        : <Navigate to="/login" replace />;
 }
