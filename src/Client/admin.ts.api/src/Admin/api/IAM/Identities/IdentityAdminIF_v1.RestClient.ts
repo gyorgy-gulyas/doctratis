@@ -5,8 +5,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
-import { AxiosError } from 'axios';
 import * as IdentityAdminIF_v1 from "../../../types/IAM/Identities/IdentityAdminIF_v1";
+import { AxiosError } from 'axios';
 import { AdminRestClient } from "../../../api/AdminRestClient";
 
 const rest = AdminRestClient.getInstance()
@@ -209,22 +209,6 @@ export const IdentityAdminIF = {
 			}
 		}
 		,
-		async changePasswordOnEmailAuth(accountId: string, authId: string, etag: string, newPassword: string): Promise<IdentityAdminIF_v1.EmailAuthDTO> {
-			try {
-				const extraHeaders = rest.getRequestHeaders("IAM.Identities.changePasswordOnEmailAuth");
-
-				const response = await rest.axios.post<IdentityAdminIF_v1.EmailAuthDTO>(
-					`/iam/identities/identityadminif/v1/changepasswordonemailauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}/${encodeURIComponent(newPassword)}`,
-					{ headers: extraHeaders }
-				);
-
-				return response.data;
-			}
-			catch (error: unknown) {
-				throw rest.mapApiError(error as AxiosError, "changePasswordOnEmailAuth");
-			}
-		}
-		,
 		async setTwoFactorOnEmailAuth(accountId: string, authId: string, etag: string, twoFactor: IdentityAdminIF_v1.TwoFactorConfigurationDTO): Promise<IdentityAdminIF_v1.EmailAuthDTO> {
 			try {
 				const extraHeaders = rest.getRequestHeaders("IAM.Identities.setTwoFactorOnEmailAuth");
@@ -242,19 +226,19 @@ export const IdentityAdminIF = {
 			}
 		}
 		,
-		async confirmEmail(token: string): Promise<boolean> {
+		async resetPasswordOnEmailAuth(accountId: string, authId: string, etag: string, newPassword: string): Promise<IdentityAdminIF_v1.EmailAuthDTO> {
 			try {
-				const extraHeaders = rest.getRequestHeaders("IAM.Identities.confirmEmail");
+				const extraHeaders = rest.getRequestHeaders("IAM.Identities.resetPasswordOnEmailAuth");
 
-				const response = await rest.axios.post<boolean>(
-					`/iam/identities/identityadminif/v1/confirmemail/${encodeURIComponent(token)}`,
+				const response = await rest.axios.post<IdentityAdminIF_v1.EmailAuthDTO>(
+					`/iam/identities/identityadminif/v1/resetpasswordonemailauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}/${encodeURIComponent(newPassword)}`,
 					{ headers: extraHeaders }
 				);
 
 				return response.data;
 			}
 			catch (error: unknown) {
-				throw rest.mapApiError(error as AxiosError, "confirmEmail");
+				throw rest.mapApiError(error as AxiosError, "resetPasswordOnEmailAuth");
 			}
 		}
 		,
@@ -407,5 +391,5 @@ export const IdentityAdminIF = {
 			}
 		}
 		,
-	}
+		}
 }

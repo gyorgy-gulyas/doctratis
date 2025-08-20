@@ -751,71 +751,6 @@ namespace IAM.Identities
 			}
 		}
 
-		public override async Task<IdentityAdminIF_v1_changePasswordOnEmailAuthResponse> changePasswordOnEmailAuth( IdentityAdminIF_v1_changePasswordOnEmailAuthRequest request, ServerCallContext grpcContext)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.changePasswordOnEmailAuth" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
-				try
-				{
-					string accountId;
-					accountId = request.AccountId;
-					string authId;
-					authId = request.AuthId;
-					string etag;
-					etag = request.Etag;
-					string newPassword;
-					newPassword = request.NewPassword;
-
-					// calling the service function itself
-					var response = await _service.changePasswordOnEmailAuth( ctx , accountId, authId, etag, newPassword );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							var result = new IdentityAdminIF_v1_changePasswordOnEmailAuthResponse();
-							result.Value = response.Value != null ? IIdentityAdminIF_v1.EmailAuthDTO.ToGrpc( response.Value ) : null;
-							return result;
-						}
-						else
-						{
-							return new IdentityAdminIF_v1_changePasswordOnEmailAuthResponse {
-								Error = new () {
-									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.changePasswordOnEmailAuth'",
-								}
-							};
-						}
-					}
-					else
-					{
-						return new IdentityAdminIF_v1_changePasswordOnEmailAuthResponse {
-							Error = new () {
-								Status = response.Error.Status.ToGrpc(),
-								MessageText = response.Error.MessageText,
-								AdditionalInformation = response.Error.AdditionalInformation
-							}
-						};
-					}
-				}
-				catch(Exception ex)
-				{
-					return new IdentityAdminIF_v1_changePasswordOnEmailAuthResponse {
-						Error = new () {
-							Status = ServiceKit.Protos.Statuses.InternalError,
-							MessageText = ex.Message,
-							AdditionalInformation = ex.ToString()
-						}
-					};
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
 		public override async Task<IdentityAdminIF_v1_setTwoFactorOnEmailAuthResponse> setTwoFactorOnEmailAuth( IdentityAdminIF_v1_setTwoFactorOnEmailAuthRequest request, ServerCallContext grpcContext)
 		{
 			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.setTwoFactorOnEmailAuth" ))
@@ -881,40 +816,46 @@ namespace IAM.Identities
 			}
 		}
 
-		public override async Task<IdentityAdminIF_v1_confirmEmailResponse> confirmEmail( IdentityAdminIF_v1_confirmEmailRequest request, ServerCallContext grpcContext)
+		public override async Task<IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse> resetPasswordOnEmailAuth( IdentityAdminIF_v1_resetPasswordOnEmailAuthRequest request, ServerCallContext grpcContext)
 		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.confirmEmail" ))
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.resetPasswordOnEmailAuth" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
-					string token;
-					token = request.Token;
+					string accountId;
+					accountId = request.AccountId;
+					string authId;
+					authId = request.AuthId;
+					string etag;
+					etag = request.Etag;
+					string newPassword;
+					newPassword = request.NewPassword;
 
 					// calling the service function itself
-					var response = await _service.confirmEmail( ctx , token );
+					var response = await _service.resetPasswordOnEmailAuth( ctx , accountId, authId, etag, newPassword );
 
 					if( response.IsSuccess() == true )
 					{
 						if( response.HasValue() == true )
 						{
-							var result = new IdentityAdminIF_v1_confirmEmailResponse();
-							result.Value = response.Value;
+							var result = new IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse();
+							result.Value = response.Value != null ? IIdentityAdminIF_v1.EmailAuthDTO.ToGrpc( response.Value ) : null;
 							return result;
 						}
 						else
 						{
-							return new IdentityAdminIF_v1_confirmEmailResponse {
+							return new IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse {
 								Error = new () {
 									Status = ServiceKit.Protos.Statuses.NotImplemented,
-									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.confirmEmail'",
+									MessageText = "Not handled reponse in GRPC Controller when calling 'IdentityAdminIF_v1.resetPasswordOnEmailAuth'",
 								}
 							};
 						}
 					}
 					else
 					{
-						return new IdentityAdminIF_v1_confirmEmailResponse {
+						return new IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse {
 							Error = new () {
 								Status = response.Error.Status.ToGrpc(),
 								MessageText = response.Error.MessageText,
@@ -925,7 +866,7 @@ namespace IAM.Identities
 				}
 				catch(Exception ex)
 				{
-					return new IdentityAdminIF_v1_confirmEmailResponse {
+					return new IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,

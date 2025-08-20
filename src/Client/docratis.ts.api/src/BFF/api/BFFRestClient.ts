@@ -37,6 +37,18 @@ export class BFFRestClient {
         this.axios.defaults.headers.common["client-tz-offset"] = new Date().getTimezoneOffset();
     }
 
+
+    /**
+     * - Authorization: Bearer <token>
+     * - identity id/name headerek (alapértelmezett nevek testreszabhatók)
+     */
+    public setAuthorization( bearerToken: string, userId: string, userName: string ): void {
+        // Authorization
+        this.axios.defaults.headers.common["Authorization"] = `Bearer ${bearerToken}`;
+        this.axios.defaults.headers.common["identity-id"] = userId;
+        this.axios.defaults.headers.common["identity-name"] = userName;
+    }
+
     /**
      * Elérhetővé teszi a belső Axios példányt
      */
@@ -54,7 +66,13 @@ export class BFFRestClient {
     }
 
     public mapApiError(error: any, operation: string): ApiError {
-        if (error.response) {
+        if (error.response?.data) {
+            return {
+                status: error.response.data.status,
+                message: error.response.data.messageText,
+                additionalInformation: error.response.data.additionalInformation,
+            };
+        } else if (error.response) {
             return {
                 status: error.response.status,
                 message: `API Error in ${operation}: ${error.response.data?.message || error.message}`,

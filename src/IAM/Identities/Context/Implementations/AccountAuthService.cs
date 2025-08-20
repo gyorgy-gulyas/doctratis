@@ -15,13 +15,11 @@ namespace IAM.Identities.Service.Implementations
         private readonly PasswordAgent _passwordAgent;
         private readonly CertificateAgent _certificateAgent;
         private readonly IConfiguration _configuration;
-        private readonly ICertificateAuthorityACL _certificateAuthorityACL;
 
         public AccountAuthService(
             IdentityStoreContext context,
             IAccountRepository accountRepository,
             IAuthRepository authRepository,
-            ICertificateAuthorityACL certificateAuthorityACL,
             TokenAgent tokenAgent,
             EmailAgent emailAgent,
             PasswordAgent passwordAgent,
@@ -30,7 +28,6 @@ namespace IAM.Identities.Service.Implementations
         {
             _accountRepository = accountRepository;
             _authRepository = authRepository;
-            _certificateAuthorityACL = certificateAuthorityACL;
             _tokenAgent = tokenAgent;
             _emailAgent = emailAgent;
             _passwordAgent = passwordAgent;
@@ -116,13 +113,13 @@ namespace IAM.Identities.Service.Implementations
             if (result.IsFailed())
                 return new(result.Error);
 
-            (string token, DateTime expiresAt) = _tokenAgent.GenerateEmailConfirmationToken(auth.accountId, auth.id);
+            (string token, DateTime expiresAt) = _tokenAgent.GenerateEmailConfirmationToken(account.Value.accountSecret, auth.id);
             await _emailAgent.SendEmailConfirmation(ctx, email, token, expiresAt, _configuration["FrontEnd:EmailConfirmationURL"]);
 
             return new(auth);
         }
 
-        async Task<Response<EmailAuth>> IAccountAuthService.changePassword(CallingContext ctx, string accountId, string authId, string etag, string oldPasword, string newPassword)
+        async Task<Response<EmailAuth>> IAccountAuthService.setPassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
             var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
             if (account.IsFailed())
@@ -134,19 +131,6 @@ namespace IAM.Identities.Service.Implementations
                 return new(get.Error);
 
             var auth = get.Value;
-
-            if (string.IsNullOrEmpty(oldPasword) == false)
-            {
-                bool valid = _passwordAgent.IsPasswordValid(oldPasword, auth.passwordSalt, auth.passwordHash);
-                if (valid == false)
-                {
-                    return new(new Error
-                    {
-                        Status = Statuses.BadRequest,
-                        MessageText = "old password is invalid",
-                    });
-                }
-            }
 
             var passwordErrors = _passwordAgent.ValidatePasswordRules(newPassword, accountName: auth.email, email: auth.email);
             if (passwordErrors.Count > 0)
@@ -197,16 +181,6 @@ namespace IAM.Identities.Service.Implementations
             return new(auth);
         }
 
-        Task<Response<bool>> IAccountAuthService.ForgottPassword(CallingContext ctx, string accountId, string authId, string url)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Response<bool>> IAccountAuthService.ResetPassword(CallingContext ctx, string token, string newPassword)
-        {
-            throw new NotImplementedException();
-        }
-
         async Task<Response<EmailAuth>> IAccountAuthService.setEmailTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, TwoFactorConfiguration.Methods method, string phoneNumber, string email)
         {
             var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
@@ -245,38 +219,37 @@ namespace IAM.Identities.Service.Implementations
             return new(auth);
         }
 
-        async Task<Response<bool>> IAccountAuthService.confirmEmail(CallingContext ctx, string confirmationToken)
+        async Task<Response<EmailAuth>> IAccountAuthService.setEmailConfirmed(CallingContext ctx, string accountId, string authId, string etag, bool confirmed)
         {
-            // Validate and decode the confirmation token to extract accountId and authId
-            var tokenData = _tokenAgent.ValidateEmailConfirmationToken(confirmationToken);
-            if (tokenData == null)
-            {
-                return new(new Error
-                {
-                    Status = Statuses.BadRequest,
-                    MessageText = "Invalid or expired email confirmation token."
-                });
-            }
-            var (accountId, authId) = tokenData.Value;
+            var account = await _accountRepository.getAccount(ctx, accountId).ConfigureAwait(false);
+            if (account.IsFailed())
+                return new(account.Error);
 
-            // Load the EmailAuth record from the repository
+            // Load existing EmailAuth
             var get = await _authRepository.getEmailAuth(ctx, accountId, authId).ConfigureAwait(false);
             if (get.IsFailed())
                 return new(get.Error);
+            if (!get.HasValue())
+                return new(new Error
+                {
+                    Status = Statuses.NotFound,
+                    MessageText = $"EmailAuth not found for account '{accountId}' with auth '{authId}'."
+                });
 
             var auth = get.Value;
-
             // If email is already confirmed, return success
             if (auth.isEmailConfirmed)
-                return new(true);
+                return new(auth);
 
             // Update the record to mark the email as confirmed
+            auth.etag = etag;
             auth.isEmailConfirmed = true;
             var updateResp = await _authRepository.updateAuth(ctx, auth).ConfigureAwait(false);
             if (updateResp.IsFailed())
                 return new(updateResp.Error);
 
-            return new(true);
+            return new(auth);
+
         }
 
         async Task<Response<ADAuth>> IAccountAuthService.CreateADAuth(CallingContext ctx, string accountId, string ldapDomainId, string userName, bool enableTwoFactor, TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail)

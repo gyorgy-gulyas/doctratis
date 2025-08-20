@@ -25,22 +25,19 @@ namespace IAM.Identities.Service.Implementations
 
             email = email.Trim().ToLowerInvariant();
 
-            var normalizedEmail = email.Trim().ToLowerInvariant();
-
             var auth = _context.Auths
-                .AsQueryable()
-                .Where(a => a.method == Auth.Methods.Email)
-                .AsEnumerable()
-                .OfType<EmailAuth>()
-                .Where(a => a.email.ToLower() == email)
+                .AsQueryable<EmailAuth,Auth>()
+                .Where(a => 
+                    a.method == Auth.Methods.Email &&
+                    a.email.ToLower() == email)
                 .FirstOrDefault();
 
             if (auth == null)
-                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email auth with email '{normalizedEmail}' was not found" });
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email auth with email '{email}' was not found" });
 
             var account = await _context.Accounts.Find(auth.accountId, auth.accountId);
             if (account == null)
-                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Account linked to email '{normalizedEmail}' was not found" });
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Account linked to email '{email}' was not found" });
 
             return new(new IAccountService.AccountWithAuth() { account = account, auth = auth });
         }
@@ -53,11 +50,11 @@ namespace IAM.Identities.Service.Implementations
             var normalizedUserName = userName.Trim().ToLowerInvariant();
 
             var auth = _context.Auths
-                .AsQueryable()
-                .Where(a => a.method == Auth.Methods.ActiveDirectory)
-                .AsEnumerable()
-                .OfType<ADAuth>()
-                .Where(a => a.LdapDomainId == domain.id && a.userName == normalizedUserName)
+                .AsQueryable<ADAuth,Auth>()
+                .Where(a => 
+                    a.method == Auth.Methods.ActiveDirectory &&
+                    a.LdapDomainId == domain.id && 
+                    a.userName == normalizedUserName )
                 .FirstOrDefault();
 
             if (auth == null)
@@ -76,11 +73,10 @@ namespace IAM.Identities.Service.Implementations
                 return new(new Error() { Status = Statuses.BadRequest, MessageText = $"KAU user id cannot be empty" });
 
             var auth = _context.Auths
-                .AsQueryable()
-                .Where(a => a.method == Auth.Methods.KAU)
-                .AsEnumerable()
-                .OfType<KAUAuth>()
-                .Where(a => a.KAUUserId == kauUserId)
+                .AsQueryable<KAUAuth,Auth>()
+                .Where(a => 
+                    a.method == Auth.Methods.KAU &&
+                    a.KAUUserId == kauUserId )
                 .FirstOrDefault();
 
             if (auth == null)
@@ -127,7 +123,7 @@ namespace IAM.Identities.Service.Implementations
 
             var original = await _accountRepository.getAccount(ctx, accountId);
             if (original.IsFailed())
-                return new(already.Error);
+                return new(original.Error);
 
             var account = new Account()
             {

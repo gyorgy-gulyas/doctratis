@@ -1,13 +1,13 @@
-import type { FormEvent } from "react";
+ï»¿import type { FormEvent } from "react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../../auth/AuthContext";
+import { LoginIF, type ApiError } from "docratis.ts.api";
 
 export default function PasswordChangePage() {
-    const { changePassword } = useAuth();
     const nav = useNavigate();
     const [q] = useSearchParams();
     const from = q.get("from") ?? "/";
+    const email = q.get("email") ?? "/";
 
     const [oldPwd, setOldPwd] = useState("");
     const [newPwd, setNewPwd] = useState("");
@@ -17,20 +17,30 @@ export default function PasswordChangePage() {
         e.preventDefault();
         setErr("");
         try {
-            await changePassword(oldPwd, newPwd);
+            await LoginIF.V1.ChangePassword(email, oldPwd, newPwd);
+
             nav(from, { replace: true });
-        } catch {
-            setErr("Jelszócsere sikertelen.");
+        } catch (e: unknown) {
+            setErr(`JelszÃ³csere sikertelen: ${(e as ApiError).message}, ${(e as ApiError).additionalInformation}`);
         }
     };
 
     return (
         <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-3">
-            <h1>Jelszócsere</h1>
-            <input value={oldPwd} onChange={(e) => setOldPwd(e.target.value)} type="password" placeholder="Régi jelszó" />
-            <input value={newPwd} onChange={(e) => setNewPwd(e.target.value)} type="password" placeholder="Új jelszó" />
+            <h1>JelszÃ³csere</h1>
+            <div>
+                <input value={email} type="text" readOnly />
+            </div>
+            <div>
+                <input value={oldPwd} onChange={(e) => setOldPwd(e.target.value)} type="password" placeholder="RÃ©gi jelszÃ³" />
+            </div>
+            <div>
+                <input value={newPwd} onChange={(e) => setNewPwd(e.target.value)} type="password" placeholder="Ãšj jelszÃ³" />
+            </div>
             {err && <div>{err}</div>}
-            <button type="submit">Mentés</button>
+            <div>
+                <button type="submit">MentÃ©s</button>
+            </div>
         </form>
     );
 }

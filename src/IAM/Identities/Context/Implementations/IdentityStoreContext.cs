@@ -3,6 +3,7 @@ using Core.Auditing.Worker;
 using IAM.Identities.Identity;
 using IAM.Identities.Ldap;
 using PolyPersist;
+using PolyPersist.Net.Common;
 using PolyPersist.Net.Context;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
@@ -25,8 +26,13 @@ namespace IAM.Identities.Service.Implementations
         {
             _auditEntryContainer = auditEntryContainer;
 
-            Accounts = base.GetOrCreateDocumentCollection<Account>().Result;
+            PolymorphismHandler.Register<Auth, EmailAuth>();
+            PolymorphismHandler.Register<Auth, ADAuth>();
+            PolymorphismHandler.Register<Auth, KAUAuth>();
+            PolymorphismHandler.Register<Auth, CertificateAuth>();
             Auths = base.GetOrCreateDocumentCollection<Auth>().Result;
+
+            Accounts = base.GetOrCreateDocumentCollection<Account>().Result;
             LdapDomains = base.GetOrCreateDocumentCollection<LdapDomain>().Result;
 
             LoginAuditEventLogs = base.GetOrCreateColumnTable<LoginAuditEventLog>().Result;
@@ -108,9 +114,11 @@ namespace IAM.Identities.Service.Implementations
             {
                 log.AccountType = _account.Type;
                 log.authMethod = _authMethod;
+                log.idenityId = _account.id;
+                log.idenityName = _account.Name;
             }
 
-            protected override string GetLogSpecificPayloadJSON() => JsonSerializer.Serialize(_jsonData);
+            protected override string GetLogSpecificPayloadJSON() => JsonSerializer.Serialize(_jsonData, JsonOptionsProvider.Options());
             protected override string GetPartitionKey() => _account.id;
             protected override IColumnTable<LoginAuditEventLog> GetTable() => _storeContext.LoginAuditEventLogs;
         }
@@ -146,7 +154,7 @@ namespace IAM.Identities.Service.Implementations
             }
 
             protected override IEntity GetRootEntity() => _domain;
-            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { _domain });
+            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { _domain }, JsonOptionsProvider.Options());
             protected override IColumnTable<LdapDomainAuditTrail> GetTable() => _storeContext.LdapDomainAuditTrails;
         }
         #endregion Domain Audit
@@ -191,7 +199,7 @@ namespace IAM.Identities.Service.Implementations
             }
 
             protected override IEntity GetRootEntity() => account;
-            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { account, auths });
+            protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { account, auths }, JsonOptionsProvider.Options());
             protected override IColumnTable<AccountAuditTrail> GetTable() => _storeContext.AccountAuditTrails;
         }
         #endregion Account Audit

@@ -8,9 +8,9 @@
 
 
 export enum AccountTypes {
-	User,
-	ExternalSystem,
-	InternalService,
+	User = "User",
+	ExternalSystem = "ExternalSystem",
+	InternalService = "InternalService",
 }
 export interface LdapDomainDTO {
 	id:string;
@@ -89,10 +89,10 @@ export interface AuthDTO {
 export namespace AuthDTO {
 
 	export enum Methods {
-		Email,
-		ActiveDirectory,
-		KAU,
-		Certificate,
+		Email = "Email",
+		ActiveDirectory = "ActiveDirectory",
+		KAU = "KAU",
+		Certificate = "Certificate",
 	}
 }
 export interface TwoFactorConfigurationDTO {
@@ -106,13 +106,13 @@ export namespace TwoFactorConfigurationDTO {
 
 	export enum Methods {
 		/// Time-based One-Time Password (e.g. Google Authenticator)
-		TOTP,
+		TOTP = "TOTP",
 
 		/// SMS-based OTP
-		SMS,
+		SMS = "SMS",
 
 		/// Email-based OTP
-		Email,
+		Email = "Email",
 
 	}
 }

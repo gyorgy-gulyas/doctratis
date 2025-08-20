@@ -1,23 +1,14 @@
-﻿using OtpNet;
-using ServiceKit.Net;
-using Twilio.TwiML.Voice;
+﻿using ServiceKit.Net;
 
 namespace IAM.Identities.Service.Implementations
 {
     public class LoginIF_v1 : ILoginIF_v1
     {
         private readonly ILoginService _loginService;
-        private readonly IAccountService _accountService;
-        private readonly IAccountAuthService _accountAuthService;
 
-        public LoginIF_v1(
-            ILoginService loginService,
-            IAccountService accountService,
-            IAccountAuthService accountAuthService)
+        public LoginIF_v1(ILoginService loginService)
         {
             _loginService = loginService;
-            _accountAuthService = accountAuthService;
-            _accountService = accountService;
         }
 
         Task<Response<ILoginIF_v1.LoginResultDTO>> ILoginIF_v1.LoginWithEmailPassword(CallingContext ctx, string email, string password)
@@ -37,46 +28,40 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response> ILoginIF_v1.ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword)
         {
-            var find = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
-            if (find.IsFailed())
-                return new(find.Error);
-
-            var result = await _accountAuthService.changePassword(ctx,
-                accountId: find.Value.account.id,
-                authId: find.Value.auth.id, 
-                etag: find.Value.auth.etag, 
-                oldPassword,
-                newPassword).ConfigureAwait(false);
-            if (result.IsFailed())
-                return new(result.Error);
+            var change = await _loginService.ChangePassword(ctx, email, oldPassword, newPassword).ConfigureAwait(false);
+            if (change.IsFailed())
+                return new(change.Error);
 
             return Response.Success();
         }
 
-        async Task<Response> ILoginIF_v1.ForgottPassword(CallingContext ctx, string email, string url)
+        async Task<Response> ILoginIF_v1.ForgotPassword(CallingContext ctx, string email)
         {
-            var find = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
-            if (find.IsFailed())
-                return new(find.Error);
-
-            var result = await _accountAuthService.ForgottPassword(ctx,
-                accountId: find.Value.account.id,
-                email,
-                url).ConfigureAwait(false);
-            if (result.IsFailed())
-                return new(result.Error);
+            var forgot = await _loginService.ForgotPassword(ctx, email).ConfigureAwait(false);
+            if (forgot.IsFailed())
+                return new(forgot.Error);
 
             return Response.Success();
         }
 
-        async Task<Response> ILoginIF_v1.ResetPassword(CallingContext ctx, string token, string url)
+        async Task<Response> ILoginIF_v1.ResetPassword(CallingContext ctx, string email, string token, string newPassword)
         {
-            var result = await _accountAuthService.ResetPassword(ctx, token, url).ConfigureAwait(false);
-            if (result.IsFailed())
-                return new(result.Error);
+            var forgot = await _loginService.ResetPassword(ctx, email, token, newPassword).ConfigureAwait(false);
+            if (forgot.IsFailed())
+                return new(forgot.Error);
 
             return Response.Success();
         }
+
+        async Task<Response> ILoginIF_v1.ConfirmEmail(CallingContext ctx, string email, string token)
+        {
+            var confirm = await _loginService.ConfirmEmail(ctx, email, token).ConfigureAwait(false);
+            if (confirm.IsFailed())
+                return new(confirm.Error);
+
+            return Response.Success();
+        }
+
 
         Task<Response<ILoginIF_v1.TokensDTO>> ILoginIF_v1.RefreshTokens(CallingContext ctx, string refreshToken)
         {

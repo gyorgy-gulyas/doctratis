@@ -8,7 +8,7 @@
 export type LoginNext =
     | { kind: "ok"; accessToken: string }
     | { kind: "twofactor"; accessToken: string }
-    | { kind: "passwordChange"; accessToken: string }
+    | { kind: "passwordChange"; }
     | { kind: "redirect"; url: string }
     | { kind: "error"; message: string };
 

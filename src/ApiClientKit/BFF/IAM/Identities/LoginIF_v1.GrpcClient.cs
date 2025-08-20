@@ -76,6 +76,58 @@ namespace BFF.ApiClientKit
 					}
 				}
 
+				public static async Task<Response> ConfirmEmail(string email, string token)
+				{
+					try
+					{
+						// fill grpc request
+						var request = new LoginIF_v1_ConfirmEmailRequest();
+						request.Email = email;
+						request.Token = token;
+
+						// calling grpc client
+						_client ??= new LoginIF_v1.LoginIF_v1Client(GrpClient._channel);
+						var grpc_response = await _client.ConfirmEmailAsync( request, new CallOptions(GrpClient.GetMetadata( "IAM.Identities.LoginIF_v1.ConfirmEmail" ))).ResponseAsync;
+
+						// fill response
+						switch( grpc_response.ResultCase )
+						{
+							case LoginIF_v1_ConfirmEmailResponse.ResultOneofCase.Success:
+								return Response.Success();
+
+							case LoginIF_v1_ConfirmEmailResponse.ResultOneofCase.Error:
+								return Response.Failure( new ServiceKit.Net.Error() {
+									Status = grpc_response.Error.Status.FromGrpc(),
+									MessageText = grpc_response.Error.MessageText,
+									AdditionalInformation = grpc_response.Error.AdditionalInformation,
+								} );
+
+							case LoginIF_v1_ConfirmEmailResponse.ResultOneofCase.None:
+							default:
+								return Response.Failure( new ServiceKit.Net.Error() {
+									Status = grpc_response.Error.Status.FromGrpc(),
+									MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ConfirmEmail'",
+								} );
+						}
+					}
+					catch (RpcException ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.FromGrpc(),
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
 				public static async Task<Response> ChangePassword(string email, string oldPassword, string newPassword)
 				{
 					try
@@ -129,37 +181,36 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response> ForgottPassword(string email, string url)
+				public static async Task<Response> ForgotPassword(string email)
 				{
 					try
 					{
 						// fill grpc request
-						var request = new LoginIF_v1_ForgottPasswordRequest();
+						var request = new LoginIF_v1_ForgotPasswordRequest();
 						request.Email = email;
-						request.Url = url;
 
 						// calling grpc client
 						_client ??= new LoginIF_v1.LoginIF_v1Client(GrpClient._channel);
-						var grpc_response = await _client.ForgottPasswordAsync( request, new CallOptions(GrpClient.GetMetadata( "IAM.Identities.LoginIF_v1.ForgottPassword" ))).ResponseAsync;
+						var grpc_response = await _client.ForgotPasswordAsync( request, new CallOptions(GrpClient.GetMetadata( "IAM.Identities.LoginIF_v1.ForgotPassword" ))).ResponseAsync;
 
 						// fill response
 						switch( grpc_response.ResultCase )
 						{
-							case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.Success:
+							case LoginIF_v1_ForgotPasswordResponse.ResultOneofCase.Success:
 								return Response.Success();
 
-							case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.Error:
+							case LoginIF_v1_ForgotPasswordResponse.ResultOneofCase.Error:
 								return Response.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
 									MessageText = grpc_response.Error.MessageText,
 									AdditionalInformation = grpc_response.Error.AdditionalInformation,
 								} );
 
-							case LoginIF_v1_ForgottPasswordResponse.ResultOneofCase.None:
+							case LoginIF_v1_ForgotPasswordResponse.ResultOneofCase.None:
 							default:
 								return Response.Failure( new ServiceKit.Net.Error() {
 									Status = grpc_response.Error.Status.FromGrpc(),
-									MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ForgottPassword'",
+									MessageText = "Not handled reponse in GRPC client when calling 'LoginIF_v1_ForgotPassword'",
 								} );
 						}
 					}
@@ -181,12 +232,13 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response> ResetPassword(string token, string newPassword)
+				public static async Task<Response> ResetPassword(string email, string token, string newPassword)
 				{
 					try
 					{
 						// fill grpc request
 						var request = new LoginIF_v1_ResetPasswordRequest();
+						request.Email = email;
 						request.Token = token;
 						request.NewPassword = newPassword;
 

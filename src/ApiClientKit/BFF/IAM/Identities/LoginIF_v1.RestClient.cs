@@ -65,6 +65,51 @@ namespace BFF.ApiClientKit
 					}
 				}
 
+				public static async Task<Response> ConfirmEmail(string email, string token)
+				{
+					try
+					{
+						// build request
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/confirmemail/{email}/{token}" ) );
+
+						// call rest client 
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ConfirmEmail" );
+
+						if (response.IsSuccessStatusCode)
+						{
+							return Response.Success();
+						}
+						else if( response.Content != null )
+						{
+							var error = await response.Content.ReadFromJsonAsync<Error>();
+							return Response.Failure( error );
+						}
+						else
+						{
+							return Response.Failure( new ServiceKit.Net.Error() {
+								Status = response.StatusCode.FromHttp(),
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ConfirmEmail'",
+							} );
+						}
+					}
+					catch (HttpRequestException ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+					catch (Exception ex)
+					{
+						return Response.Failure( new ServiceKit.Net.Error() {
+							Status = Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString(),
+						} );
+					}
+				}
+
 				public static async Task<Response> ChangePassword(string email, string oldPassword, string newPassword)
 				{
 					try
@@ -110,15 +155,15 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response> ForgottPassword(string email, string url)
+				public static async Task<Response> ForgotPassword(string email)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/forgottpassword/{email}/{url}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/forgotpassword/{email}" ) );
 
 						// call rest client 
-						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ForgottPassword" );
+						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ForgotPassword" );
 
 						if (response.IsSuccessStatusCode)
 						{
@@ -133,7 +178,7 @@ namespace BFF.ApiClientKit
 						{
 							return Response.Failure( new ServiceKit.Net.Error() {
 								Status = response.StatusCode.FromHttp(),
-								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ForgottPassword'",
+								MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ForgotPassword'",
 							} );
 						}
 					}
@@ -155,12 +200,12 @@ namespace BFF.ApiClientKit
 					}
 				}
 
-				public static async Task<Response> ResetPassword(string token, string newPassword)
+				public static async Task<Response> ResetPassword(string email, string token, string newPassword)
 				{
 					try
 					{
 						// build request
-						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/resetpassword/{token}/{newPassword}" ) );
+						HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/resetpassword/{email}/{token}/{newPassword}" ) );
 
 						// call rest client 
 						HttpResponseMessage response = await RestClient.Request( request, "IAM.Identities.LoginIF.V1.ResetPassword" );

@@ -9,24 +9,24 @@ exports.SignInResult = void 0;
 var SignInResult;
 (function (SignInResult) {
     /// Login was successful
-    SignInResult[SignInResult["Ok"] = 0] = "Ok";
+    SignInResult["Ok"] = "Ok";
     /// Invalid username or password provided
-    SignInResult[SignInResult["InvalidUserNameOrPassword"] = 1] = "InvalidUserNameOrPassword";
+    SignInResult["InvalidUserNameOrPassword"] = "InvalidUserNameOrPassword";
     /// Email has not been confirmed by the user
-    SignInResult[SignInResult["EmailNotConfirmed"] = 2] = "EmailNotConfirmed";
+    SignInResult["EmailNotConfirmed"] = "EmailNotConfirmed";
     /// The user account is deactivated or locked
-    SignInResult[SignInResult["UserIsNotActive"] = 3] = "UserIsNotActive";
+    SignInResult["UserIsNotActive"] = "UserIsNotActive";
     /// The password has expired and needs to be changed
-    SignInResult[SignInResult["PasswordExpired"] = 4] = "PasswordExpired";
+    SignInResult["PasswordExpired"] = "PasswordExpired";
     /// for LDAP auththentication: when username does not contain the domainname
-    SignInResult[SignInResult["DomainNotSpecified"] = 5] = "DomainNotSpecified";
+    SignInResult["DomainNotSpecified"] = "DomainNotSpecified";
     /// for LDAP auththentication: when the domain is not alloed to use the system
-    SignInResult[SignInResult["DomainNotRegistered"] = 6] = "DomainNotRegistered";
+    SignInResult["DomainNotRegistered"] = "DomainNotRegistered";
     /// for LDAP auththentication: when the domain use is not added for the system
-    SignInResult[SignInResult["DomainUserNotRegistered"] = 7] = "DomainUserNotRegistered";
+    SignInResult["DomainUserNotRegistered"] = "DomainUserNotRegistered";
     /// for KAÜ auththentication: When token exchange is failed, or invalid token
-    SignInResult[SignInResult["KAUTokenError"] = 8] = "KAUTokenError";
+    SignInResult["KAUTokenError"] = "KAUTokenError";
     /// for KAÜ auththentication: when no user registered in the system with given KAÜ user
-    SignInResult[SignInResult["KAUUserNotFound"] = 9] = "KAUUserNotFound";
+    SignInResult["KAUUserNotFound"] = "KAUUserNotFound";
 })(SignInResult || (exports.SignInResult = SignInResult = {}));
 //# sourceMappingURL=LoginIF_v1.js.map

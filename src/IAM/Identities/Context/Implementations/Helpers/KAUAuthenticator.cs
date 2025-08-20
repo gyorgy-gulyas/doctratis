@@ -1,5 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using PolyPersist.Net.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 
 namespace IAM.Identities.Service.Implementations.Helpers
 {
@@ -29,7 +31,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
                 TimestampUTC = DateTime.UtcNow,
             };
 
-            var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
+            var payloadJson = JsonSerializer.Serialize(payload, JsonOptionsProvider.Options());
             var payloadBase64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(payloadJson));
 
             // HMAC-SHA256 aláírás
@@ -62,7 +64,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
 
             // payload deszerializálása
             var payloadJson = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(payloadBase64));
-            var payload = System.Text.Json.JsonSerializer.Deserialize<StatePayload>(payloadJson);
+            var payload = JsonSerializer.Deserialize<StatePayload>(payloadJson, JsonOptionsProvider.Options());
 
             returnUrl = payload.ReturnUrl;
 
@@ -97,7 +99,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
                     return null;
 
                 var json = await response.Content.ReadAsStringAsync();
-                return System.Text.Json.JsonSerializer.Deserialize<KauTokenResponse>(json);
+                return JsonSerializer.Deserialize<KauTokenResponse>(json, JsonOptionsProvider.Options());
             }
             catch (Exception)
             {

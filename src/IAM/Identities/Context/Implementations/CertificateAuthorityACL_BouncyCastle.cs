@@ -25,7 +25,7 @@ namespace IAM.Identities.Context.Implementations
         public CertificateAuthorityACL_BouncyCastle( IConfiguration configuration)
         {
             // Betöltés fájlból (vagy generálás teszt célra)
-            (_caPrivateKey, _caCertificate) = LoadCaFromPem("ca-cert.pem", "ca-key.pem");
+            //(_caPrivateKey, _caCertificate) = LoadCaFromPem("ca-cert.pem", "ca-key.pem");
         }
 
         public Task<Response<byte[]>> signCsr(CallingContext ctx, string csrPem, string profile)

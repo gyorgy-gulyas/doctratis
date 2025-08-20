@@ -19,11 +19,13 @@ namespace IAM.Identities
 		/// <return>ILoginIF_v1.LoginResultDTO</return>
 		public Task<Response<ILoginIF_v1.LoginResultDTO>> LoginWithEmailPassword(CallingContext ctx, string email, string password);
 
+		public Task<Response> ConfirmEmail(CallingContext ctx, string email, string token);
+
 		public Task<Response> ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword);
 
-		public Task<Response> ForgottPassword(CallingContext ctx, string email, string url);
+		public Task<Response> ForgotPassword(CallingContext ctx, string email);
 
-		public Task<Response> ResetPassword(CallingContext ctx, string token, string newPassword);
+		public Task<Response> ResetPassword(CallingContext ctx, string email, string token, string newPassword);
 
 		/// <summary>
 		///  Complete login with Active Directory
@@ -220,6 +222,9 @@ namespace IAM.Identities
 			public ILoginIF_v1.TokensDTO tokens { get; set; }
 			/// Indicates whether two-factor authentication is required
 			public bool requires2FA { get; set; }
+			/// only filled when SignInResult is Ok
+			public string accountId { get; set; }
+			public string accountName { get; set; }
 
 			#region Clone 
 			public virtual LoginResultDTO Clone()
@@ -231,6 +236,8 @@ namespace IAM.Identities
 				// clone of tokens
 				clone.tokens = tokens?.Clone();
 				clone.requires2FA = requires2FA;
+				clone.accountId = new string(accountId.ToCharArray());
+				clone.accountName = new string(accountName.ToCharArray());
 
 				return clone;
 			}
@@ -247,6 +254,8 @@ namespace IAM.Identities
 				if(tokens == null && other.tokens != null ) return false;
 				if(tokens != null && tokens.Equals(other.tokens) == false ) return false;
 				if(requires2FA != other.requires2FA) return false;
+				if(accountId != other.accountId) return false;
+				if(accountName != other.accountName) return false;
 
 				return true;
 			}
@@ -261,6 +270,8 @@ namespace IAM.Identities
 				// hash of tokens
 				if(tokens != null ) hash.Add(tokens);
 				hash.Add(requires2FA);
+				hash.Add(accountId);
+				hash.Add(accountName);
 
 				return hash.ToHashCode();
 			}
@@ -274,6 +285,8 @@ namespace IAM.Identities
 				result.Result = ILoginIF_v1.SignInResultMappings.ToGrpc( @this.result );
 				result.Tokens = @this.tokens != null ? ILoginIF_v1.TokensDTO.ToGrpc( @this.tokens ) : null;
 				result.Requires2FA = @this.requires2FA;
+				result.AccountId = @this.accountId;
+				result.AccountName = @this.accountName;
 
 				return result;
 			}
@@ -284,6 +297,8 @@ namespace IAM.Identities
 				result.result = ILoginIF_v1.SignInResultMappings.FromGrpc( @from.Result) ;
 				result.tokens = @from.Tokens != null ? ILoginIF_v1.TokensDTO.FromGrpc( @from.Tokens ) : null;
 				result.requires2FA = @from.Requires2FA;
+				result.accountId = @from.AccountId;
+				result.accountName = @from.AccountName;
 
 				return result;
 			}

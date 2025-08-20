@@ -42,6 +42,8 @@ grafana:
 -- kubectl get ingress -n docratis
 -- kubectl describe ingress -n docratis
 -- helm list -n docratis-infra
+-- kubectl rollout restart deployment identity-and-access-management -n docratis
+-- kubectl rollout restart deployment template-management -n docratis
 
 
 kubectl get events -n docratis --field-selector "involvedObject.kind=Ingress,involvedObject.name=apps-gateway" ` --sort-by=.lastTimestamp | Select-Object -Last 10

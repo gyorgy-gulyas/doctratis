@@ -9,55 +9,55 @@
 
 export enum ProjectStatuses {
 	/// A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.
-	Draft,
+	Draft = "Draft",
 
 	/// A projekt éles állapotban van, a benne lévő sablonokat használják, csak korlátozottan módosítható.
-	Active,
+	Active = "Active",
 
 	/// A projekt lezárva vagy lefagyasztva, tartalma nem módosítható (pl. audit miatt).
-	Locked,
+	Locked = "Locked",
 
 	/// A projekt kivezetett, csak olvasható, történeti célból van megtartva.
-	Archived,
+	Archived = "Archived",
 
 	/// A projekt törlésre lett jelölve, de még nem véglegesen törölt audit miatt.
-	Deleted,
+	Deleted = "Deleted",
 
 }
 
 export enum ProjectAccessRoles {
 	/// Csak olvasásra jogosult
-	Reader,
+	Reader = "Reader",
 
 	/// Módosíthat sablonokat, mappákat
-	Editor,
+	Editor = "Editor",
 
 	/// Teljes hozzáférés, hozzáférések kezelése is
-	Owner,
+	Owner = "Owner",
 
 	/// Csak audit/jogosultság-nézethez van hozzáférése
-	Auditor,
+	Auditor = "Auditor",
 
 	/// Csak a hozzáférések kezelése
-	Admin,
+	Admin = "Admin",
 
 }
 
 export enum ProjectAccessStatuses {
 	/// Meghívás elküldve, még nincs elfogadva. (pl. emailes invite)
-	Pending,
+	Pending = "Pending",
 
 	/// Hozzáférés él, a felhasználó vagy rendszer rendelkezik a szerepkörrel
-	Active,
+	Active = "Active",
 
 	/// Átmenetileg inaktiválva (pl. biztonsági okból, fiók zárolása).
-	Suspended,
+	Suspended = "Suspended",
 
 	/// Visszavonva manuálisan. Már nem érvényes.
-	Revoked,
+	Revoked = "Revoked",
 
 	/// Törölve, de még auditálás miatt megvan az adat.
-	Deleted,
+	Deleted = "Deleted",
 
 }
 export interface ProjectSummaryDTO {

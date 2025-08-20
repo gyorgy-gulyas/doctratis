@@ -11,6 +11,8 @@ namespace IAM.Identities.Service.Implementations
     {
         private readonly IdentityStoreContext _context;
         private readonly IAccountService _accountService;
+        private readonly IAccountAuthService _accountAuthService;
+        private readonly IAuthRepository _authRepository;
         private readonly SmsAgent _smsAgent;
         private readonly EmailAgent _emailAgent;
         private readonly TokenAgent _tokenAgent;
@@ -19,17 +21,21 @@ namespace IAM.Identities.Service.Implementations
         private readonly KAUAuthenticator _kauAuthenticator;
 
         public LoginService(
-            IdentityStoreContext context, 
-            IAccountService accountService, 
-            SmsAgent smsAgent, 
-            EmailAgent emailAgent, 
-            TokenAgent tokenAgent, 
-            PasswordAgent passwordAgent, 
+            IdentityStoreContext context,
+            IAccountService accountService,
+            IAccountAuthService accountAuthService,
+            IAuthRepository authRepository,
+            SmsAgent smsAgent,
+            EmailAgent emailAgent,
+            TokenAgent tokenAgent,
+            PasswordAgent passwordAgent,
             LdapAuthenticator ldapAuthenticator,
             KAUAuthenticator kauAuthenticator)
         {
             _context = context;
             _accountService = accountService;
+            _accountAuthService = accountAuthService;
+            _authRepository = authRepository;
             _smsAgent = smsAgent;
             _emailAgent = emailAgent;
             _tokenAgent = tokenAgent;
@@ -55,7 +61,7 @@ namespace IAM.Identities.Service.Implementations
             var account = result.Value.account;
             var auth = result.Value.auth as EmailAuth;
 
-            var signIn = _trySignInWithPassword(account, auth as EmailAuth, password);
+            var signIn = _trySignInWithPassword(account, auth, password);
             if (signIn != ILoginIF_v1.SignInResult.Ok)
             {
                 _context.AuditLog_SignInFailed(ctx, account, Auth.Methods.Email, signIn);
@@ -181,7 +187,9 @@ namespace IAM.Identities.Service.Implementations
                 {
                     requires2FA = false,
                     result = ILoginIF_v1.SignInResult.Ok,
-                    tokens = tokens
+                    tokens = tokens,
+                    accountId  = account.id,
+                    accountName = account.Name
                 });
             }
         }
@@ -295,14 +303,16 @@ namespace IAM.Identities.Service.Implementations
                     AccessTokenExpiresAt = expiresAt,
                     RefreshToken = null,
                     RefreshTokenExpiresAt = DateTime.MinValue
-                }
+                },
+                accountId = account.id,
+                accountName = account.Name,
             });
 
             // --- Local helper function ---
             async Task SendTwoFactorCode(string secret)
             {
                 var secretBytes = Convert.FromBase64String(secret);
-                
+
                 string code;
 
                 switch (twoFactor.method)
@@ -352,5 +362,88 @@ namespace IAM.Identities.Service.Implementations
             // Successful sign-in
             return ILoginIF_v1.SignInResult.Ok;
         }
+
+        async Task<Response> ILoginService.ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword)
+        {
+            var find = await _authRepository.findEmailAuthByEmail(ctx, email).ConfigureAwait(false);
+            if (find.IsFailed())
+                return new(find.Error);
+            if (find.HasValue() == false)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email Auth '{email}' does not exist" });
+
+            var auth = find.Value;
+            if (_passwordAgent.IsPasswordValid(oldPassword, auth.passwordSalt, auth.passwordHash) == false)
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Old password password does not atch with current password" });
+
+            var set = await _accountAuthService.setPassword(ctx, auth.accountId, auth.id, auth.etag, newPassword).ConfigureAwait(false);
+            if (set.IsFailed())
+                return new(set.Error);
+
+            return Response.Success();
+        }
+
+        async Task<Response> ILoginService.ForgotPassword(CallingContext ctx, string email)
+        {
+            var find = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
+            if (find.IsFailed())
+                return new(find.Error);
+            if (find.HasValue() == false)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email Auth '{email}' does not exist" });
+
+            var account = find.Value.account;
+            var auth = find.Value.auth as EmailAuth;
+            var (token, expiresAt) = _tokenAgent.GenerateForgotPasswordCode(account.accountSecret);
+
+            var send = await _emailAgent.SendForgotPassword(ctx, auth.email, token, expiresAt).ConfigureAwait(false);
+            if (send.IsFailed())
+                return new(find.Error);
+
+            return Response.Success();
+        }
+
+        async Task<Response> ILoginService.ResetPassword(CallingContext ctx, string email, string code, string newPassword)
+        {
+            var find = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
+            if (find.IsFailed())
+                return new(find.Error);
+            if (find.HasValue() == false)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email Auth '{email}' does not exist" });
+
+            var account = find.Value.account;
+            var auth = find.Value.auth as EmailAuth;
+
+            var isValid = _tokenAgent.ValidateForgotPasswordCode(account.accountSecret, code);
+            if(isValid == false)
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Invalid forgot password token" });
+
+            var set = await _accountAuthService.setPassword(ctx, account.id, auth.id, auth.etag, newPassword).ConfigureAwait( false );
+            if (set.IsFailed())
+                return new(find.Error);
+
+            return Response.Success();
+        }
+
+        async Task<Response> ILoginService.ConfirmEmail(CallingContext ctx, string email, string code)
+        {
+            var find = await _accountService.findAccountByEmailAuth(ctx, email).ConfigureAwait(false);
+            if (find.IsFailed())
+                return new(find.Error);
+            if (find.HasValue() == false)
+                return new(new Error() { Status = Statuses.NotFound, MessageText = $"Email Auth '{email}' does not exist" });
+
+            var account = find.Value.account;
+            var auth = find.Value.auth as EmailAuth;
+
+            var isValid = _tokenAgent.ValidateEmailConfirmationToken(account.accountSecret, code);
+            if (isValid == false)
+                return new(new Error() { Status = Statuses.BadRequest, MessageText = $"Invalid confirmation token" });
+
+            var set = await _accountAuthService.setEmailConfirmed(ctx, account.id, auth.id, auth.etag, true).ConfigureAwait(false);
+            if (set.IsFailed())
+                return new(find.Error);
+
+            return Response.Success();
+        }
+
     }
 }

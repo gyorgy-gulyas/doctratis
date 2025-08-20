@@ -79,6 +79,45 @@ namespace IAM.Identities
 			}
 		}
 
+		[HttpPost( "confirmemail/{email}/{token}" )] 
+		[Produces( MediaTypeNames.Application.Json )]
+		[SwaggerResponse( StatusCodes.Status200OK, "Ok" )]
+		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
+		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
+		public async Task<IActionResult> ConfirmEmail( [FromRoute] string email,  [FromRoute] string token)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ConfirmEmail" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
+				try
+				{
+					// calling the service function itself
+					var response = await _service.ConfirmEmail( ctx, email, token );
+
+					if( response.IsSuccess() == true )
+					{
+						return Ok();
+					}
+					else
+					{
+						return StatusCode(response.Error.Status.ToHttp(), response.Error);
+					}
+				}
+				catch(Exception ex)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		[HttpPost( "changepassword/{email}/{oldPassword}/{newPassword}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "Ok" )]
@@ -118,7 +157,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "forgottpassword/{email}/{url}" )] 
+		[HttpPost( "forgotpassword/{email}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "Ok" )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -127,15 +166,15 @@ namespace IAM.Identities
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> ForgottPassword( [FromRoute] string email,  [FromRoute] string url)
+		public async Task<IActionResult> ForgotPassword( [FromRoute] string email)
 		{
-			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ForgottPassword" ))
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ForgotPassword" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
 				try
 				{
 					// calling the service function itself
-					var response = await _service.ForgottPassword( ctx, email, url );
+					var response = await _service.ForgotPassword( ctx, email );
 
 					if( response.IsSuccess() == true )
 					{
@@ -157,7 +196,7 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "resetpassword/{token}/{newPassword}" )] 
+		[HttpPost( "resetpassword/{email}/{token}/{newPassword}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "Ok" )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
@@ -166,7 +205,7 @@ namespace IAM.Identities
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> ResetPassword( [FromRoute] string token,  [FromRoute] string newPassword)
+		public async Task<IActionResult> ResetPassword( [FromRoute] string email,  [FromRoute] string token,  [FromRoute] string newPassword)
 		{
 			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ResetPassword" ))
 			{
@@ -174,7 +213,7 @@ namespace IAM.Identities
 				try
 				{
 					// calling the service function itself
-					var response = await _service.ResetPassword( ctx, token, newPassword );
+					var response = await _service.ResetPassword( ctx, email, token, newPassword );
 
 					if( response.IsSuccess() == true )
 					{

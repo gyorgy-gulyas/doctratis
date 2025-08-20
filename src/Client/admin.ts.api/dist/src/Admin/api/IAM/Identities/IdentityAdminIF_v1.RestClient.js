@@ -163,18 +163,6 @@ exports.IdentityAdminIF = {
                 }
             });
         },
-        changePasswordOnEmailAuth(accountId, authId, etag, newPassword) {
-            return __awaiter(this, void 0, void 0, function* () {
-                try {
-                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.changePasswordOnEmailAuth");
-                    const response = yield rest.axios.post(`/iam/identities/identityadminif/v1/changepasswordonemailauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
-                    return response.data;
-                }
-                catch (error) {
-                    throw rest.mapApiError(error, "changePasswordOnEmailAuth");
-                }
-            });
-        },
         setTwoFactorOnEmailAuth(accountId, authId, etag, twoFactor) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
@@ -187,15 +175,15 @@ exports.IdentityAdminIF = {
                 }
             });
         },
-        confirmEmail(token) {
+        resetPasswordOnEmailAuth(accountId, authId, etag, newPassword) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.confirmEmail");
-                    const response = yield rest.axios.post(`/iam/identities/identityadminif/v1/confirmemail/${encodeURIComponent(token)}`, { headers: extraHeaders });
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.resetPasswordOnEmailAuth");
+                    const response = yield rest.axios.post(`/iam/identities/identityadminif/v1/resetpasswordonemailauth/${encodeURIComponent(accountId)}/${encodeURIComponent(authId)}/${encodeURIComponent(etag)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
                     return response.data;
                 }
                 catch (error) {
-                    throw rest.mapApiError(error, "confirmEmail");
+                    throw rest.mapApiError(error, "resetPasswordOnEmailAuth");
                 }
             });
         },

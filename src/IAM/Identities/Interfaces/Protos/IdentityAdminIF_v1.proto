@@ -30,9 +30,8 @@ service IdentityAdminIF_v1 {
 	rpc setActiveForAuth(IdentityAdminIF_v1_setActiveForAuthRequest) returns (IdentityAdminIF_v1_setActiveForAuthResponse);
 	rpc createtEmailAuth(IdentityAdminIF_v1_createtEmailAuthRequest) returns (IdentityAdminIF_v1_createtEmailAuthResponse);
 	rpc getEmailAuth(IdentityAdminIF_v1_getEmailAuthRequest) returns (IdentityAdminIF_v1_getEmailAuthResponse);
-	rpc changePasswordOnEmailAuth(IdentityAdminIF_v1_changePasswordOnEmailAuthRequest) returns (IdentityAdminIF_v1_changePasswordOnEmailAuthResponse);
 	rpc setTwoFactorOnEmailAuth(IdentityAdminIF_v1_setTwoFactorOnEmailAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnEmailAuthResponse);
-	rpc confirmEmail(IdentityAdminIF_v1_confirmEmailRequest) returns (IdentityAdminIF_v1_confirmEmailResponse);
+	rpc resetPasswordOnEmailAuth(IdentityAdminIF_v1_resetPasswordOnEmailAuthRequest) returns (IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse);
 	rpc createADAuth(IdentityAdminIF_v1_createADAuthRequest) returns (IdentityAdminIF_v1_createADAuthResponse);
 	rpc getADAuth(IdentityAdminIF_v1_getADAuthRequest) returns (IdentityAdminIF_v1_getADAuthResponse);
 	rpc setTwoFactorOnADAuth(IdentityAdminIF_v1_setTwoFactorOnADAuthRequest) returns (IdentityAdminIF_v1_setTwoFactorOnADAuthResponse);
@@ -176,20 +175,6 @@ message IdentityAdminIF_v1_getEmailAuthResponse {
 	}
 }
 
-message IdentityAdminIF_v1_changePasswordOnEmailAuthRequest {
-	string accountId = 1;
-	string authId = 2;
-	string etag = 3;
-	string newPassword = 4;
-}
-
-message IdentityAdminIF_v1_changePasswordOnEmailAuthResponse {
-	oneof result {
-		EmailAuthDTO Value = 1;
-		ServiceKit.Protos.Error Error = 2;
-	}
-}
-
 message IdentityAdminIF_v1_setTwoFactorOnEmailAuthRequest {
 	string accountId = 1;
 	string authId = 2;
@@ -204,13 +189,16 @@ message IdentityAdminIF_v1_setTwoFactorOnEmailAuthResponse {
 	}
 }
 
-message IdentityAdminIF_v1_confirmEmailRequest {
-	string token = 1;
+message IdentityAdminIF_v1_resetPasswordOnEmailAuthRequest {
+	string accountId = 1;
+	string authId = 2;
+	string etag = 3;
+	string newPassword = 4;
 }
 
-message IdentityAdminIF_v1_confirmEmailResponse {
+message IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse {
 	oneof result {
-		bool Value = 1;
+		EmailAuthDTO Value = 1;
 		ServiceKit.Protos.Error Error = 2;
 	}
 }

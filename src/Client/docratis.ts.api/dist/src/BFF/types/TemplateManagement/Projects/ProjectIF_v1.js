@@ -9,40 +9,40 @@ exports.ProjectAccessStatuses = exports.ProjectAccessRoles = exports.ProjectStat
 var ProjectStatuses;
 (function (ProjectStatuses) {
     /// A projekt még kialakítás alatt áll, sablonokat lehet hozzáadni, de nem éles.
-    ProjectStatuses[ProjectStatuses["Draft"] = 0] = "Draft";
+    ProjectStatuses["Draft"] = "Draft";
     /// A projekt éles állapotban van, a benne lévő sablonokat használják, csak korlátozottan módosítható.
-    ProjectStatuses[ProjectStatuses["Active"] = 1] = "Active";
+    ProjectStatuses["Active"] = "Active";
     /// A projekt lezárva vagy lefagyasztva, tartalma nem módosítható (pl. audit miatt).
-    ProjectStatuses[ProjectStatuses["Locked"] = 2] = "Locked";
+    ProjectStatuses["Locked"] = "Locked";
     /// A projekt kivezetett, csak olvasható, történeti célból van megtartva.
-    ProjectStatuses[ProjectStatuses["Archived"] = 3] = "Archived";
+    ProjectStatuses["Archived"] = "Archived";
     /// A projekt törlésre lett jelölve, de még nem véglegesen törölt audit miatt.
-    ProjectStatuses[ProjectStatuses["Deleted"] = 4] = "Deleted";
+    ProjectStatuses["Deleted"] = "Deleted";
 })(ProjectStatuses || (exports.ProjectStatuses = ProjectStatuses = {}));
 var ProjectAccessRoles;
 (function (ProjectAccessRoles) {
     /// Csak olvasásra jogosult
-    ProjectAccessRoles[ProjectAccessRoles["Reader"] = 0] = "Reader";
+    ProjectAccessRoles["Reader"] = "Reader";
     /// Módosíthat sablonokat, mappákat
-    ProjectAccessRoles[ProjectAccessRoles["Editor"] = 1] = "Editor";
+    ProjectAccessRoles["Editor"] = "Editor";
     /// Teljes hozzáférés, hozzáférések kezelése is
-    ProjectAccessRoles[ProjectAccessRoles["Owner"] = 2] = "Owner";
+    ProjectAccessRoles["Owner"] = "Owner";
     /// Csak audit/jogosultság-nézethez van hozzáférése
-    ProjectAccessRoles[ProjectAccessRoles["Auditor"] = 3] = "Auditor";
+    ProjectAccessRoles["Auditor"] = "Auditor";
     /// Csak a hozzáférések kezelése
-    ProjectAccessRoles[ProjectAccessRoles["Admin"] = 4] = "Admin";
+    ProjectAccessRoles["Admin"] = "Admin";
 })(ProjectAccessRoles || (exports.ProjectAccessRoles = ProjectAccessRoles = {}));
 var ProjectAccessStatuses;
 (function (ProjectAccessStatuses) {
     /// Meghívás elküldve, még nincs elfogadva. (pl. emailes invite)
-    ProjectAccessStatuses[ProjectAccessStatuses["Pending"] = 0] = "Pending";
+    ProjectAccessStatuses["Pending"] = "Pending";
     /// Hozzáférés él, a felhasználó vagy rendszer rendelkezik a szerepkörrel
-    ProjectAccessStatuses[ProjectAccessStatuses["Active"] = 1] = "Active";
+    ProjectAccessStatuses["Active"] = "Active";
     /// Átmenetileg inaktiválva (pl. biztonsági okból, fiók zárolása).
-    ProjectAccessStatuses[ProjectAccessStatuses["Suspended"] = 2] = "Suspended";
+    ProjectAccessStatuses["Suspended"] = "Suspended";
     /// Visszavonva manuálisan. Már nem érvényes.
-    ProjectAccessStatuses[ProjectAccessStatuses["Revoked"] = 3] = "Revoked";
+    ProjectAccessStatuses["Revoked"] = "Revoked";
     /// Törölve, de még auditálás miatt megvan az adat.
-    ProjectAccessStatuses[ProjectAccessStatuses["Deleted"] = 4] = "Deleted";
+    ProjectAccessStatuses["Deleted"] = "Deleted";
 })(ProjectAccessStatuses || (exports.ProjectAccessStatuses = ProjectAccessStatuses = {}));
 //# sourceMappingURL=ProjectIF_v1.js.map

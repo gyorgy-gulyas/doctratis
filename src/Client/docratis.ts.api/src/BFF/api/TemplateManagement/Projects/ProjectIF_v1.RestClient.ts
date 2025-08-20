@@ -6,8 +6,8 @@
 // </auto-generated>
 
 import { AxiosError } from 'axios';
-import { BFFRestClient } from "../../../api/BFFRestClient";
 import * as ProjectIF_v1 from "../../../types/TemplateManagement/Projects/ProjectIF_v1";
+import { BFFRestClient } from "../../../api/BFFRestClient";
 
 const rest = BFFRestClient.getInstance()
 

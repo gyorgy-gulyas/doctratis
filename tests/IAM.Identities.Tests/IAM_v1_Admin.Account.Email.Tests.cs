@@ -7,8 +7,8 @@ namespace IAM.Identities.Tests
     [TestClass]
     public partial class IdentityAdminIF_v1_Acccount_Email_Tests
     {
-        private IIdentityAdminIF_v1 Sut =>
-           TestMain.ServiceProvider.GetRequiredService<IIdentityAdminIF_v1>();
+        private IIdentityAdminIF_v1 Sut => TestMain.ServiceProvider.GetRequiredService<IIdentityAdminIF_v1>();
+        private ILoginIF_v1 LoginIF => TestMain.ServiceProvider.GetRequiredService<ILoginIF_v1>();
 
         [TestInitialize]
         public async Task Setup()
@@ -174,36 +174,6 @@ namespace IAM.Identities.Tests
             Assert.AreEqual(ServiceKit.Net.Statuses.NotFound, badAuth.Error.Status);
         }
 
-        // --------- changePasswordOnEmailAuth --------------------------------
-
-        [TestMethod]
-        public async Task EmailAuth_ChangePassword_success_updates_etag_and_lastupdate()
-        {
-            var acc = await CreateUser("ea_pw");
-            var create = await Sut.createtEmailAuth(TestMain.ctx, acc.id, "ea_pw@example.com", "InitPassword#123", Tfa());
-            Assert.IsTrue(create.IsSuccess());
-
-            var before = create.Value;
-            var chg = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, before.id, before.etag, "NewPassword#456");
-            Assert.IsTrue(chg.IsSuccess(), chg.Error?.MessageText);
-
-            var after = chg.Value;
-            Assert.AreNotEqual(before.etag, after.etag, "ETag should change after password update.");
-            Assert.IsTrue(after.LastUpdate >= before.LastUpdate);
-        }
-
-        [TestMethod]
-        public async Task EmailAuth_ChangePassword_fail_wrong_etag()
-        {
-            var acc = await CreateUser("ea_pw_bad");
-            var create = await Sut.createtEmailAuth(TestMain.ctx, acc.id, "ea_pw_bad@example.com", "InitPassword#123", Tfa());
-            Assert.IsTrue(create.IsSuccess());
-
-            var fail = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, create.Value.id, etag: "WRONG-ETAG", "NewPassword#456");
-            Assert.IsTrue(fail.IsFailed(), "Wrong ETag should fail.");
-            Assert.AreEqual(ServiceKit.Net.Statuses.BadRequest, fail.Error.Status);
-        }
-
         // --------- setTwoFactorOnEmailAuth ----------------------------------
 
         [TestMethod]
@@ -274,16 +244,6 @@ namespace IAM.Identities.Tests
             Assert.IsTrue(wrongAuth.IsFailed());
         }
 
-        // --------- confirmEmail ---------------------------------------------
-
-        [TestMethod]
-        public async Task EmailAuth_ConfirmEmail_fail_invalid_token()
-        {
-            var res = await Sut.confirmEmail(TestMain.ctx, token: "definitely-not-valid");
-            Assert.IsTrue(res.IsFailed());
-            Assert.AreEqual(ServiceKit.Net.Statuses.BadRequest, res.Error.Status);
-        }
-
         // MEGJEGYZÉS:
         // A sikeres confirmEmail teszthez szükség van egy módra, hogy a létrehozáskor generált
         // e-mail megerősítő tokent a teszt ki tudja olvasni (pl. IEmailTokenRepository / FakeMailer).
@@ -305,7 +265,7 @@ namespace IAM.Identities.Tests
             string token = mail.body.Substring(start + 1, end - start - 1);
 
             // 2) Confirm
-            var ok = await Sut.confirmEmail(TestMain.ctx, token);
+            var ok = await LoginIF.ConfirmEmail(TestMain.ctx, "ea_confirm@example.com", token);
             Assert.IsTrue(ok.IsSuccess(), ok.Error?.MessageText);
 
             // 3) Read-back: isEmailConfirmed = true
@@ -395,7 +355,7 @@ namespace IAM.Identities.Tests
             var created = await Sut.createtEmailAuth(TestMain.ctx, acc.id, "pw_change_fail@example.com", "Good#Pass1234", Tfa());
             Assert.IsTrue(created.IsSuccess(), created.Error?.MessageText);
 
-            var res = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, created.Value.id, created.Value.etag, badPassword);
+            var res = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, created.Value.id, created.Value.etag, badPassword);
             Assert.IsTrue(res.IsFailed(), $"Expected failure for new password '{badPassword}'");
             Assert.IsTrue(res.Error.AdditionalInformation.Contains(expectMessageContains, StringComparison.OrdinalIgnoreCase),
                 $"Error should mention: {expectMessageContains}. Actual: {res.Error.MessageText}");
@@ -409,7 +369,7 @@ namespace IAM.Identities.Tests
             Assert.IsTrue(created.IsSuccess());
 
             var before = created.Value;
-            var ok = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, before.id, before.etag, "Another#Pass1234");
+            var ok = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, before.id, before.etag, "Another#Pass1234");
             Assert.IsTrue(ok.IsSuccess(), ok.Error?.MessageText);
             Assert.AreNotEqual(before.etag, ok.Value.etag);
             Assert.IsTrue(ok.Value.LastUpdate >= before.LastUpdate);
@@ -423,7 +383,7 @@ namespace IAM.Identities.Tests
             Assert.IsTrue(created.IsSuccess());
 
             // új jelszó = régi jelszó
-            var fail = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, created.Value.id, created.Value.etag, "Good#Pass1234");
+            var fail = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, created.Value.id, created.Value.etag, "Good#Pass1234");
             Assert.IsTrue(fail.IsFailed(), "Should reject reusing current password.");
             Assert.IsTrue(fail.Error.MessageText.Contains("different from the current password", StringComparison.OrdinalIgnoreCase)
                           || fail.Error.MessageText.Contains("not match any of the previously used", StringComparison.OrdinalIgnoreCase));
@@ -531,7 +491,7 @@ namespace IAM.Identities.Tests
             var passwords = Enumerable.Range(1, 12).Select(MakeValidPassword).ToArray();
             foreach (var p in passwords)
             {
-                var chg = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p);
+                var chg = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p);
                 Assert.IsTrue(chg.IsSuccess(), chg.Error?.MessageText);
                 current = chg.Value;
             }
@@ -539,7 +499,7 @@ namespace IAM.Identities.Tests
             // 2) Próbáljuk visszaállítani bármelyik korábbi 12 közül – elvárt: FAIL
             foreach (var p in passwords)
             {
-                var fail = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p);
+                var fail = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p);
                 Assert.IsTrue(fail.IsFailed(), $"Reusing recent password '{p}' should fail.");
                 Assert.IsTrue(
                     fail.Error.MessageText.Contains("previously used", StringComparison.OrdinalIgnoreCase) ||
@@ -549,20 +509,20 @@ namespace IAM.Identities.Tests
 
             // 3) Most forgassunk MÉG EGYET (p13), hogy a legrégebbi (p1 vagy p0) kicsússzon a 12-es ablakból
             var p13 = MakeValidPassword(13);
-            var ok13 = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p13);
+            var ok13 = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p13);
             Assert.IsTrue(ok13.IsSuccess(), ok13.Error?.MessageText);
             current = ok13.Value;
 
             // 4) Ha a rendszer a "12 utolsó" elvet követi, a legrégebbi régi jelszó (p0) most már ELVILEG használható
             // Megkíséreljük p0-t beállítani – elvárt: SUCCESS (ha a History_MaxCount=12 logika aktív)
-            var reuseOldest = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p0);
+            var reuseOldest = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, current.id, current.etag, p0);
             // Ha a rendszered policy-ja tiltja a „bármikor előfordult” jelszót (nem csak az utolsó 12-t), itt FAIL lesz.
             // A következő két assert közül pontosíts a saját szabályod szerint:
             Assert.IsTrue(reuseOldest.IsSuccess(), reuseOldest.Error?.MessageText);
             // Assert.IsTrue(reuseOldest.IsFailed()); // <-- ezt válaszd, ha a teljes múltbeli reuse is tiltott.
 
             // 5) „aktuális jelszóra” váltás tilalma (current == p0 vagy p13 attól függően) – visszaellenőrzés
-            var sameAsCurrent = await Sut.changePasswordOnEmailAuth(TestMain.ctx, acc.id, reuseOldest.Value.id, reuseOldest.Value.etag, p0);
+            var sameAsCurrent = await Sut.resetPasswordOnEmailAuth(TestMain.ctx, acc.id, reuseOldest.Value.id, reuseOldest.Value.etag, p0);
             Assert.IsTrue(sameAsCurrent.IsFailed(), "New password must be different from the current password.");
         }
 

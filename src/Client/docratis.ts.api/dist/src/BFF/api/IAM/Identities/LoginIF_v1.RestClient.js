@@ -32,11 +32,23 @@ exports.LoginIF = {
                 }
             });
         },
-        ChangePassword(oldPassword, newPassword) {
+        ConfirmEmail(email, token) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ConfirmEmail");
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/confirmemail/${encodeURIComponent(email)}/${encodeURIComponent(token)}`, { headers: extraHeaders });
+                    return response.data;
+                }
+                catch (error) {
+                    throw rest.mapApiError(error, "ConfirmEmail");
+                }
+            });
+        },
+        ChangePassword(email, oldPassword, newPassword) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
                     const extraHeaders = rest.getRequestHeaders("IAM.Identities.ChangePassword");
-                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/changepassword/${encodeURIComponent(oldPassword)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/changepassword/${encodeURIComponent(email)}/${encodeURIComponent(oldPassword)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
                     return response.data;
                 }
                 catch (error) {
@@ -44,15 +56,27 @@ exports.LoginIF = {
                 }
             });
         },
-        ForgottPassword(email) {
+        ForgotPassword(email) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ForgottPassword");
-                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/forgottpassword/${encodeURIComponent(email)}`, { headers: extraHeaders });
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ForgotPassword");
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/forgotpassword/${encodeURIComponent(email)}`, { headers: extraHeaders });
                     return response.data;
                 }
                 catch (error) {
-                    throw rest.mapApiError(error, "ForgottPassword");
+                    throw rest.mapApiError(error, "ForgotPassword");
+                }
+            });
+        },
+        ResetPassword(email, token, newPassword) {
+            return __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const extraHeaders = rest.getRequestHeaders("IAM.Identities.ResetPassword");
+                    const response = yield rest.axios.post(`/iam/identities/loginif/v1/resetpassword/${encodeURIComponent(email)}/${encodeURIComponent(token)}/${encodeURIComponent(newPassword)}`, { headers: extraHeaders });
+                    return response.data;
+                }
+                catch (error) {
+                    throw rest.mapApiError(error, "ResetPassword");
                 }
             });
         },

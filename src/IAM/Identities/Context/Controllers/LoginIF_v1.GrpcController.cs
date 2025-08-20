@@ -86,6 +86,56 @@ namespace IAM.Identities
 			}
 		}
 
+		public override async Task<LoginIF_v1_ConfirmEmailResponse> ConfirmEmail( LoginIF_v1_ConfirmEmailRequest request, ServerCallContext grpcContext)
+		{
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ConfirmEmail" ))
+			{
+				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
+				try
+				{
+					string email;
+					email = request.Email;
+					string token;
+					token = request.Token;
+
+					// calling the service function itself
+					var response = await _service.ConfirmEmail( ctx , email, token );
+
+					if( response.IsSuccess() == true )
+					{
+						return new LoginIF_v1_ConfirmEmailResponse {
+							Success = new Empty()
+						};
+					}
+					else
+					{
+						return new LoginIF_v1_ConfirmEmailResponse {
+							Error = new () {
+								Status = response.Error.Status.ToGrpc(),
+								MessageText = response.Error.MessageText,
+								AdditionalInformation = response.Error.AdditionalInformation
+							}
+						};
+					}
+					
+				}
+				catch(Exception ex)
+				{
+					return new LoginIF_v1_ConfirmEmailResponse {
+						Error = new () {
+							Status = ServiceKit.Protos.Statuses.InternalError,
+							MessageText = ex.Message,
+							AdditionalInformation = ex.ToString()
+						}
+					};
+				}
+				finally
+				{
+					ctx.ReturnToPool();
+				}
+			}
+		}
+
 		public override async Task<LoginIF_v1_ChangePasswordResponse> ChangePassword( LoginIF_v1_ChangePasswordRequest request, ServerCallContext grpcContext)
 		{
 			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ChangePassword" ))
@@ -138,30 +188,28 @@ namespace IAM.Identities
 			}
 		}
 
-		public override async Task<LoginIF_v1_ForgottPasswordResponse> ForgottPassword( LoginIF_v1_ForgottPasswordRequest request, ServerCallContext grpcContext)
+		public override async Task<LoginIF_v1_ForgotPasswordResponse> ForgotPassword( LoginIF_v1_ForgotPasswordRequest request, ServerCallContext grpcContext)
 		{
-			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ForgottPassword" ))
+			using(LogContext.PushProperty( "Scope", "LoginIF_v1.ForgotPassword" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
 					string email;
 					email = request.Email;
-					string url;
-					url = request.Url;
 
 					// calling the service function itself
-					var response = await _service.ForgottPassword( ctx , email, url );
+					var response = await _service.ForgotPassword( ctx , email );
 
 					if( response.IsSuccess() == true )
 					{
-						return new LoginIF_v1_ForgottPasswordResponse {
+						return new LoginIF_v1_ForgotPasswordResponse {
 							Success = new Empty()
 						};
 					}
 					else
 					{
-						return new LoginIF_v1_ForgottPasswordResponse {
+						return new LoginIF_v1_ForgotPasswordResponse {
 							Error = new () {
 								Status = response.Error.Status.ToGrpc(),
 								MessageText = response.Error.MessageText,
@@ -173,7 +221,7 @@ namespace IAM.Identities
 				}
 				catch(Exception ex)
 				{
-					return new LoginIF_v1_ForgottPasswordResponse {
+					return new LoginIF_v1_ForgotPasswordResponse {
 						Error = new () {
 							Status = ServiceKit.Protos.Statuses.InternalError,
 							MessageText = ex.Message,
@@ -195,13 +243,15 @@ namespace IAM.Identities
 				CallingContext ctx = CallingContext.PoolFromGrpcContext( grpcContext, _logger );
 				try
 				{
+					string email;
+					email = request.Email;
 					string token;
 					token = request.Token;
 					string newPassword;
 					newPassword = request.NewPassword;
 
 					// calling the service function itself
-					var response = await _service.ResetPassword( ctx , token, newPassword );
+					var response = await _service.ResetPassword( ctx , email, token, newPassword );
 
 					if( response.IsSuccess() == true )
 					{

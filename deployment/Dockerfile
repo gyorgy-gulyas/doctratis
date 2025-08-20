@@ -15,7 +15,7 @@ RUN find . -type f -iname "nuget.config" ! -path "./nuget.config" -delete
 # Build ARG – paraméterezett csproj
 ARG CS_PROJ_PATH
 RUN dotnet restore "$CS_PROJ_PATH" --configfile nuget.config
-RUN dotnet publish "$CS_PROJ_PATH" -c Release -o /app/publish
+RUN dotnet publish "$CS_PROJ_PATH" -c Debug -o /app/publish
 
 # --- Final stage ---
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
@@ -27,4 +27,5 @@ LABEL app.kubernetes.io/part-of="docratis"
 # Build ARG – paraméterezett entrypoint
 ARG ENTRY_DLL
 ENV ENTRY_DLL=$ENTRY_DLL
-CMD ["sh", "-c", "dotnet $ENTRY_DLL"]
+#CMD ["sh", "-c", "dotnet $ENTRY_DLL"]
+ENTRYPOINT dotnet $ENTRY_DLL

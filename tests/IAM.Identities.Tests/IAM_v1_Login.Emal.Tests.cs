@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using OtpNet;
 using ServiceKit.Net;
 using ServiceKit.Net.Communicators;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace IAM.Identities.Tests
@@ -56,37 +55,8 @@ namespace IAM.Identities.Tests
             var token = GetTokenFromLastConfirmationMailBody(email);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token), "Failed to extract token from the email.");
 
-            var confirm = await Admin.confirmEmail(TestMain.ctx, token);
+            var confirm = await Sut.ConfirmEmail(TestMain.ctx, email, token);
             Assert.IsTrue(confirm.IsSuccess(), confirm.Error?.MessageText);
-        }
-
-        private static bool? TryGetBool(object obj, params string[] propNames)
-        {
-            var t = obj.GetType();
-            foreach (var name in propNames)
-            {
-                var p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (p != null && (p.PropertyType == typeof(bool) || p.PropertyType == typeof(bool?)))
-                {
-                    var v = p.GetValue(obj);
-                    if (v is bool b) return b;
-                }
-            }
-            return null;
-        }
-
-        private static string TryGetString(object obj, params string[] propNames)
-        {
-            var t = obj.GetType();
-            foreach (var name in propNames)
-            {
-                var p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (p != null && p.PropertyType == typeof(string))
-                {
-                    return (string)p.GetValue(obj);
-                }
-            }
-            return null;
         }
 
         private string GetTokenFromLastConfirmationMailBody(string email)
@@ -173,9 +143,6 @@ namespace IAM.Identities.Tests
             Assert.IsTrue(result.IsSuccess(), result.Error?.MessageText);
             var login = result.Value;
             Assert.AreEqual(ILoginIF_v1.SignInResult.Ok, login.result);
-
-            var isAuth = TryGetBool(result.Value, "IsAuthenticated", "Authenticated", "Success");
-            if (isAuth.HasValue) Assert.IsTrue(isAuth.Value);
         }
 
         [TestMethod]
@@ -195,9 +162,6 @@ namespace IAM.Identities.Tests
             Assert.IsTrue(result.IsSuccess(), "Even with wrong password, LoginWithEmailPassword must return a LoginResultDTO.");
             var login = result.Value;
             Assert.AreEqual(ILoginIF_v1.SignInResult.InvalidUserNameOrPassword, login.result, "Wrong password should return SignInResult.InvalidUserNameOrPassword.");
-
-            var isAuth = TryGetBool(login, "IsAuthenticated", "Authenticated", "Success");
-            if (isAuth.HasValue) Assert.IsFalse(isAuth.Value, "Authentication should fail with wrong password.");
         }
 
         [TestMethod]
@@ -256,12 +220,6 @@ namespace IAM.Identities.Tests
 
             var login = result.Value;
             Assert.AreEqual(ILoginIF_v1.SignInResult.Ok, login.result, "Normalized email should return Ok.");
-
-            var normalized = TryGetString(login, "Email", "UserEmail", "LoginEmail");
-            if (normalized != null)
-            {
-                Assert.AreEqual("caseuser@example.com", normalized.ToLowerInvariant());
-            }
         }
 
         [TestMethod]
@@ -283,7 +241,7 @@ namespace IAM.Identities.Tests
         }
 
         [TestMethod]
-        public async Task Login_EmailPassword_inactive_email_auth_returns_UserIsNotActive_or_Unauthorized()
+        public async Task Login_EmailPassword_inactive_email_auth_returns_UserIsNotActive()
         {
             var (acc, auth) = await CreateUserWithEmailAuthAsync(
                 accountName: "login_inactive_auth",
@@ -300,19 +258,7 @@ namespace IAM.Identities.Tests
             Assert.IsFalse(deact.Value.isActive);
 
             var result = await Sut.LoginWithEmailPassword(TestMain.ctx, "inactive.auth@example.com", "Good#Pass1234");
-
-            if (result.IsSuccess())
-            {
-                Assert.AreEqual(ILoginIF_v1.SignInResult.UserIsNotActive, result.Value.result,
-                    "Inactive auth should return SignInResult.UserIsNotActive.");
-                var isAuth = TryGetBool(result.Value, "IsAuthenticated", "Authenticated", "Success");
-                if (isAuth.HasValue) Assert.IsFalse(isAuth.Value);
-            }
-            else
-            {
-                Assert.AreEqual(ServiceKit.Net.Statuses.Unauthorized, result.Error.Status,
-                    "Alternative implementation: returns Unauthorized error.");
-            }
+            Assert.AreEqual(ILoginIF_v1.SignInResult.UserIsNotActive, result.Value.result);
         }
 
         [TestMethod]
@@ -404,6 +350,83 @@ namespace IAM.Identities.Tests
 
             var step2 = await Sut.Login2FA(clone_ctx, code);
             Assert.IsTrue(step2.IsSuccess(), step2.Error?.MessageText);
+        }
+
+        [TestMethod]
+        public async Task ForgotPassword_sends_6_digit_code_via_email()
+        {
+            // Arrange
+            var (acc, auth) = await CreateUserWithEmailAuthAsync(
+                accountName: "forgot_pw_test",
+                email: "forgot.user@example.com",
+                initialPassword: "Initial#Pass1234");
+
+            await ConfirmLastEmailAsync("forgot.user@example.com");
+
+            // Act
+            var forgot = await Sut.ForgotPassword(TestMain.ctx, "forgot.user@example.com");
+
+            // Assert
+            Assert.IsTrue(forgot.IsSuccess(), forgot.Error?.MessageText);
+
+            var code = GetTOTPFromLastMailBody("forgot.user@example.com");
+            Assert.AreEqual(6, code.Length, "Forgot password code must be 6 digits");
+            Assert.IsTrue(int.TryParse(code, out _), "Forgot password code must be numeric");
+        }
+
+        [TestMethod]
+        public async Task ResetPassword_with_valid_code_sets_new_password()
+        {
+            // Arrange
+            var (acc, auth) = await CreateUserWithEmailAuthAsync(
+                accountName: "reset_pw_test",
+                email: "reset.user@example.com",
+                initialPassword: "Initial#Pass1234");
+
+            await ConfirmLastEmailAsync("reset.user@example.com");
+
+            // Trigger forgot password flow
+            var forgot = await Sut.ForgotPassword(TestMain.ctx, "reset.user@example.com");
+            Assert.IsTrue(forgot.IsSuccess(), forgot.Error?.MessageText);
+
+            var code = GetTOTPFromLastMailBody("reset.user@example.com");
+            var newPassword = "New#SecurePass123";
+
+            // Act
+            var reset = await Sut.ResetPassword(TestMain.ctx, "reset.user@example.com", code, newPassword);
+
+            // Assert
+            Assert.IsTrue(reset.IsSuccess(), reset.Error?.MessageText);
+
+            // Login with new password
+            var login = await Sut.LoginWithEmailPassword(TestMain.ctx, "reset.user@example.com", newPassword);
+            Assert.AreEqual(ILoginIF_v1.SignInResult.Ok, login.Value.result, "Login should succeed with new password");
+        }
+
+        [TestMethod]
+        public async Task ResetPassword_fails_for_unknown_email()
+        {
+            var result = await Sut.ResetPassword(TestMain.ctx, "doesnotexist@example.com", "123456", "NewPassword#1");
+            Assert.IsFalse(result.IsSuccess(), "ResetPassword should fail for unknown email.");
+            Assert.AreEqual(Statuses.NotFound, result.Error?.Status);
+        }
+
+        [TestMethod]
+        public async Task ResetPassword_fails_for_invalid_token()
+        {
+            var (acc, auth) = await CreateUserWithEmailAuthAsync(
+                accountName: "reset_fail_token",
+                email: "fail.token@example.com",
+                initialPassword: "Initial#1234");
+
+            await ConfirmLastEmailAsync("fail.token@example.com");
+
+            var forgotResult = await Sut.ForgotPassword(TestMain.ctx, "fail.token@example.com");
+            Assert.IsTrue(forgotResult.IsSuccess());
+
+            var resetResult = await Sut.ResetPassword(TestMain.ctx, "fail.token@example.com", "badtoken", "NewPassword#1234");
+            Assert.IsFalse(resetResult.IsSuccess(), "Reset should fail with wrong token.");
+            Assert.AreEqual(Statuses.BadRequest, resetResult.Error?.Status);
         }
     }
 }

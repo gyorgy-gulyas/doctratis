@@ -72,6 +72,53 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
+		async Task<Response> ILoginIF_v1.ConfirmEmail(CallingContext ctx, string email, string token)
+		{
+			try
+			{
+				// build request
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/confirmemail/{email}/{token}" ) );
+				ctx.FillHttpRequest( request, "IAMIdentitiesLoginIF_v1", "ConfirmEmail" );
+
+				// call http client 
+				HttpResponseMessage response = await _httpClient.SendAsync( request );
+
+				if (response.IsSuccessStatusCode)
+				{
+					return Response.Success();
+				}
+				else if( response.Content != null )
+				{
+					var error = await response.Content.ReadFromJsonAsync<Error>();
+					return Response.Failure( error );
+				}
+				else
+				{
+					return Response.Failure( new ServiceKit.Net.Error() {
+						Status = response.StatusCode.FromHttp(),
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ConfirmEmail'",
+					} );
+				}
+			}
+			catch (HttpRequestException ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+			catch (Exception ex)
+			{
+				return Response.Failure( new ServiceKit.Net.Error() {
+					Status = Statuses.InternalError,
+					MessageText = ex.Message,
+					AdditionalInformation = ex.ToString(),
+				} );
+			}
+		}
+
+		/// <inheritdoc />
 		async Task<Response> ILoginIF_v1.ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword)
 		{
 			try
@@ -119,13 +166,13 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response> ILoginIF_v1.ForgottPassword(CallingContext ctx, string email, string url)
+		async Task<Response> ILoginIF_v1.ForgotPassword(CallingContext ctx, string email)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/forgottpassword/{email}/{url}" ) );
-				ctx.FillHttpRequest( request, "IAMIdentitiesLoginIF_v1", "ForgottPassword" );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/forgotpassword/{email}" ) );
+				ctx.FillHttpRequest( request, "IAMIdentitiesLoginIF_v1", "ForgotPassword" );
 
 				// call http client 
 				HttpResponseMessage response = await _httpClient.SendAsync( request );
@@ -143,7 +190,7 @@ namespace IAM.Identities
 				{
 					return Response.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ForgottPassword'",
+						MessageText = "Not handled reponse in REST client when calling 'LoginIF_v1_ForgotPassword'",
 					} );
 				}
 			}
@@ -166,12 +213,12 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response> ILoginIF_v1.ResetPassword(CallingContext ctx, string token, string newPassword)
+		async Task<Response> ILoginIF_v1.ResetPassword(CallingContext ctx, string email, string token, string newPassword)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/resetpassword/{token}/{newPassword}" ) );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/loginif/v1/resetpassword/{email}/{token}/{newPassword}" ) );
 				ctx.FillHttpRequest( request, "IAMIdentitiesLoginIF_v1", "ResetPassword" );
 
 				// call http client 

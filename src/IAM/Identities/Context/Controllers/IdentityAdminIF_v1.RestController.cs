@@ -584,52 +584,6 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "changepasswordonemailauth/{accountId}/{authId}/{etag}/{newPassword}" )] 
-		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
-		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
-		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> changePasswordOnEmailAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromRoute] string newPassword)
-		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.changePasswordOnEmailAuth" ))
-			{
-				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
-				try
-				{
-					// calling the service function itself
-					var response = await _service.changePasswordOnEmailAuth( ctx, accountId, authId, etag, newPassword );
-
-					if( response.IsSuccess() == true )
-					{
-						if( response.HasValue() == true )
-						{
-							return Ok(response.Value);
-						}
-						else
-						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.changePasswordOnEmailAuth'" );
-						}
-					}
-					else
-					{
-						return StatusCode(response.Error.Status.ToHttp(), response.Error);
-					}
-				}
-				catch(Exception ex)
-				{
-					return StatusCode(StatusCodes.Status500InternalServerError, new Error() { Status = Statuses.InternalError, MessageText = ex.Message, AdditionalInformation = ex.ToString()} );
-				}
-				finally
-				{
-					ctx.ReturnToPool();
-				}
-			}
-		}
-
 		[HttpPost( "settwofactoronemailauth/{accountId}/{authId}/{etag}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
 		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
@@ -676,24 +630,24 @@ namespace IAM.Identities
 			}
 		}
 
-		[HttpPost( "confirmemail/{token}" )] 
+		[HttpPost( "resetpasswordonemailauth/{accountId}/{authId}/{etag}/{newPassword}" )] 
 		[Produces( MediaTypeNames.Application.Json )]
-		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(bool) )]
+		[SwaggerResponse( StatusCodes.Status200OK, "", typeof(IIdentityAdminIF_v1.EmailAuthDTO) )]
 		[SwaggerResponse( StatusCodes.Status400BadRequest, nameof(StatusCodes.Status400BadRequest), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status408RequestTimeout, nameof(StatusCodes.Status408RequestTimeout), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status404NotFound, nameof(StatusCodes.Status404NotFound), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status401Unauthorized, nameof(StatusCodes.Status401Unauthorized), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status501NotImplemented, nameof(StatusCodes.Status501NotImplemented), typeof(ServiceKit.Net.Error) )]
 		[SwaggerResponse( StatusCodes.Status500InternalServerError, nameof(StatusCodes.Status500InternalServerError), typeof(ServiceKit.Net.Error) )]
-		public async Task<IActionResult> confirmEmail( [FromRoute] string token)
+		public async Task<IActionResult> resetPasswordOnEmailAuth( [FromRoute] string accountId,  [FromRoute] string authId,  [FromRoute] string etag,  [FromRoute] string newPassword)
 		{
-			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.confirmEmail" ))
+			using(LogContext.PushProperty( "Scope", "IdentityAdminIF_v1.resetPasswordOnEmailAuth" ))
 			{
 				CallingContext ctx = CallingContext.PoolFromHttpContext( HttpContext, _logger );
 				try
 				{
 					// calling the service function itself
-					var response = await _service.confirmEmail( ctx, token );
+					var response = await _service.resetPasswordOnEmailAuth( ctx, accountId, authId, etag, newPassword );
 
 					if( response.IsSuccess() == true )
 					{
@@ -703,7 +657,7 @@ namespace IAM.Identities
 						}
 						else
 						{
-							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.confirmEmail'" );
+							return StatusCode(StatusCodes.Status501NotImplemented, "Not handled reponse in REST Controller when calling 'IdentityAdminIF_v1.resetPasswordOnEmailAuth'" );
 						}
 					}
 					else

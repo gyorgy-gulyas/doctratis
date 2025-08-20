@@ -8,18 +8,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwoFactorConfigurationDTO = exports.AuthDTO = exports.AccountTypes = void 0;
 var AccountTypes;
 (function (AccountTypes) {
-    AccountTypes[AccountTypes["User"] = 0] = "User";
-    AccountTypes[AccountTypes["ExternalSystem"] = 1] = "ExternalSystem";
-    AccountTypes[AccountTypes["InternalService"] = 2] = "InternalService";
+    AccountTypes["User"] = "User";
+    AccountTypes["ExternalSystem"] = "ExternalSystem";
+    AccountTypes["InternalService"] = "InternalService";
 })(AccountTypes || (exports.AccountTypes = AccountTypes = {}));
 var AuthDTO;
 (function (AuthDTO) {
     let Methods;
     (function (Methods) {
-        Methods[Methods["Email"] = 0] = "Email";
-        Methods[Methods["ActiveDirectory"] = 1] = "ActiveDirectory";
-        Methods[Methods["KAU"] = 2] = "KAU";
-        Methods[Methods["Certificate"] = 3] = "Certificate";
+        Methods["Email"] = "Email";
+        Methods["ActiveDirectory"] = "ActiveDirectory";
+        Methods["KAU"] = "KAU";
+        Methods["Certificate"] = "Certificate";
     })(Methods = AuthDTO.Methods || (AuthDTO.Methods = {}));
 })(AuthDTO || (exports.AuthDTO = AuthDTO = {}));
 var TwoFactorConfigurationDTO;
@@ -27,11 +27,11 @@ var TwoFactorConfigurationDTO;
     let Methods;
     (function (Methods) {
         /// Time-based One-Time Password (e.g. Google Authenticator)
-        Methods[Methods["TOTP"] = 0] = "TOTP";
+        Methods["TOTP"] = "TOTP";
         /// SMS-based OTP
-        Methods[Methods["SMS"] = 1] = "SMS";
+        Methods["SMS"] = "SMS";
         /// Email-based OTP
-        Methods[Methods["Email"] = 2] = "Email";
+        Methods["Email"] = "Email";
     })(Methods = TwoFactorConfigurationDTO.Methods || (TwoFactorConfigurationDTO.Methods = {}));
 })(TwoFactorConfigurationDTO || (exports.TwoFactorConfigurationDTO = TwoFactorConfigurationDTO = {}));
 //# sourceMappingURL=IdentityAdminIF_v1.js.map

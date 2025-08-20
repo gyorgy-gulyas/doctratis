@@ -1,10 +1,11 @@
-﻿using System.Text.Json;
-using Core.Auditing;
+﻿using Core.Auditing;
 using Core.Auditing.Worker;
 using PolyPersist;
+using PolyPersist.Net.Common;
 using PolyPersist.Net.Context;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
+using System.Text.Json;
 using TemplateManagement.Projects.Project;
 
 namespace TemplateManagement.Projects.Service.Implementations
@@ -65,7 +66,7 @@ namespace TemplateManagement.Projects.Service.Implementations
         }
 
         protected override IEntity GetRootEntity() => header;
-        protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { header, accesses });
+        protected override string GetEntitySpecificPayloadJSON() => JsonSerializer.Serialize(new { header, accesses }, JsonOptionsProvider.Options());
         protected override IColumnTable<ProjectAuditTrail> GetTable() => _storeContext.ProjectAuditTrails;
     }
 }

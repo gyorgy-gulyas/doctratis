@@ -30,6 +30,14 @@ namespace IAM.Identities
 		/// <return>ILoginService.KAUCallbackResponse</return>
 		public Task<Response<ILoginService.KAUCallbackResponse>> KAUCallback(CallingContext ctx, string code, string state);
 
+		public Task<Response> ChangePassword(CallingContext ctx, string email, string oldPassword, string newPassword);
+
+		public Task<Response> ForgotPassword(CallingContext ctx, string email);
+
+		public Task<Response> ResetPassword(CallingContext ctx, string email, string token, string newPassword);
+
+		public Task<Response> ConfirmEmail(CallingContext ctx, string email, string token);
+
 
 		public partial class KAUCallbackResponse : IEquatable<KAUCallbackResponse>
 		{

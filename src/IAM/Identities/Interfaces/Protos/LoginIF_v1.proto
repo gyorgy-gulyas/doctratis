@@ -20,8 +20,9 @@ import "servicekit/error.proto";
 service LoginIF_v1 {
 	/// Login using email and password credentials
 	rpc LoginWithEmailPassword(LoginIF_v1_LoginWithEmailPasswordRequest) returns (LoginIF_v1_LoginWithEmailPasswordResponse);
+	rpc ConfirmEmail(LoginIF_v1_ConfirmEmailRequest) returns (LoginIF_v1_ConfirmEmailResponse);
 	rpc ChangePassword(LoginIF_v1_ChangePasswordRequest) returns (LoginIF_v1_ChangePasswordResponse);
-	rpc ForgottPassword(LoginIF_v1_ForgottPasswordRequest) returns (LoginIF_v1_ForgottPasswordResponse);
+	rpc ForgotPassword(LoginIF_v1_ForgotPasswordRequest) returns (LoginIF_v1_ForgotPasswordResponse);
 	rpc ResetPassword(LoginIF_v1_ResetPasswordRequest) returns (LoginIF_v1_ResetPasswordResponse);
 	/// Complete login with Active Directory
 	rpc LoginWithAD(LoginIF_v1_LoginWithADRequest) returns (LoginIF_v1_LoginWithADResponse);
@@ -55,6 +56,18 @@ message LoginIF_v1_LoginWithEmailPasswordResponse {
 	}
 }
 
+message LoginIF_v1_ConfirmEmailRequest {
+	string email = 1;
+	string token = 2;
+}
+
+message LoginIF_v1_ConfirmEmailResponse {
+	oneof result {
+		google.protobuf.Empty Success = 1;
+		ServiceKit.Protos.Error Error = 2;
+	}
+}
+
 message LoginIF_v1_ChangePasswordRequest {
 	string email = 1;
 	string oldPassword = 2;
@@ -68,12 +81,11 @@ message LoginIF_v1_ChangePasswordResponse {
 	}
 }
 
-message LoginIF_v1_ForgottPasswordRequest {
+message LoginIF_v1_ForgotPasswordRequest {
 	string email = 1;
-	string url = 2;
 }
 
-message LoginIF_v1_ForgottPasswordResponse {
+message LoginIF_v1_ForgotPasswordResponse {
 	oneof result {
 		google.protobuf.Empty Success = 1;
 		ServiceKit.Protos.Error Error = 2;
@@ -81,8 +93,9 @@ message LoginIF_v1_ForgottPasswordResponse {
 }
 
 message LoginIF_v1_ResetPasswordRequest {
-	string token = 1;
-	string newPassword = 2;
+	string email = 1;
+	string token = 2;
+	string newPassword = 3;
 }
 
 message LoginIF_v1_ResetPasswordResponse {
@@ -188,5 +201,8 @@ message LoginResultDTO {
 	TokensDTO tokens = 2;
 	/// Indicates whether two-factor authentication is required
 	bool requires2FA = 3;
+	/// only filled when SignInResult is Ok
+	string accountId = 4;
+	string accountName = 5;
 }
 

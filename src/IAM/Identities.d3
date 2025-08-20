@@ -209,11 +209,9 @@ domain IAM {
 
             // ===== Email & Password =====
             command createEmailAuth(accountId:string, email:string, password:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.EmailAuth
-            command changePassword(accountId:string, authId:string, etag:string, oldPassword:string, newPassword:string) : Identity.EmailAuth
             command setEmailTwoFactor(accountId:string, authId:string, etag:string, enabled:boolean, method:Identity.TwoFactorConfiguration.Methods, phoneNumber:string, email:string) : Identity.EmailAuth
-            command confirmEmail(confirmationToken:string) : boolean
-            command ForgottPassword( accountId:string, authId:string, url:string ) : boolean
-            command ResetPassword( token:string, newPassword:string ) : boolean
+            command setPassword(accountId:string, authId:string, etag:string, newPassword:string) : Identity.EmailAuth
+            command setEmailConfirmed(accountId:string, authId:string, etag:string, confirmed:boolean ) : Identity.EmailAuth
 
             // ===== Active Directory (LDAP) =====
             command CreateADAuth(accountId:string, ldapDomainId:string, userName:string, enableTwoFactor:boolean, twoFactorMethod:Identity.TwoFactorConfiguration.Methods, twoFactorPhoneNumber:string, twoFactorEmail:string) : Identity.ADAuth
@@ -276,17 +274,20 @@ domain IAM {
             command LoginWithEmailPassword( email:string, password:string ) : LoginIF.v1.LoginResultDTO
             command LoginWithAD( username:string, password:string ) : LoginIF.v1.LoginResultDTO
             command Login2FA( code:string ) : LoginIF.v1.TokensDTO
-
             command RefreshTokens( totp:string ) : LoginIF.v1.TokensDTO
 
             query GetKAULoginURL( redirectUrl:string, backendCallbackUrl:string ) : string
-
             valueobject KAUCallbackResponse
             {
                 returnUrl:string
                 result:LoginIF.v1.LoginResultDTO
             }
             command KAUCallback( code:string, state:string ) : KAUCallbackResponse
+
+            command ChangePassword( email:string, oldPassword:string, newPassword:string )
+            command ForgotPassword( email:string )
+            command ResetPassword( email:string, token:string, newPassword:string )
+            command ConfirmEmail( email:string, token:string )
         }
 
         @internal_api(grpc,rest)
@@ -427,9 +428,8 @@ domain IAM {
             }
             command createtEmailAuth( accountId:string, email:string, initialPassword:string, twoFactor: TwoFactorConfigurationDTO ) : EmailAuthDTO
             command getEmailAuth( accountId:string, authId:string ) : EmailAuthDTO
-            command changePasswordOnEmailAuth( accountId:string, authId:string, etag:string, newPassword:string ) : EmailAuthDTO
             command setTwoFactorOnEmailAuth(accountId:string, authId:string, etag:string, twoFactor:TwoFactorConfigurationDTO) : EmailAuthDTO
-            command confirmEmail(token:string) : boolean
+            command resetPasswordOnEmailAuth( accountId:string, authId:string, etag:string, newPassword:string ) : EmailAuthDTO
 
              # Active Directory-based authentication
             dto ADAuthDTO {
@@ -548,13 +548,17 @@ domain IAM {
                 tokens: TokensDTO
                 # Indicates whether two-factor authentication is required
                 requires2FA: boolean
+                # only filled when SignInResult is Ok
+                accountId:string
+                accountName:string
             }
 
             # Login using email and password credentials
             command LoginWithEmailPassword( email:string, password:string ) : LoginResultDTO
+            command ConfirmEmail(email:string, token:string)
             command ChangePassword( email:string, oldPassword:string, newPassword:string )
-            command ForgottPassword( email:string, url:string )
-            command ResetPassword( token:string, newPassword:string )
+            command ForgotPassword( email:string )
+            command ResetPassword( email:string, token:string, newPassword:string )
 
             # Complete login with Active Directory
             command LoginWithAD( username:string, password:string ) : LoginResultDTO

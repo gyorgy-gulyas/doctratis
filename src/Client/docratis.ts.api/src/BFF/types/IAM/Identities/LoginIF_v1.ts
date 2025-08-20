@@ -9,34 +9,34 @@
 
 export enum SignInResult {
 	/// Login was successful
-	Ok,
+	Ok = "Ok",
 
 	/// Invalid username or password provided
-	InvalidUserNameOrPassword,
+	InvalidUserNameOrPassword = "InvalidUserNameOrPassword",
 
 	/// Email has not been confirmed by the user
-	EmailNotConfirmed,
+	EmailNotConfirmed = "EmailNotConfirmed",
 
 	/// The user account is deactivated or locked
-	UserIsNotActive,
+	UserIsNotActive = "UserIsNotActive",
 
 	/// The password has expired and needs to be changed
-	PasswordExpired,
+	PasswordExpired = "PasswordExpired",
 
 	/// for LDAP auththentication: when username does not contain the domainname
-	DomainNotSpecified,
+	DomainNotSpecified = "DomainNotSpecified",
 
 	/// for LDAP auththentication: when the domain is not alloed to use the system
-	DomainNotRegistered,
+	DomainNotRegistered = "DomainNotRegistered",
 
 	/// for LDAP auththentication: when the domain use is not added for the system
-	DomainUserNotRegistered,
+	DomainUserNotRegistered = "DomainUserNotRegistered",
 
 	/// for KAÜ auththentication: When token exchange is failed, or invalid token
-	KAUTokenError,
+	KAUTokenError = "KAUTokenError",
 
 	/// for KAÜ auththentication: when no user registered in the system with given KAÜ user
-	KAUUserNotFound,
+	KAUUserNotFound = "KAUUserNotFound",
 
 }
 export interface TokensDTO {
@@ -57,5 +57,8 @@ export interface LoginResultDTO {
 	tokens:TokensDTO;
 	/// Indicates whether two-factor authentication is required
 	requires2FA:boolean;
+	/// only filled when SignInResult is Ok
+	accountId:string;
+	accountName:string;
 }
 

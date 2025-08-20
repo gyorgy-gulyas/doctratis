@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using OtpNet;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -7,12 +8,16 @@ namespace IAM.Identities.Service.Implementations.Helpers
 {
     public class TokenAgent
     {
-        private const string _secretKey = "EzEgyTitkosKulcsLegalabb32Karakter";
+        private const string _secretKey = "1C774C24-BF2D-4CE3-8FD9-BF26BABEC093";
         private const string _issuer = "docratis";
         private const string _audience = "MyAppUsers";
         private const int AccessTokenValidaionTimeInMinutes = 24 * 60;
         private const int RefresokenValidaionTimeInDays = 7;
+
+        private const string _EmailConfirmationSecretKey = "08105FE2-180C-4591-B54B-7526E812FA71";
         private const int EmailConfirmationTokenValidityInMinutes = 24 * 60;
+        private const string _ForgotPasswordSecretKey = "7178ED78-16CA-4E2B-9D11-200865D3A600";
+        private const int ForgotPasswordTokenValidaionTimeInMinutes = 60;
 
         /// <summary>
         /// Access token generálása rövid lejárati idővel (pl. 15 perc)
@@ -108,64 +113,44 @@ namespace IAM.Identities.Service.Implementations.Helpers
         /// <summary>
         /// Generates a short-lived token for confirming an email address.
         /// </summary>
-        public (string token, DateTime expiresAt) GenerateEmailConfirmationToken(string accountId, string authId)
+        public (string token, DateTime expiresAt) GenerateEmailConfirmationToken(string userSecret, string authId)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim> {
-                new Claim("accountId", accountId),
-                new Claim("authId", authId),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+            var secretBytes = Encoding.UTF8.GetBytes(_secretKey + _EmailConfirmationSecretKey + userSecret );
+            var totp = new Totp(secretBytes, step: EmailConfirmationTokenValidityInMinutes * 60);
 
             var expiresAt = DateTime.UtcNow.AddMinutes(EmailConfirmationTokenValidityInMinutes);
 
-            var token = new JwtSecurityToken(
-                issuer: _issuer,
-                audience: _audience,
-                claims: claims,
-                expires: expiresAt,
-                signingCredentials: creds
-            );
-
-            return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+            return (totp.ComputeTotp(), expiresAt);
         }
 
         /// <summary>
         /// Validates an email confirmation token and returns the accountId/authId if valid.
         /// Returns null if invalid or expired.
         /// </summary>
-        public (string AccountId, string AuthId)? ValidateEmailConfirmationToken(string token)
+        public bool ValidateEmailConfirmationToken(string userSecret, string code)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_secretKey);
+            var secretBytes = Encoding.UTF8.GetBytes(_secretKey + _EmailConfirmationSecretKey + userSecret);
+            var totp = new Totp(secretBytes, step: EmailConfirmationTokenValidityInMinutes * 60);
 
-            try
-            {
-                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = _issuer,
-                    ValidAudience = _audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                }, out SecurityToken validatedToken);
+            return totp.VerifyTotp(code, out _, new VerificationWindow(previous: 1, future: 1));
+        }
 
-                var accountId = principal.FindFirst("accountId")?.Value;
-                var authId = principal.FindFirst("authId")?.Value;
+        public (string token, DateTime expiresAt) GenerateForgotPasswordCode(string userSecret)
+        {
+            var secretBytes = Encoding.UTF8.GetBytes(_secretKey + _ForgotPasswordSecretKey + userSecret);
+            var totp = new Totp(secretBytes, step: ForgotPasswordTokenValidaionTimeInMinutes * 60);
 
-                if (string.IsNullOrEmpty(accountId) || string.IsNullOrEmpty(authId))
-                    return null;
+            var expiresAt = DateTime.UtcNow.AddMinutes(ForgotPasswordTokenValidaionTimeInMinutes);
 
-                return (accountId, authId);
-            }
-            catch
-            {
-                return null;
-            }
+            return (totp.ComputeTotp(), expiresAt);
+        }
+
+        public bool ValidateForgotPasswordCode(string userSecret, string code)
+        {
+            var secretBytes = Encoding.UTF8.GetBytes(_secretKey + _ForgotPasswordSecretKey + userSecret);
+            var totp = new Totp(secretBytes, step: ForgotPasswordTokenValidaionTimeInMinutes * 60);
+
+            return totp.VerifyTotp(code, out _, new VerificationWindow(previous: 1, future: 1));
         }
     }
 }

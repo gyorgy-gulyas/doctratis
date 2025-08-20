@@ -6,10 +6,8 @@ import { LoginIF, SignInResult } from "docratis.ts.api";
 type AuthCtx = {
     isAuth: boolean;
     token: string | null;
-    tempToken: string | null;        // 2FA / PW change ideiglenes token
     login: (payload: LoginPayload) => Promise<LoginNext>;
     completeTwoFactor: (code: string) => Promise<void>;
-    changePassword: (oldPwd: string, newPwd: string) => Promise<void>;
     logout: () => void;
 };
 
@@ -23,7 +21,6 @@ export const useAuth = () => {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
-    const [tempToken, setTempToken] = useState<string | null>(null);
 
     const login = async (payload: LoginPayload): Promise<LoginNext> => {
         switch (payload.provider) {
@@ -44,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     case SignInResult.UserIsNotActive:
                         return { kind: "error", message: "The user account is deactivated or locked" };
                     case SignInResult.PasswordExpired:
-                        return { kind: "passwordChange", accessToken: r.tokens.AccessToken };
+                        return { kind: "passwordChange" };
                     default:
                         return { kind: "error", message: "Unknown error" };
                 }
@@ -84,21 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(tokens.AccessToken);
     };
 
-    const changePassword = async (oldPwd: string, newPwd: string) => {
-        const success = await LoginIF.V1.ChangePassword(oldPwd, newPwd)
-        if (success == true) {
-            return;
-        }
-        throw new Error("Password change failed");
-    };
-
     const logout = () => {
         setToken(null);
-        setTempToken(null);
     };
 
     return (
-        <Ctx.Provider value={{ isAuth: !!token, token, tempToken, login, completeTwoFactor, changePassword, logout }}>
+        <Ctx.Provider value={{ isAuth: !!token, token, login, completeTwoFactor, logout }}>
             {children}
         </Ctx.Provider>
     );

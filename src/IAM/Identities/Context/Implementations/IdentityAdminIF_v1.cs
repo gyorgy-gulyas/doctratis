@@ -159,15 +159,6 @@ namespace IAM.Identities.Service.Implementations
             return new(get.Value.Convert());
         }
 
-        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
-        {
-            var change = await _accountAuthService.changePassword(ctx, accountId, authId, etag, oldPassword:string.Empty, newPassword).ConfigureAwait(false);
-            if (change.IsFailed())
-                return new(change.Error);
-
-            return new(change.Value.Convert());
-        }
-
         async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
             var set2FA = await _accountAuthService.setEmailTwoFactor(
@@ -177,40 +168,45 @@ namespace IAM.Identities.Service.Implementations
                 phoneNumber: twoFactor.phoneNumber,
                 email: twoFactor.email
             ).ConfigureAwait(false);
-
             if (set2FA.IsFailed())
                 return new(set2FA.Error);
 
             return new(set2FA.Value.Convert());
         }
 
-        async Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
+        async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.resetPasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
         {
-            var confirm = await _accountAuthService.confirmEmail(ctx, token).ConfigureAwait(false);
-            if (confirm.IsFailed())
-                return new(confirm.Error);
+            var setPassword = await _accountAuthService.setPassword(
+                ctx,
+                accountId,
+                authId,
+                etag,
+                newPassword).ConfigureAwait(false); ;
+            if (setPassword.IsFailed())
+                return new(setPassword.Error);
 
-            return new(confirm.Value);
+            return new(setPassword.Value.Convert());
         }
+
 
         async Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> IIdentityAdminIF_v1.createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
         {
             // Ldap domain betöltése a DTO-hoz (név miatt)
             var ldap = await _ldapDomainRepository.getLdapDomain(ctx, ldapDomainId).ConfigureAwait(false);
-            if( ldap.IsFailed() )
+            if (ldap.IsFailed())
                 return new(ldap.Error);
 
             var create = await _accountAuthService.CreateADAuth(
-                ctx, 
-                accountId, 
-                ldapDomainId, 
+                ctx,
+                accountId,
+                ldapDomainId,
                 adUsername,
                 enableTwoFactor: twoFactor?.enabled ?? false,
                 twoFactorMethod: (twoFactor?.method ?? IIdentityAdminIF_v1.TwoFactorConfigurationDTO.Methods.TOTP).Convert(),
                 twoFactorPhoneNumber: twoFactor?.phoneNumber,
                 twoFactorEmail: twoFactor?.email
             ).ConfigureAwait(false);
-            if(create.IsFailed())
+            if (create.IsFailed())
                 return new(create.Error);
 
             return new(create.Value.Convert(ldap.Value));
@@ -527,7 +523,7 @@ namespace IAM.Identities.Service.Implementations
                 serialNumber = @this.serialNumber,
                 issuer = @this.issuer,
                 subject = @this.subject,
-                publicKeyHash  = @this.publicKeyHash,
+                publicKeyHash = @this.publicKeyHash,
                 validFrom = @this.validFrom,
                 validUntil = @this.validUntil,
                 isRevoked = @this.isRevoked,

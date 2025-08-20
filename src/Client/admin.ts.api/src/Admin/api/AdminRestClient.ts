@@ -54,10 +54,16 @@ export class AdminRestClient {
     }
 
     public mapApiError(error: any, operation: string): ApiError {
-        if (error.response) {
+        if (error.response?.data) {
+            return {
+                status: error.response.data.status,
+                message: error.response.data.messageText,
+                additionalInformation: error.response.data.additionalInformation,
+            };
+        } else if (error.response) {
             return {
                 status: error.response.status,
-                message: `API Error in ${operation}: ${error.response.data?.message || error.message}`,
+                message: `API Error in ${operation}: ${error.message}`,
                 additionalInformation: JSON.stringify(error.response.data),
             };
         } else if (error.request) {

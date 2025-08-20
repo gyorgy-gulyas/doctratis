@@ -1,5 +1,4 @@
 using IAM.Identities.Identity;
-using PolyPersist.Net.Common;
 using PolyPersist.Net.Extensions;
 using ServiceKit.Net;
 
@@ -12,11 +11,6 @@ namespace IAM.Identities.Service.Implementations
         public AuthRepository(IdentityStoreContext context)
         {
             _context = context;
-
-            PolymorphismHandler.Register<Auth, EmailAuth>();
-            PolymorphismHandler.Register<Auth, ADAuth>();
-            PolymorphismHandler.Register<Auth, KAUAuth>();
-            PolymorphismHandler.Register<Auth, CertificateAuth>();
         }
 
         async Task<Response<Auth>> IAuthRepository.createAuth(CallingContext ctx, Auth auth)
@@ -102,8 +96,7 @@ namespace IAM.Identities.Service.Implementations
 
             var auth = _context
                 .Auths
-                .AsQueryable()
-                .OfType<EmailAuth>()
+                .AsQueryable<EmailAuth,Auth>()
                 .Where(ah => ah.email.ToLower() == email )
                 .FirstOrDefault();
 
@@ -128,8 +121,7 @@ namespace IAM.Identities.Service.Implementations
 
             var auth = _context
                 .Auths
-                .AsQueryable()
-                .OfType<ADAuth>()
+                .AsQueryable<ADAuth,Auth>()
                 .Where(ah =>
                     ah.LdapDomainId == ldapDomainId && 
                     ah.userName.ToLower() == userName)
@@ -142,8 +134,7 @@ namespace IAM.Identities.Service.Implementations
         {
             var auths = _context
                 .Auths
-                .AsQueryable()
-                .OfType<ADAuth>()
+                .AsQueryable<ADAuth,Auth>()
                 .Where(ah => ah.LdapDomainId == ldapDomainId )
                 .ToList();
 
@@ -166,8 +157,7 @@ namespace IAM.Identities.Service.Implementations
         {
             var auth = _context
                 .Auths
-                .AsQueryable()
-                .OfType<KAUAuth>()
+                .AsQueryable<KAUAuth, Auth>()
                 .Where(ah => ah.KAUUserId == kauUserId)
                 .FirstOrDefault();
 
@@ -190,8 +180,7 @@ namespace IAM.Identities.Service.Implementations
         {
              var auth = _context
                 .Auths
-                .AsQueryable()
-                .OfType<CertificateAuth>()
+                .AsQueryable<CertificateAuth, Auth>()
                 .Where(ah => ah.certificateThumbprint == thumbprint)
                 .FirstOrDefault();
 
@@ -204,8 +193,7 @@ namespace IAM.Identities.Service.Implementations
 
             var auth = _context
                 .Auths
-                .AsQueryable()
-                .OfType<CertificateAuth>()
+                .AsQueryable<CertificateAuth, Auth>()
                 .Where(ah => ah.serialNumber == serialNumber)
                 .FirstOrDefault();
 

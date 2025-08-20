@@ -671,62 +671,6 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
-		{
-			try
-			{
-				// fill grpc request
-				var request = new IdentityAdminIF_v1_changePasswordOnEmailAuthRequest();
-				request.AccountId = accountId;
-				request.AuthId = authId;
-				request.Etag = etag;
-				request.NewPassword = newPassword;
-
-				// calling grpc client
-				var grpc_response = await _client.changePasswordOnEmailAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "changePasswordOnEmailAuth" ))).ResponseAsync;
-
-				// fill response
-				switch( grpc_response.ResultCase )
-				{
-					case IdentityAdminIF_v1_changePasswordOnEmailAuthResponse.ResultOneofCase.Value:
-						IIdentityAdminIF_v1.EmailAuthDTO value;
-						value = grpc_response.Value != null ? IIdentityAdminIF_v1.EmailAuthDTO.FromGrpc( grpc_response.Value ) : null;
-						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Success( value );
-
-					case IdentityAdminIF_v1_changePasswordOnEmailAuthResponse.ResultOneofCase.Error:
-						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = grpc_response.Error.MessageText,
-							AdditionalInformation = grpc_response.Error.AdditionalInformation,
-						} );
-
-					case IdentityAdminIF_v1_changePasswordOnEmailAuthResponse.ResultOneofCase.None:
-					default:
-						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_changePasswordOnEmailAuth'",
-						} );
-				}
-			}
-			catch (RpcException ex)
-			{
-				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.FromGrpc(),
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
 		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 		{
 			try
@@ -783,43 +727,46 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
+		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.resetPasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
 		{
 			try
 			{
 				// fill grpc request
-				var request = new IdentityAdminIF_v1_confirmEmailRequest();
-				request.Token = token;
+				var request = new IdentityAdminIF_v1_resetPasswordOnEmailAuthRequest();
+				request.AccountId = accountId;
+				request.AuthId = authId;
+				request.Etag = etag;
+				request.NewPassword = newPassword;
 
 				// calling grpc client
-				var grpc_response = await _client.confirmEmailAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "confirmEmail" ))).ResponseAsync;
+				var grpc_response = await _client.resetPasswordOnEmailAuthAsync( request, new CallOptions(ctx.ToGrpcMetadata( "IAM.IdentitiesIdentityAdminIF_v1", "resetPasswordOnEmailAuth" ))).ResponseAsync;
 
 				// fill response
 				switch( grpc_response.ResultCase )
 				{
-					case IdentityAdminIF_v1_confirmEmailResponse.ResultOneofCase.Value:
-						bool value;
-						value = grpc_response.Value;
-						return Response<bool>.Success( value );
+					case IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse.ResultOneofCase.Value:
+						IIdentityAdminIF_v1.EmailAuthDTO value;
+						value = grpc_response.Value != null ? IIdentityAdminIF_v1.EmailAuthDTO.FromGrpc( grpc_response.Value ) : null;
+						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Success( value );
 
-					case IdentityAdminIF_v1_confirmEmailResponse.ResultOneofCase.Error:
-						return Response<bool>.Failure( new ServiceKit.Net.Error() {
+					case IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse.ResultOneofCase.Error:
+						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
 							MessageText = grpc_response.Error.MessageText,
 							AdditionalInformation = grpc_response.Error.AdditionalInformation,
 						} );
 
-					case IdentityAdminIF_v1_confirmEmailResponse.ResultOneofCase.None:
+					case IdentityAdminIF_v1_resetPasswordOnEmailAuthResponse.ResultOneofCase.None:
 					default:
-						return Response<bool>.Failure( new ServiceKit.Net.Error() {
+						return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 							Status = grpc_response.Error.Status.FromGrpc(),
-							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_confirmEmail'",
+							MessageText = "Not handled reponse in GRPC client when calling 'IdentityAdminIF_v1_resetPasswordOnEmailAuth'",
 						} );
 				}
 			}
 			catch (RpcException ex)
 			{
-				return Response<bool>.Failure( new ServiceKit.Net.Error() {
+				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = ex.StatusCode.FromGrpc(),
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -827,7 +774,7 @@ namespace IAM.Identities
 			}
 			catch (Exception ex)
 			{
-				return Response<bool>.Failure( new ServiceKit.Net.Error() {
+				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),

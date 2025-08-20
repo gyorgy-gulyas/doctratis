@@ -52,13 +52,10 @@ namespace IAM.Identities
 		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> getEmailAuth(CallingContext ctx, string accountId, string authId);
 
 		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
-		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword);
-
-		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, TwoFactorConfigurationDTO twoFactor);
 
-		/// <return>bool</return>
-		public Task<Response<bool>> confirmEmail(CallingContext ctx, string token);
+		/// <return>IIdentityAdminIF_v1.EmailAuthDTO</return>
+		public Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> resetPasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword);
 
 		/// <return>IIdentityAdminIF_v1.ADAuthDTO</return>
 		public Task<Response<IIdentityAdminIF_v1.ADAuthDTO>> createADAuth(CallingContext ctx, string accountId, string ldapDomainId, string adUsername, TwoFactorConfigurationDTO twoFactor);

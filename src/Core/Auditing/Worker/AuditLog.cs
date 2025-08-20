@@ -1,9 +1,5 @@
-﻿using JsonDiffPatchDotNet;
-using Newtonsoft.Json.Linq;
-using PolyPersist;
-using PolyPersist.Net.Extensions;
+﻿using PolyPersist;
 using ServiceKit.Net;
-using System.Collections.Concurrent;
 
 namespace Core.Auditing.Worker
 {
@@ -31,6 +27,8 @@ namespace Core.Auditing.Worker
                 idenityId = _callingContext.IdentityId,
                 idenityName = _callingContext.IdentityName,
             };
+
+            FillAddtionalMembers(newTrail);
 
             var table = GetTable();
             await table.Insert(newTrail);

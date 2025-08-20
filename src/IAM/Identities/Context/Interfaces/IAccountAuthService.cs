@@ -19,19 +19,13 @@ namespace IAM.Identities
 		public Task<Response<Identity.EmailAuth>> createEmailAuth(CallingContext ctx, string accountId, string email, string password, bool enableTwoFactor, Identity.TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail);
 
 		/// <return>Identity.EmailAuth</return>
-		public Task<Response<Identity.EmailAuth>> changePassword(CallingContext ctx, string accountId, string authId, string etag, string oldPassword, string newPassword);
-
-		/// <return>Identity.EmailAuth</return>
 		public Task<Response<Identity.EmailAuth>> setEmailTwoFactor(CallingContext ctx, string accountId, string authId, string etag, bool enabled, Identity.TwoFactorConfiguration.Methods method, string phoneNumber, string email);
 
-		/// <return>bool</return>
-		public Task<Response<bool>> confirmEmail(CallingContext ctx, string confirmationToken);
+		/// <return>Identity.EmailAuth</return>
+		public Task<Response<Identity.EmailAuth>> setPassword(CallingContext ctx, string accountId, string authId, string etag, string newPassword);
 
-		/// <return>bool</return>
-		public Task<Response<bool>> ForgottPassword(CallingContext ctx, string accountId, string authId, string url);
-
-		/// <return>bool</return>
-		public Task<Response<bool>> ResetPassword(CallingContext ctx, string token, string newPassword);
+		/// <return>Identity.EmailAuth</return>
+		public Task<Response<Identity.EmailAuth>> setEmailConfirmed(CallingContext ctx, string accountId, string authId, string etag, bool confirmed);
 
 		/// <return>Identity.ADAuth</return>
 		public Task<Response<Identity.ADAuth>> CreateADAuth(CallingContext ctx, string accountId, string ldapDomainId, string userName, bool enableTwoFactor, Identity.TwoFactorConfiguration.Methods twoFactorMethod, string twoFactorPhoneNumber, string twoFactorEmail);

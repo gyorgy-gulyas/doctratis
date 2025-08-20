@@ -34,6 +34,16 @@ class BFFRestClient {
         this.axios.defaults.headers.common["client-tz-offset"] = new Date().getTimezoneOffset();
     }
     /**
+     * - Authorization: Bearer <token>
+     * - identity id/name headerek (alapértelmezett nevek testreszabhatók)
+     */
+    setAuthorization(bearerToken, userId, userName) {
+        // Authorization
+        this.axios.defaults.headers.common["Authorization"] = `Bearer ${bearerToken}`;
+        this.axios.defaults.headers.common["identity-id"] = userId;
+        this.axios.defaults.headers.common["identity-name"] = userName;
+    }
+    /**
      * Elérhetővé teszi a belső Axios példányt
      */
     get apiClient() {

@@ -613,54 +613,6 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.changePasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
-		{
-			try
-			{
-				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/changepasswordonemailauth/{accountId}/{authId}/{etag}/{newPassword}" ) );
-				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "changePasswordOnEmailAuth" );
-
-				// call http client 
-				HttpResponseMessage response = await _httpClient.SendAsync( request );
-
-				if (response.IsSuccessStatusCode)
-				{
-					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.EmailAuthDTO>();
-					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Success( value );
-				}
-				else if( response.Content != null )
-				{
-					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( error );
-				}
-				else
-				{
-					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_changePasswordOnEmailAuth'",
-					} );
-				}
-			}
-			catch (HttpRequestException ex)
-			{
-				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-			catch (Exception ex)
-			{
-				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
-					Status = Statuses.InternalError,
-					MessageText = ex.Message,
-					AdditionalInformation = ex.ToString(),
-				} );
-			}
-		}
-
-		/// <inheritdoc />
 		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.setTwoFactorOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, IIdentityAdminIF_v1.TwoFactorConfigurationDTO twoFactor)
 		{
 			try
@@ -712,38 +664,38 @@ namespace IAM.Identities
 		}
 
 		/// <inheritdoc />
-		async Task<Response<bool>> IIdentityAdminIF_v1.confirmEmail(CallingContext ctx, string token)
+		async Task<Response<IIdentityAdminIF_v1.EmailAuthDTO>> IIdentityAdminIF_v1.resetPasswordOnEmailAuth(CallingContext ctx, string accountId, string authId, string etag, string newPassword)
 		{
 			try
 			{
 				// build request
-				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/confirmemail/{token}" ) );
-				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "confirmEmail" );
+				HttpRequestMessage request = new HttpRequestMessage( HttpMethod.Post, WebUtility.UrlEncode( $"/iam/identities/identityadminif/v1/resetpasswordonemailauth/{accountId}/{authId}/{etag}/{newPassword}" ) );
+				ctx.FillHttpRequest( request, "IAMIdentitiesIdentityAdminIF_v1", "resetPasswordOnEmailAuth" );
 
 				// call http client 
 				HttpResponseMessage response = await _httpClient.SendAsync( request );
 
 				if (response.IsSuccessStatusCode)
 				{
-					var value = await response.Content.ReadFromJsonAsync<bool>();
-					return Response<bool>.Success( value );
+					var value = await response.Content.ReadFromJsonAsync<IIdentityAdminIF_v1.EmailAuthDTO>();
+					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Success( value );
 				}
 				else if( response.Content != null )
 				{
 					var error = await response.Content.ReadFromJsonAsync<Error>();
-					return Response<bool>.Failure( error );
+					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( error );
 				}
 				else
 				{
-					return Response<bool>.Failure( new ServiceKit.Net.Error() {
+					return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 						Status = response.StatusCode.FromHttp(),
-						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_confirmEmail'",
+						MessageText = "Not handled reponse in REST client when calling 'IdentityAdminIF_v1_resetPasswordOnEmailAuth'",
 					} );
 				}
 			}
 			catch (HttpRequestException ex)
 			{
-				return Response<bool>.Failure( new ServiceKit.Net.Error() {
+				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = ex.StatusCode.HasValue ? ex.StatusCode.Value.FromHttp() : Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
@@ -751,7 +703,7 @@ namespace IAM.Identities
 			}
 			catch (Exception ex)
 			{
-				return Response<bool>.Failure( new ServiceKit.Net.Error() {
+				return Response<IIdentityAdminIF_v1.EmailAuthDTO>.Failure( new ServiceKit.Net.Error() {
 					Status = Statuses.InternalError,
 					MessageText = ex.Message,
 					AdditionalInformation = ex.ToString(),
