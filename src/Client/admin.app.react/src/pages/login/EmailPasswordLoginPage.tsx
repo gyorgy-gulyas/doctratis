@@ -24,12 +24,16 @@ export default function EmailPasswordLoginPage() {
                 case SignInResult.Ok:
                     {
                         const bff = BFFRestClient.getInstance()
-                        bff.setAuthorization(r.accountId, r.accountName, r.tokens.AccessToken);
+                        bff.setAuthorization(r.tokens.AccessToken, r.accountId, r.accountName);
+                        auth.login({
+                            token: r.tokens,
+                            accountId: r.accountId,
+                            accountName: r.accountName,
+                        });
 
                         if (r.requires2FA)
                             nav(`/login/2fa?from=${encodeURIComponent(from)}`, { replace: true });
                         else {
-                            auth.isAuth = true
                             nav(from, { replace: true });
                         }
                     }

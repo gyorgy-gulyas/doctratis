@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 
 export default function TwoFactorPage() {
-    const { completeTwoFactor } = useAuth();
     const auth = useAuth();
     const nav = useNavigate();
     const [q] = useSearchParams();
@@ -17,8 +16,6 @@ export default function TwoFactorPage() {
         e.preventDefault();
         setErr("");
         try {
-            await completeTwoFactor(code);
-
             auth.isAuth = true;
             nav(from, { replace: true });
         } catch {
