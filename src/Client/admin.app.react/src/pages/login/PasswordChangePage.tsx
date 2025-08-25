@@ -1,7 +1,7 @@
 ﻿import type { FormEvent } from "react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { LoginIF, type ApiError } from "docratis.ts.api";
+import { LoginIF, type ApiError } from "@docratis/bff.api.package.ts";
 
 export default function PasswordChangePage() {
     const nav = useNavigate();

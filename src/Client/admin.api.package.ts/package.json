@@ -1,0 +1,31 @@
+{
+  "name": "@docratis/admin.api.package.ts",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.32.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "uuid": "^11.1.0"
+  }
+}

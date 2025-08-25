@@ -1,7 +1,7 @@
 ﻿import type { FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { BFFRestClient, LoginIF, SignInResult } from "docratis.ts.api";
+import { BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
 
 export default function EmailPasswordLoginPage() {

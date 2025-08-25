@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import "./App.css";
 
-import { BFFRestClient } from "docratis.ts.api";
-import { AdminRestClient } from "../../admin.ts.api/app";
+import { BFFRestClient } from "@docratis/bff.api.package.ts";
+import { AdminRestClient } from "@docratis/admin.api.package.ts";
 
 import RequireAuth from "./auth/RequireAuth";
 import HomePage from "./pages/HomePage";

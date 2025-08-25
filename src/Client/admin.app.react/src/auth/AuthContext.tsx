@@ -1,4 +1,4 @@
-﻿import type { TokensDTO } from "docratis.ts.api";
+﻿import type { TokensDTO } from "@docratis/bff.api.package.ts";
 import { createContext, useContext, useMemo, useState, useCallback } from "react";
 
 type AuthState = {

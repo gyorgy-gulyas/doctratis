@@ -2,10 +2,11 @@
   "name": "doctratis",
   "private": true,
   "workspaces": [
+    "src/Client/admin.api.package.ts",
     "src/Client/admin.app.react",
-    "src/Client/admin.ts.api",
-    "src/Client/docratis.react.app",
-    "src/Client/docratis.ts.api"
+    "src/Client/bff.api.package.ts",
+    "src/Client/client.react.app",
+    "src/Client/ui.package.react"
   ],
   "devDependencies": {
     "typescript": "^5.9.0"
