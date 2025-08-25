@@ -1,0 +1,13 @@
+{
+  "name": "doctratis",
+  "private": true,
+  "workspaces": [
+    "src/Client/admin.app.react",
+    "src/Client/admin.ts.api",
+    "src/Client/docratis.react.app",
+    "src/Client/docratis.ts.api"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

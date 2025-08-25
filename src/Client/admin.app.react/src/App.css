@@ -5,6 +5,9 @@
   text-align: center;
 }
 
+form { text-align: left; }
+label { display: block; }
+
 .logo {
   height: 6em;
   padding: 1.5em;

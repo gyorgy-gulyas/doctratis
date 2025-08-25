@@ -18,7 +18,7 @@ import ADLoginPage from "./pages/login/ADLoginPage";
 function App() {
     const backendAddress_dockerLocal = "http://localhost/";
 
-    // inicializálás csak egyszer
+    // Init only once
     useEffect(() => {
         BFFRestClient.getInstance().init(
             backendAddress_dockerLocal,
@@ -36,7 +36,7 @@ function App() {
 
     return (
         <Routes>
-            {/* Login flow gyökér */}
+            {/* Login flow  */}
             <Route path="/login" element={<LoginMethodPage />} />
             <Route path="/login/email" element={<EmailPasswordLoginPage />} />
             <Route path="/login/kau" element={<KAULoginPage />} />
@@ -44,10 +44,9 @@ function App() {
             <Route path="/login/2fa" element={<TwoFactorPage />} />
             <Route path="/login/password-change" element={<PasswordChangePage />} />
 
-            {/* Védett útvonalak */}
+            {/* Protected paths */}
             <Route element={<RequireAuth />}>
                 <Route path="/" element={<HomePage />} />
-                {/* ide jöhetnek további védett oldalak */}
             </Route>
 
             {/* Fallback */}

@@ -61,12 +61,25 @@ export default function EmailPasswordLoginPage() {
     return (
         <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-3">
             <h1>Belépés (Email & Jelszó)</h1>
-            <div>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-            </div>
-            <div>
-                <input value={pwd} onChange={(e) => setPwd(e.target.value)} type="password" placeholder="Jelszó" />
-            </div>
+            <label htmlFor="email">Email</label>
+            <input 
+                id="email" 
+                name="email" 
+                type="email"
+                autoComplete="email"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="sample@domain.com" 
+                required/>
+            <label htmlFor="password">Jelszó</label>
+            <input 
+                id="password" 
+                name="password" 
+                value={pwd} 
+                type="password"
+                onChange={(e) => setPwd(e.target.value)} 
+                placeholder="your password" 
+                required/>
             {err && <div>{err}</div>}
             <div>
                 <button type="submit">Belépés</button>

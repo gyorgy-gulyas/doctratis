@@ -1,48 +1,60 @@
 ﻿import type { TokensDTO } from "docratis.ts.api";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useCallback } from "react";
 
-type AuthCtx = {
+type AuthState = {
     isAuth: boolean;
     token: TokensDTO | null;
     accountId: string | null;
     accountName: string | null;
+};
+
+type AuthCtx = AuthState & {
     login: (p: { token: TokensDTO; accountId: string; accountName: string }) => void;
     logout: () => void;
 };
 
-const Ctx = createContext<AuthCtx | null>(null);
+const Ctx = createContext<AuthCtx>({
+    isAuth: false,
+    token: null,
+    accountId: null,
+    accountName: null,
+    login: () => { },
+    logout: () => { },
+});
 
-export const useAuth = () => {
-    const v = useContext(Ctx);
-    if (!v) throw new Error("AuthProvider missing");
-    return v;
-};
+export const useAuth = () => useContext(Ctx);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [token, setToken] = useState<TokensDTO | null>(null);
-    const [isAuth, setIsAuth] = useState<boolean>(false);
-    const [accountId, setAccountId] = useState<string | null>(null);
-    const [accountName, setAccountName] = useState<string | null>(null);
+    const [state, setState] = useState<AuthState>({
+        isAuth: false,
+        token: null,
+        accountId: null,
+        accountName: null,
+    });
 
+    const login = useCallback<AuthCtx["login"]>(({ token, accountId, accountName }) => {
+        setState({
+            isAuth: true,
+            token,
+            accountId,
+            accountName,
+        });
+    }, []);
 
-    const value = useMemo(
-        () => ({ isAuth, token, accountId, accountName, login, logout }),
-        [isAuth, token, accountId, accountName]
-    );
+    const logout = useCallback<AuthCtx["logout"]>(() => {
+        setState({
+            isAuth: false,
+            token: null,
+            accountId: null,
+            accountName: null,
+        });
+    }, []);
 
-    const login: AuthCtx["login"] = ({ token, accountId, accountName }) => {
-        setToken(token);
-        setAccountId(accountId);
-        setAccountName(accountName);
-        setIsAuth(true);
-    };
+    const value = useMemo<AuthCtx>(() => ({
+        ...state, login, logout
+    }
+    ), [state, login, logout]);
 
-    const logout = () => {
-        setIsAuth(false);
-        setToken(null);
-        setAccountId(null);
-        setAccountName(null);
-    };
 
     return (
         <Ctx.Provider value={value}>
