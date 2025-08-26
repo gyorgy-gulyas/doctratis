@@ -1,4 +1,4 @@
-import { Button } from "@docratis/ui.package.react"
+import { Button, Label } from "@docratis/ui.package.react"
 import { Link } from "react-router-dom";
 
 export default function LoginMethodPage() {
@@ -9,8 +9,9 @@ export default function LoginMethodPage() {
                 <Button asChild>
                     <Link to="/login/email">Email + Jelszó</Link>
                 </Button>
+
                 <Button asChild >
-                    <Link to="/login/kau">KAU</Link>
+                    <Link to="/login/kau">KAÜ</Link>
                 </Button>
                 <Button asChild >
                     <Link to="/login/ad">Active Directory</Link>

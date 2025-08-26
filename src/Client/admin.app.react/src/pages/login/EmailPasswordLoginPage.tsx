@@ -1,5 +1,5 @@
 ﻿import type { FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { ApiError, BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
@@ -96,13 +96,20 @@ export default function EmailPasswordLoginPage() {
                 </div>
             </div>
 
-            <div className="text-destructive h-8">{err}</div>
+            {err && <div className="text-destructive h-8">{err}</div>}
 
             <div>
                 <LoadingButton type="submit" size="lg" className="w-full" isLoading={isLoading} loadingText="Bejelentkezés…">
                     Belépés
                 </LoadingButton>
             </div>
+
+            <Link
+                to={"/login/forgot-password?email=" + email}
+                className="block w-full text-center text-sm text-primary underline underline-offset-4 mt-2"
+            >
+                Elfelejtettem a jelszavam
+            </Link>
         </form>
     );
 }

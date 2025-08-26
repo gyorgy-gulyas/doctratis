@@ -15,6 +15,7 @@ import TwoFactorPage from "./pages/login/TwoFactorPage";
 import PasswordChangePage from "./pages/login/PasswordChangePage";
 import KAULoginPage from "./pages/login/KAULoginPage";
 import ADLoginPage from "./pages/login/ADLoginPage";
+import ForgotPasswordPage from "./pages/login/ForgotPassword";
 
 function App() {
     const backendAddress_dockerLocal = "http://localhost/";
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/login/ad" element={<ADLoginPage />} />
                 <Route path="/login/2fa" element={<TwoFactorPage />} />
                 <Route path="/login/password-change" element={<PasswordChangePage />} />
+                <Route path="/login/forgot-password" element={<ForgotPasswordPage />} />
             </Route>
             
             {/* Protected paths */}
