@@ -4,8 +4,8 @@ import { createContext, useContext, useMemo, useState, useCallback } from "react
 type AuthState = {
     isAuth: boolean;
     token: TokensDTO | null;
-    accountId: string | null;
-    accountName: string | null;
+    accountId: string;
+    accountName: string;
 };
 
 type AuthCtx = AuthState & {
@@ -16,8 +16,8 @@ type AuthCtx = AuthState & {
 const Ctx = createContext<AuthCtx>({
     isAuth: false,
     token: null,
-    accountId: null,
-    accountName: null,
+    accountId: "",
+    accountName: "",
     login: () => { },
     logout: () => { },
 });
@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, setState] = useState<AuthState>({
         isAuth: false,
         token: null,
-        accountId: null,
-        accountName: null,
+        accountId: "",
+        accountName: "",
     });
 
     const login = useCallback<AuthCtx["login"]>(({ token, accountId, accountName }) => {
@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setState({
             isAuth: false,
             token: null,
-            accountId: null,
-            accountName: null,
+            accountId: "",
+            accountName: "",
         });
     }, []);
 

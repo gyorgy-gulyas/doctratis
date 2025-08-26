@@ -8,6 +8,7 @@ import { AdminRestClient } from "@docratis/admin.api.package.ts";
 import RequireAuth from "./auth/RequireAuth";
 import HomePage from "./pages/HomePage";
 
+import AuthLayout from "./layouts/AuthLayout";
 import LoginMethodPage from "./pages/login/LoginMethodPage";
 import EmailPasswordLoginPage from "./pages/login/EmailPasswordLoginPage";
 import TwoFactorPage from "./pages/login/TwoFactorPage";
@@ -37,13 +38,15 @@ function App() {
     return (
         <Routes>
             {/* Login flow  */}
-            <Route path="/login" element={<LoginMethodPage />} />
-            <Route path="/login/email" element={<EmailPasswordLoginPage />} />
-            <Route path="/login/kau" element={<KAULoginPage />} />
-            <Route path="/login/ad" element={<ADLoginPage />} />
-            <Route path="/login/2fa" element={<TwoFactorPage />} />
-            <Route path="/login/password-change" element={<PasswordChangePage />} />
-
+            <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginMethodPage />} />
+                <Route path="/login/email" element={<EmailPasswordLoginPage />} />
+                <Route path="/login/kau" element={<KAULoginPage />} />
+                <Route path="/login/ad" element={<ADLoginPage />} />
+                <Route path="/login/2fa" element={<TwoFactorPage />} />
+                <Route path="/login/password-change" element={<PasswordChangePage />} />
+            </Route>
+            
             {/* Protected paths */}
             <Route element={<RequireAuth />}>
                 <Route path="/" element={<HomePage />} />
