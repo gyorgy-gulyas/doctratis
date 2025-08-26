@@ -4,7 +4,7 @@ import { Label } from "@docratis/ui.package.react";
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground ">
       {/* Fejléc (logo + felirat) */}
       <header className="w-full py-6 flex items-center justify-center">
         <div className="flex items-center gap-3">
@@ -15,7 +15,7 @@ export default function AuthLayout() {
 
       {/* Fő tartalom – vertikálisan középre igazítva, szépen középre húzva */}
       <main className="flex-1 flex items-center">
-        <div className="w-full max-w-md mx-auto p-6">
+        <div className="w-full max-w-md mx-auto p-6 ">
           <Outlet />
         </div>
       </main>
