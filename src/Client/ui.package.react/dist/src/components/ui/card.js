@@ -21,7 +21,7 @@ function CardHeader(_a) {
 }
 function CardTitle(_a) {
     var { className } = _a, props = __rest(_a, ["className"]);
-    return (_jsx("div", Object.assign({ "data-slot": "card-title", className: cn("leading-none ", className) }, props)));
+    return (_jsx("div", Object.assign({ "data-slot": "card-title", className: cn("leading-none font-semibold", className) }, props)));
 }
 function CardDescription(_a) {
     var { className } = _a, props = __rest(_a, ["className"]);

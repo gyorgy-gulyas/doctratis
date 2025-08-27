@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2752196">
+  <PropertyGroup>
+    <StartupCommand>npm run dev</StartupCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Vitest</JavaScriptTestFramework>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+  </PropertyGroup>
+
+  <!-- (opcionális) típusellenőrzés build előtt -->
+  <Target Name="TypeCheck" BeforeTargets="Build">
+    <Exec Command="npx tsc --noEmit -p tsconfig.json" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+</Project>

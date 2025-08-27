@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-6 w-96">
+      <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-6 max-w-2xl">
       <h1>Elfelejtett jelszó</h1>
 
       <div className={isLoading ? "space-y-6 pointer-events-none opacity-50" : "space-y-6"}>
