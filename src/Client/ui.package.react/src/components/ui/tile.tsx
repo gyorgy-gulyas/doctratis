@@ -1,7 +1,7 @@
+import { Card, CardDescription, CardHeader, CardTitle } from "@docratis/ui.package.react"
+import { ChevronRight } from "lucide-react"
 import * as React from "react"
 import { Link } from "react-router-dom"
-import { Card, CardHeader, CardTitle, CardDescription } from "@docratis/ui.package.react"
-import { ChevronRight } from "lucide-react"
 
 type Props = {
     to: string
@@ -17,16 +17,16 @@ export function Tile({ to, icon, title, description }: Props) {
             className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
         >
             <Card className="relative overflow-hidden transition hover:shadow-md hover:-translate-y-0.5">
-                {/* finom színátmenet hoverre */}
+                {/* finom szï¿½nï¿½tmenet hoverre */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/0 to-primary/0 group-hover:to-primary/5 transition-colors" />
                 <CardHeader className="flex items-center gap-4 py-4">
-                    {/* ikon “badge” */}
+                    {/* ikon ï¿½badgeï¿½ */}
                     <div className="grid place-items-center size-12 rounded-md bg-primary/10 text-primary group-hover:bg-primary/15 transition">
-                        {/* ikon méretezés */}
+                        {/* ikon mï¿½retezï¿½s */}
                         <div className="size-6">{icon}</div>
                     </div>
 
-                    {/* szöveg */}
+                    {/* szï¿½veg */}
                     <div className="flex-1 text-left">
                         <CardTitle className="text-base leading-tight">{title}</CardTitle>
                         <CardDescription className="text-sm leading-snug">

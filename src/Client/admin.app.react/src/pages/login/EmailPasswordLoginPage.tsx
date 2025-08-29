@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { ApiError, BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
-import { Description, Input, Label, LoadingButton } from "@docratis/ui.package.react"
+import { Description, Input, Label, LoadingButton, PasswordInput } from "@docratis/ui.package.react"
+import { Search } from "lucide-react"
 
 export default function EmailPasswordLoginPage() {
     const auth = useAuth();
@@ -65,9 +66,9 @@ export default function EmailPasswordLoginPage() {
     };
 
     return (
-        <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-6 w-96">
+        <form onSubmit={onSubmit} className="p-6 max-w-xl mx-auto space-y-6">
             <h1>Belépés</h1>
-            <Description>Ez a bejelentkezési mód csak előzetesen regisztrált felhasználók számára érhető el. Ha szeretnél hozzáférést a rendszerhez, vedd fel a kapcsolatot az adminisztrátoroddal.</Description>
+            <Description>Ez a bejelentkezési mód csak előzetesen regisztrált felhasználók számára érhető el. Ha szeretnél hozzáférést a rendszerhez, vedd fel a kapcsolatot a rendszer adminisztrátorral.</Description>
             <div className={isLoading ? "space-y-6 pointer-events-none opacity-50" : "space-y-6"}>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
@@ -80,15 +81,15 @@ export default function EmailPasswordLoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="sample@domain.com"
                         required
+                        clearable
                     />
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="password">Jelszó</Label>
-                    <Input
+                    <PasswordInput
                         id="password"
                         name="password"
-                        type="password"
                         value={pwd}
                         onChange={(e) => setPwd(e.target.value)}
                         placeholder="your password"

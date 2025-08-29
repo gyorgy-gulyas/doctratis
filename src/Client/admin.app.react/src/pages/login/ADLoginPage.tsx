@@ -71,7 +71,7 @@ export default function ADLoginPage() {
     };
 
     return (
-        <form onSubmit={onSubmit} className="p-6 max-w-sm mx-auto space-y-4 w-96">
+        <form onSubmit={onSubmit} className="p-6 max-w-xl mx-auto space-y-4">
             <h1 className="text-xl font-semibold">AD bejelentkezés</h1>
             <div className={isLoading ? "space-y-6 pointer-events-none opacity-50" : "space-y-6"}>
                 <div className="space-y-2">

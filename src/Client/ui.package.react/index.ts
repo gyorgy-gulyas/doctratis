@@ -7,4 +7,5 @@ export * from "./src/components/ui/input"
 export * from "./src/components/ui/input-otp"
 export * from "./src/components/ui/label"
 export * from "./src/components/ui/loading-button";
+export * from "./src/components/ui/passwordinput";
 export * from "./src/components/ui/tile"

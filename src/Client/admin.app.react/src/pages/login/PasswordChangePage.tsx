@@ -2,7 +2,18 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoginIF, type ApiError } from "@docratis/bff.api.package.ts";
-import { Input, Label, LoadingButton } from "@docratis/ui.package.react"
+import { Input, Label, LoadingButton, PasswordInput, type PasswordRules } from "@docratis/ui.package.react"
+
+const rules: PasswordRules = {
+  minLength: 12,
+  maxLength: 128,
+  minUppercase: 1,
+  minLowercase: 1,
+  minDigits: 1,
+  minNonAlphanumeric: 1,
+  minUniqueChars: 5,
+  maxRepeatRun: 3,
+};
 
 export default function PasswordChangePage() {
     const nav = useNavigate();
@@ -11,7 +22,8 @@ export default function PasswordChangePage() {
     const email = q.get("email") ?? "/";
 
     const [oldPwd, setOldPwd] = useState("");
-    const [newPwd, setNewPwd] = useState("");
+    const [newPwd1, setNewPwd1] = useState("");
+    const [newPwd2, setNewPwd2] = useState("");
     const [err, setErr] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -20,7 +32,7 @@ export default function PasswordChangePage() {
         setErr("");
         try {
             setIsLoading(true);
-            await LoginIF.V1.ChangePassword(email, oldPwd, newPwd);
+            await LoginIF.V1.ChangePassword(email, oldPwd, newPwd1);
 
             nav(from, { replace: true });
         } catch (e: unknown) {
@@ -50,10 +62,9 @@ export default function PasswordChangePage() {
 
                 <div className="space-y-2">
                     <Label htmlFor="oldPassword">Régi jelszó</Label>
-                    <Input
+                    <PasswordInput
                         id="oldPassword"
                         name="oldPassword"
-                        type="password"
                         value={oldPwd}
                         onChange={(e) => setOldPwd(e.target.value)}
                         required
@@ -62,12 +73,24 @@ export default function PasswordChangePage() {
 
                 <div className="space-y-2">
                     <Label htmlFor="newPassword">Új jelszó</Label>
-                    <Input
+                    <PasswordInput
                         id="newPassword"
                         name="newPassword"
-                        type="password"
-                        value={newPwd}
-                        onChange={(e) => setNewPwd(e.target.value)}
+                        value={newPwd1}
+                        onChange={(e) => setNewPwd1(e.target.value)}
+                        passwordRules={rules}
+                        emailForRules={email}
+                        required
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="newPassword2">Új jelszó</Label>
+                    <PasswordInput
+                        id="newPassword2"
+                        name="newPassword2"
+                        value={newPwd2}
+                        onChange={(e) => setNewPwd2(e.target.value)}
                         required
                     />
                 </div>
