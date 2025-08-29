@@ -1,4 +1,5 @@
 export * from "./src/PasswordControl";
+export * from "./src/components/ui/alert";
 export * from "./src/components/ui/button";
 export * from "./src/components/ui/card";
 export * from "./src/components/ui/description";

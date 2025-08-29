@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { ApiError, BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
-import { Description, Input, Label, LoadingButton, PasswordInput } from "@docratis/ui.package.react"
+import { Description, Input, Label, LoadingButton, Button, PasswordInput } from "@docratis/ui.package.react"
 import { Search } from "lucide-react"
 
 export default function EmailPasswordLoginPage() {
@@ -102,9 +102,23 @@ export default function EmailPasswordLoginPage() {
             {err && <div className="text-destructive h-8">{err}</div>}
 
             <div>
-                <LoadingButton type="submit" size="lg" className="w-full" isLoading={isLoading} loadingText="Bejelentkezés…">
+                <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    infoContent={
+                        <div className="max-w-64">
+                            <h4 className="font-semibold mb-1">Keresés funkció</h4>
+                            <p className="text-xs opacity-90">
+                                Ez a gomb a keresési folyamatot indítja el.
+                                <br />
+                                Tipp: használj pontos kulcsszót a gyorsabb találatokhoz.
+                            </p>
+                        </div>
+                    }
+                >
                     Belépés
-                </LoadingButton>
+                </Button>
             </div>
 
             <Link

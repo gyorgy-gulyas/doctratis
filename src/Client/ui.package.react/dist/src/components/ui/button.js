@@ -14,6 +14,8 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 import { Description } from "./description";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tooltip";
+import { Info } from "lucide-react";
 const buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive", {
     variants: {
         variant: {
@@ -37,9 +39,9 @@ const buttonVariants = cva("inline-flex items-center justify-center gap-2 whites
     },
 });
 function Button(_a) {
-    var { className, variant, size, asChild = false, description, descriptionAlign } = _a, props = __rest(_a, ["className", "variant", "size", "asChild", "description", "descriptionAlign"]);
+    var { className, variant, size, asChild = false, description, descriptionAlign, infoContent, children } = _a, props = __rest(_a, ["className", "variant", "size", "asChild", "description", "descriptionAlign", "infoContent", "children"]);
     const Comp = asChild ? Slot : "button";
-    return (_jsxs("div", { className: "flex flex-col gap-1 w-full", children: [_jsx(Comp, Object.assign({ "data-slot": "button", className: cn(buttonVariants({ variant, size, className })) }, props)), description && _jsx(Description, { align: descriptionAlign, children: description })] }));
+    return (_jsxs("div", { className: "flex flex-col gap-1 w-full", children: [_jsxs(Comp, Object.assign({ "data-slot": "button", className: cn(buttonVariants({ variant, size, className }), "relative group") }, props, { children: [children, infoContent && (_jsx(TooltipProvider, { delayDuration: 150, skipDelayDuration: 300, children: _jsxs(Tooltip, { children: [_jsx(TooltipTrigger, { asChild: true, children: _jsx("span", { className: "absolute right-1 top-1 inline-flex items-center justify-center", onClick: (e) => e.stopPropagation(), children: _jsx(Info, { className: cn("h-3 w-3 transition-colors", "text-muted-foreground", "group-hover:text-primary"), "aria-hidden": "true" }) }) }), _jsx(TooltipContent, { children: typeof infoContent === "string" ? _jsx("p", { children: infoContent }) : infoContent })] }) }))] })), description && _jsx(Description, { align: descriptionAlign, children: description })] }));
 }
 export { Button, buttonVariants };
 //# sourceMappingURL=button.js.map
