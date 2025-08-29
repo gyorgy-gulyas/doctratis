@@ -90,6 +90,7 @@ export default function EmailPasswordLoginPage() {
                     <PasswordInput
                         id="password"
                         name="password"
+                        errorMessage="saewf"
                         value={pwd}
                         onChange={(e) => setPwd(e.target.value)}
                         placeholder="your password"

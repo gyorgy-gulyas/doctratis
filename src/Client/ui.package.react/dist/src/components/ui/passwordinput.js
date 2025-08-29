@@ -83,38 +83,32 @@ function evaluateRules(password, rules, accountNameForRules, emailForRules) {
     return items;
 }
 export function PasswordInput(_a) {
-    var _b, _c;
-    var { className, passwordRules, showChecklist = true, disableRevealAfterBlur = true, hint, accountNameForRules, emailForRules, onChange, onBlur, onFocus, value: valueProp, defaultValue } = _a, props = __rest(_a, ["className", "passwordRules", "showChecklist", "disableRevealAfterBlur", "hint", "accountNameForRules", "emailForRules", "onChange", "onBlur", "onFocus", "value", "defaultValue"]);
+    var _b;
+    var { className, passwordRules, accountNameForRules, emailForRules, onChange, value: valueProp, description, descriptionAlign = "left", errorMessage } = _a, props = __rest(_a, ["className", "passwordRules", "accountNameForRules", "emailForRules", "onChange", "value", "description", "descriptionAlign", "errorMessage"]);
     const [visible, setVisible] = React.useState(false);
     const [capsOn, setCapsOn] = React.useState(false);
     const [canReveal, setCanReveal] = React.useState(true);
     const inputRef = React.useRef(null);
     const clickedRevealRef = React.useRef(false);
-    // kontrollált + nem kontrollált támogatása
-    const isControlled = valueProp != null;
-    const [internal, setInternal] = React.useState((_b = defaultValue) !== null && _b !== void 0 ? _b : "");
-    const value = (_c = (isControlled ? valueProp : internal)) !== null && _c !== void 0 ? _c : "";
+    // mindig kontrollált
+    const value = (_b = valueProp) !== null && _b !== void 0 ? _b : "";
     React.useEffect(() => {
-        console.log("can revale changed");
+        console.log("can reveal changed");
         console.log(canReveal);
     }, [canReveal]);
     const handleBlur = (e) => {
         if (clickedRevealRef.current) {
             clickedRevealRef.current = false;
-            onBlur === null || onBlur === void 0 ? void 0 : onBlur(e);
             return;
         }
-        if (disableRevealAfterBlur && value.trim() !== "") {
+        if (value.trim() !== "") {
             setCanReveal(false);
             setVisible(false);
         }
-        onBlur === null || onBlur === void 0 ? void 0 : onBlur(e);
     };
     const handleChange = (e) => {
-        var _a, _b;
-        if (!isControlled)
-            setInternal((_a = e.target.value) !== null && _a !== void 0 ? _a : "");
-        if (((_b = e.target.value) !== null && _b !== void 0 ? _b : "") === "") {
+        var _a;
+        if (((_a = e.target.value) !== null && _a !== void 0 ? _a : "") === "") {
             setCanReveal(true);
             setVisible(false);
         }
@@ -143,6 +137,7 @@ export function PasswordInput(_a) {
     const ruleResults = passwordRules && value !== ""
         ? evaluateRules(value, passwordRules, accountNameForRules, emailForRules)
         : [];
-    return (_jsxs("div", { className: "flex flex-col gap-1", children: [_jsxs("div", { className: "relative", children: [_jsx("input", Object.assign({ ref: inputRef, type: visible ? "text" : "password", "data-slot": "input", autoComplete: "new-password", className: cn("file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]", "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive", "pr-10", className), value: value, onChange: handleChange, onFocus: onFocus, onBlur: handleBlur, onKeyUp: handleKeyUp }, props)), _jsx("button", { type: "button", "aria-label": visible ? "Jelszó elrejtése" : "Jelszó megjelenítése", onMouseDown: handleRevealMouseDown, onPointerDown: handleRevealPointerDown, onClick: toggleVisible, className: cn("absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-sm", "text-muted-foreground hover:text-foreground transition", !canReveal && "opacity-50 cursor-not-allowed"), tabIndex: -1, children: visible ? _jsx(EyeOff, { className: "h-4 w-4" }) : _jsx(Eye, { className: "h-4 w-4" }) })] }), capsOn && (_jsxs("div", { className: "flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400", children: [_jsx(AlertTriangle, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "Be van kapcsolva a Caps Lock." })] })), hint && _jsx("p", { className: "text-xs text-destructive", children: hint }), showChecklist && passwordRules && value !== "" && ruleResults.length > 0 && (_jsx("ul", { className: "mt-1 space-y-1", children: ruleResults.map(r => (_jsxs("li", { className: cn("text-xs flex items-start gap-1", r.ok ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"), children: [r.ok ? (_jsx(Check, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" })) : (_jsx(X, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" })), _jsx("span", { children: r.text })] }, r.key))) }))] }));
+    const showError = Boolean(errorMessage);
+    return (_jsxs("div", { className: "flex flex-col gap-1", children: [_jsxs("div", { className: "relative", children: [_jsx("input", Object.assign({ ref: inputRef, type: visible ? "text" : "password", "data-slot": "input", autoComplete: "new-password", className: cn("file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm", "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]", "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive", "pr-10", showError && "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30", className), value: value, onChange: handleChange, onBlur: handleBlur, onKeyUp: handleKeyUp }, props)), _jsx("button", { type: "button", "aria-label": visible ? "Jelszó elrejtése" : "Jelszó megjelenítése", onMouseDown: handleRevealMouseDown, onPointerDown: handleRevealPointerDown, onClick: toggleVisible, className: cn("absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-sm", "text-muted-foreground hover:text-foreground transition", !canReveal && "opacity-50 cursor-not-allowed"), tabIndex: -1, children: visible ? _jsx(EyeOff, { className: "h-4 w-4" }) : _jsx(Eye, { className: "h-4 w-4" }) })] }), capsOn && (_jsxs("div", { className: "flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400", children: [_jsx(AlertTriangle, { className: "h-3.5 w-3.5" }), _jsx("span", { children: "Be van kapcsolva a Caps Lock." })] })), errorMessage && (_jsx("p", { className: "text-xs text-destructive", children: errorMessage })), passwordRules && value !== "" && ruleResults.length > 0 && (_jsx("ul", { className: "mt-1 space-y-1", children: ruleResults.map(r => (_jsxs("li", { className: cn("text-xs flex items-start gap-1", r.ok ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"), children: [r.ok ? (_jsx(Check, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" })) : (_jsx(X, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" })), _jsx("span", { children: r.text })] }, r.key))) })), description && (_jsx("p", { className: cn("text-xs text-muted-foreground", descriptionAlign === "center" && "text-center", descriptionAlign === "right" && "text-right"), children: description }))] }));
 }
 //# sourceMappingURL=passwordinput.js.map

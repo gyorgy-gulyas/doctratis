@@ -15,9 +15,6 @@ export type PasswordRules = {
 
 type PasswordInputProps = Omit<React.ComponentProps<"input">, "type"> & {
     passwordRules?: PasswordRules;
-    showChecklist?: boolean;
-    disableRevealAfterBlur?: boolean;
-    hint?: string;
     accountNameForRules?: string;
     emailForRules?: string;
     description?: string,
@@ -97,16 +94,13 @@ function evaluateRules(
 export function PasswordInput({
     className,
     passwordRules,
-    showChecklist = true,
-    disableRevealAfterBlur = true,
-    hint,
     accountNameForRules,
     emailForRules,
     onChange,
-    onBlur,
-    onFocus,
     value: valueProp,
-    defaultValue,
+    description,
+    descriptionAlign = "left",
+    errorMessage,
     ...props
 }: PasswordInputProps) {
     const [visible, setVisible] = React.useState(false);
@@ -115,31 +109,26 @@ export function PasswordInput({
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const clickedRevealRef = React.useRef(false);
 
-    // kontrollált + nem kontrollált támogatása
-    const isControlled = valueProp != null;
-    const [internal, setInternal] = React.useState<string>((defaultValue as string) ?? "");
-    const value = (isControlled ? (valueProp as string) : internal) ?? "";
+    // mindig kontrollált
+    const value = (valueProp as string) ?? "";
 
-    React.useEffect( () => {
-        console.log( "can revale changed");
-        console.log( canReveal);
-    }, [canReveal])
+    React.useEffect(() => {
+        console.log("can reveal changed");
+        console.log(canReveal);
+    }, [canReveal]);
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         if (clickedRevealRef.current) {
             clickedRevealRef.current = false;
-            onBlur?.(e);
             return;
         }
-        if (disableRevealAfterBlur && value.trim() !== "") {
+        if (value.trim() !== "") {
             setCanReveal(false);
             setVisible(false);
         }
-        onBlur?.(e);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!isControlled) setInternal(e.target.value ?? "");
         if ((e.target.value ?? "") === "") {
             setCanReveal(true);
             setVisible(false);
@@ -173,7 +162,7 @@ export function PasswordInput({
             ? evaluateRules(value, passwordRules, accountNameForRules, emailForRules)
             : [];
 
-    const showError = Boolean(errorMessage) // <-- ÚJ
+    const showError = Boolean(errorMessage);
 
     return (
         <div className="flex flex-col gap-1">
@@ -188,11 +177,11 @@ export function PasswordInput({
                         "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
                         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
                         "pr-10",
+                        showError && "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30",
                         className
                     )}
                     value={value}
                     onChange={handleChange}
-                    onFocus={onFocus}
                     onBlur={handleBlur}
                     onKeyUp={handleKeyUp}
                     {...props}
@@ -222,9 +211,11 @@ export function PasswordInput({
                 </div>
             )}
 
-            {hint && <p className="text-xs text-destructive">{hint}</p>}
+            {errorMessage && (
+                <p className="text-xs text-destructive">{errorMessage}</p>
+            )}
 
-            {showChecklist && passwordRules && value !== "" && ruleResults.length > 0 && (
+            {passwordRules && value !== "" && ruleResults.length > 0 && (
                 <ul className="mt-1 space-y-1">
                     {ruleResults.map(r => (
                         <li
@@ -243,6 +234,18 @@ export function PasswordInput({
                         </li>
                     ))}
                 </ul>
+            )}
+
+            {description && (
+                <p
+                    className={cn(
+                        "text-xs text-muted-foreground",
+                        descriptionAlign === "center" && "text-center",
+                        descriptionAlign === "right" && "text-right"
+                    )}
+                >
+                    {description}
+                </p>
             )}
         </div>
     );
