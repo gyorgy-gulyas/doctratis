@@ -1,0 +1,34 @@
+# mongo/values.yaml
+# Production baseline
+architecture: replicaset
+replicaCount: 3
+
+arbiter:
+  enabled: false
+
+auth:
+  enabled: true
+  existingSecret: mongodb-auth
+  rootUser: root
+
+persistence:
+  enabled: true
+  storageClass: ""            # prodban tedd a saját SC-re (pl. "gp2" / "premium-rwo")
+  accessModes: ["ReadWriteOnce"]
+  size: 20Gi
+  mountPath: /bitnami/mongodb
+
+volumePermissions:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# (opcionális) PodAntiAffinity, hogy node-okra szórja a példányokat
+podAntiAffinityPreset: soft
+topologySpreadConstraints: []

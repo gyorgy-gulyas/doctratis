@@ -79,18 +79,20 @@ public class IAMServiceHost : BaseServiceHost
 
 namespace IAM.Identities.Service
 {
+    using PolyPersist.Net.BlobStore.GridFS;
     using PolyPersist.Net.BlobStore.Memory;
     using PolyPersist.Net.ColumnStore.Memory;
     using PolyPersist.Net.Core;
     using PolyPersist.Net.DocumentStore.Memory;
+    using PolyPersist.Net.DocumentStore.MongoDB;
 
     public class IdentityStoreProvider : StoreProvider
     {
-        //        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://127.0.0.1:27617/?directConnection=true");
-        //        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://127.0.0.1:27617/?directConnection=true");
+        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://root:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/admin?replicaSet=rs0");
+        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://root:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/admin?replicaSet=rs0");
 
-        protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
-        protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
+        //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
+        //protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
         protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
     }
 }

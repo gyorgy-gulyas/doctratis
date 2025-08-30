@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Nem akarunk buildelhető kódot -->
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+
+    <!-- Ne generáljon bin/obj mappát -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+
+    <!-- Csak meta-projekt, nem buildelünk belőle semmit -->
+    <IsPackable>false</IsPackable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Rekurzívan vegyen fel mindent a deploy mappából -->
+    <None Include=".\**\*" />
+    <!-- Helm chartok -->
+    <None Include="helm\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="mongo\dev-expose_mongo.ps1" />
+    <None Include="mongo\dev-values.yaml" />
+    <None Include="mongo\dev-external-svc.yaml" />
+    <None Include="mongo\prod-external-svc.yaml" />
+    <None Include="mongo\secrets.yaml" />
+  </ItemGroup>
+
+</Project>

@@ -3,6 +3,7 @@ docker build -f ./deployment/Dockerfile --build-arg CS_PROJ_PATH=./src/IAM/Servi
 
 kubectl create namespace docratis
 kubectl create namespace docratis-infra
+kubectl create namespace docratis-store
 kubectl config set-context --current --namespace=doctratis
 
 helm upgrade --install template-management ./deployment/docratis-services --values ./deployment/docratis-services/values.yaml --values ./src/TemplateManagement/Service/deployment/values.yaml --namespace docratis
@@ -36,6 +37,22 @@ grafana:
 	kubectl -n docratis-infra port-forward svc/monitoring-grafana 3000:80
 	http://localhost:3000/login
 
+------------------MONGO------------------------------
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+kubectl apply -f ./deployment/mongo/secrets.yaml -n docratis-store
+Dev:
+helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f .\deployment\mongo\values.yaml -f .\deployment\mongo\dev-values.yaml
+kubectl apply -f .\deployment\mongo\dev-external-svc.yaml -n docratis-store
+Prod:
+helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f ./deployment/mongo/values.yaml
+kubectl apply -f .\deployment\mongo\prod-external-svc.yaml -n docratis-store
+
+check:
+kubectl -n docratis-store get svc mongodb-external
+docker run -d --name mongo-port-proxy -p 27018:27018 alpine/socat tcp-listen:27018,reuseaddr,fork tcp:192.168.65.3:30001
+mongosh mongodb://root:DocratisMongoPassword@192.168.65.3:32017/admin?replicaSet=replicaset-0
+
 
 -- docker image ls
 -- kubectl get pods
@@ -57,3 +74,5 @@ http://template-management:8080/templatemanagement/projects/projectif/v1/listacc
 
 kubectl get deploy -n docratis template-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
 kubectl get deploy -n docratis identity-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
+
+
