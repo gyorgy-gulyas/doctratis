@@ -1,0 +1,10 @@
+#deployment/scylla/auth-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scylla-auth-config
+  namespace: docratis-store
+data:
+  scylla.yaml: |
+    authenticator: PasswordAuthenticator
+    authorizer: CassandraAuthorizer

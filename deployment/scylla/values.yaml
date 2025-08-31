@@ -1,0 +1,19 @@
+﻿# scylla/values.yaml
+datacenter: docratis
+racks:
+  - name: r1
+    members: 3
+    scyllaConfig: scylla-auth-config
+    storage:
+      capacity: 10Gi
+    resources:
+      requests:
+        cpu: 1
+        memory: 2Gi
+      limits:
+        cpu: 2
+        memory: 4Gi
+
+scyllaImage:
+  repository: scylladb/scylla
+  tag: 5.4.9

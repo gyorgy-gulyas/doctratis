@@ -1,0 +1,36 @@
+# scylla/dev-external-svc.yaml
+# Exposes Scylla externally for DEV only (no auth by default).
+# Lets developers connect via a fixed NodePort without kubectl port-forward.
+# Do NOT use this in production.
+
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of the external DEV service
+  name: scylla-external
+  # Namespace where Scylla runs
+  namespace: docratis-store
+spec:
+  # Use NodePort so Docker Desktop node gets a stable TCP port
+  type: NodePort
+  selector:
+    # Must match scylla-client selector to hit all Scylla pods
+    app: scylla
+    app.kubernetes.io/managed-by: scylla-operator
+    app.kubernetes.io/name: scylla
+    scylla/cluster: scylla
+  ports:
+    - name: cql
+      # Cluster-internal CQL (non-TLS) port
+      port: 9042
+      targetPort: 9042
+      # Fixed NodePort for DEV (must be 30000–32767)
+      nodePort: 30042
+      protocol: TCP
+    - name: cql-tls
+      # Cluster-internal CQL over TLS
+      port: 9142
+      targetPort: 9142
+      # Fixed NodePort for DEV (must be 30000–32767)
+      nodePort: 31942
+      protocol: TCP

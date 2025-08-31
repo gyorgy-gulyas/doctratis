@@ -1,0 +1,52 @@
+#deployment/scylla/bootstrap-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scylla-bootstrap
+  namespace: docratis-store
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 300  # <-- after five minutes the GC will deleted this job
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: cql-bootstrap
+          image: scylladb/scylla
+          command:
+            - bash
+            - -lc
+            - |
+              set -euo pipefail
+              echo "Waiting for CQL..."
+              until cqlsh scylla-client 9042 -u cassandra -p cassandra -e "SHOW VERSION" >/dev/null 2>&1; do
+                sleep 5
+              done
+              echo "Preparing CQL..."
+              sed -e "s/__APP_USER__/${APP_USER}/g" \
+                  -e "s/__APP_PASS__/${APP_PASS}/g" \
+                  -e "s/__KEYSPACE__/${KEYSPACE}/g" \
+                  -e "s/__DC__/${DC}/g" \
+                  -e "s/__RF__/${RF}/g" /cfg/bootstrap.cql > /tmp/bootstrap.cql
+              echo "Running bootstrap CQL..."
+              cqlsh scylla-client 9042 -u cassandra -p cassandra -f /tmp/bootstrap.cql
+              echo "Done."
+          env:
+            - name: APP_USER
+              valueFrom: { secretKeyRef: { name: scylla-app-user, key: username } }
+            - name: APP_PASS
+              valueFrom: { secretKeyRef: { name: scylla-app-user, key: password } }
+            - name: KEYSPACE
+              value: "docratis"
+            - name: DC
+              value: "docratis"   # a values.yaml-ban megadott datacenter neve
+            - name: RF
+              value: "2"          # replikációs faktor
+          volumeMounts:
+            - name: cfg
+              mountPath: /cfg
+              readOnly: true
+      volumes:
+        - name: cfg
+          configMap:
+            name: scylla-bootstrap-cql

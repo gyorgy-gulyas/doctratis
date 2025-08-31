@@ -1,0 +1,34 @@
+# scylla/prod-external-svc.yaml
+# This Service exposes Scylla externally in the production cluster.
+# It is only intended for administrative access (cqlsh, ops tooling, backups).
+# Applications must use internal DNS; external access is restricted to specific IP ranges.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: scylla-external
+  # Name of the external PROD service
+  namespace: docratis-store
+  # Namespace where Scylla runs
+spec:
+  type: LoadBalancer
+  # Use LoadBalancer to obtain a stable external IP/DNS
+  loadBalancerSourceRanges:
+    - 1.2.3.4/32
+    # Restrict external access to the backup/admin IP(s)
+  selector:
+    app: scylla
+    app.kubernetes.io/managed-by: scylla-operator
+    app.kubernetes.io/name: scylla
+    scylla/cluster: scylla
+  ports:
+    - name: cql
+      port: 9042
+      # External LB port for non-TLS CQL
+      targetPort: 9042
+      protocol: TCP
+    - name: cql-tls
+      port: 9142
+      # External LB port for TLS CQL (recommended for PROD)
+      targetPort: 9142
+      protocol: TCP
