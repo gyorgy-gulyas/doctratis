@@ -79,18 +79,22 @@ public class IAMServiceHost : BaseServiceHost
 
 namespace IAM.Identities.Service
 {
+    using PolyPersist.Net.BlobStore.GridFS;
     using PolyPersist.Net.BlobStore.Memory;
+    using PolyPersist.Net.ColumnStore.Cassandra;
     using PolyPersist.Net.ColumnStore.Memory;
     using PolyPersist.Net.Core;
     using PolyPersist.Net.DocumentStore.Memory;
+    using PolyPersist.Net.DocumentStore.MongoDB;
 
     public class IdentityStoreProvider : StoreProvider
     {
-        //        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://127.0.0.1:27617/?directConnection=true");
-        //        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://127.0.0.1:27617/?directConnection=true");
+        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin");
+        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_files?replicaSet=rs0&authSource=admin");
+        protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore("host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis");
 
-        protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
-        protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
-        protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
+        //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
+        //protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
+        //protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
     }
 }

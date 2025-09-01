@@ -1,0 +1,11 @@
+﻿# only development: create compass user
+initdbScripts:
+  compass-user.js: |
+    db.getSiblingDB('admin').createUser({
+      user: 'compass',
+      pwd: 'CompassPassword123',
+      roles: [
+        { role: 'readWriteAnyDatabase', db: 'admin' },
+        { role: 'clusterMonitor', db: 'admin' }
+      ]
+    });

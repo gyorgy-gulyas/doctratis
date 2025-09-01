@@ -1,0 +1,32 @@
+﻿# mongo/dev-external-svc.yaml
+# This Service exposes MongoDB externally in the production cluster.
+# It is only intended for administrative tasks such as backups (mongodump) and Compass access.
+# Applications should connect internally; external access is restricted to specific IPs for security.
+
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of the external MongoDB service
+  name: mongodb-external
+  # Namespace where MongoDB is deployed
+  namespace: docratis-store
+spec:
+  type: LoadBalancer
+  # Use a LoadBalancer service so we get a stable external IP/DNS
+  #loadBalancerSourceRanges:
+    # Restrict access to this IP (e.g. backup server public IP).
+    #- 1.2.3.4/32
+    # Add more CIDRs if multiple sources need access.
+    #- 4.5.6.7/64
+  selector:
+    # Select the MongoDB pods deployed by the Bitnami Helm chart
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/instance: mongodb
+  ports:
+    - name: mongodb
+      # The external port exposed by the LoadBalancer
+      port: 27017
+      # Forward traffic to the MongoDB container port inside the pod
+      targetPort: 27017
+      # Use TCP protocol as MongoDB communicates over TCP
+      protocol: TCP
