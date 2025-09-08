@@ -58,7 +58,8 @@ mongosh mongodb://root:DocratisMongoPassword@127.0.0.1:28000/admin?directConnect
 mongodb://root:DocratisMongoPassword@\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin
 
 # ----------------- cert-manager ------------------------------------
-helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 -n docratis-infra --set crds.enabled=true
+# helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 -n docratis-infra --set crds.enabled=true
+helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 -n docratis-infra -f .\deployment\cert-manager\values.yaml --set crds.enabled=true
 # check
 kubectl wait -n docratis-infra --for=condition=available deploy/cert-manager --timeout=180s
 kubectl wait -n docratis-infra --for=condition=available deploy/cert-manager-webhook --timeout=180s

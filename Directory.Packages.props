@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
     <!-- PolyPersist Local packages -->
@@ -30,6 +30,7 @@
     <!-- Google protobuf -->
     <PackageVersion Include="Google.Protobuf" Version="3.23.1" />
     <PackageVersion Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.57.0" />
     <!-- logging for controllers -->
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Swagger funcionality for controllers -->

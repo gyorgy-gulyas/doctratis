@@ -1,0 +1,19 @@
+# .NET build artefaktok
+**/bin
+**/obj
+
+# Node.js / frontend buildek
+**/node_modules
+**/dist
+**/build
+
+# Git és egyéb
+.git
+.gitignore
+
+# Docker saját
+Dockerfile
+docker-compose*.yml
+
+# Dokumentáció
+*.md

@@ -1,0 +1,19 @@
+# cert-manager/values.yaml
+securityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+
+cainjector:
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+
+webhook:
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+
+startupapicheck:
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true

@@ -4,18 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Grpc.Tools" PrivateAssets="True" />
+  </ItemGroup>
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\..\</SolutionDir>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" />
-    <PackageReference Include="ServiceKit.Net.General" />
-    <PackageReference Include="ServiceKit.Net.Service" />
+    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
+    <PackageReference Include="ServiceKit.Net.General" />
+    <PackageReference Include="ServiceKit.Net.Service" />
   </ItemGroup>
 
 </Project>
