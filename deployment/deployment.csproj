@@ -29,14 +29,6 @@
     <None Include="mongo\dev-external-svc.yaml" />
     <None Include="mongo\prod-external-svc.yaml" />
     <None Include="mongo\secrets.yaml" />
-    <None Include="scylla\app-user-secret.yaml" />
-    <None Include="scylla\auth-config.yaml" />
-    <None Include="scylla\bootstrap-job.yaml" />
-    <None Include="scylla\bootstrap.cql" />
-    <None Include="scylla\dev-expose_scylla.ps1" />
-    <None Include="scylla\dev-external-svc.yaml" />
-    <None Include="scylla\prod-external-svc.yaml" />
-    <None Include="scylla\secrets.yaml" />
     <None Include="scylla\values.yaml" />
   </ItemGroup>
 

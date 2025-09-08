@@ -5,13 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Tools" PrivateAssets="True" Version="2.57.0"/>
+    <PackageReference Include="Grpc.Tools" PrivateAssets="True" />
   </ItemGroup>
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)' == ''">../../../../</SolutionDir>
   </PropertyGroup>
   <ItemGroup>
-    <Protobuf Include="Protos/*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
+    <Protobuf 
+      Include="Protos/*.proto" 
+      GrpcServices="Both" 
+      OutputDir="Generated"
+      AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
   </ItemGroup>
 
   <ItemGroup>

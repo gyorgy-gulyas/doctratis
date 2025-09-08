@@ -44,7 +44,7 @@ kubectl apply -f ./deployment/mongo/secrets.yaml -n docratis-store
 Dev:
 	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f .\deployment\mongo\values.yaml -f .\deployment\mongo\dev-values.yaml
 	kubectl apply -f .\deployment\mongo\dev-external-svc.yaml -n docratis-store
-	powershell -File .\deployment\mongo\dev-expose_scylla.ps1
+	powershell -File .\deployment\mongo\dev-expose_mongo.ps1
 Prod:
 	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f ./deployment/mongo/values.yaml
 	kubectl apply -f .\deployment\mongo\prod-external-svc.yaml -n docratis-store
@@ -79,6 +79,7 @@ helm list -n scylla-operator | findstr /I scylla-operator
 kubectl apply -f .\deployment\scylla\auth-config.yaml
 kubectl apply -f .\deployment\scylla\secrets.yaml
 kubectl -n docratis-store create configmap scylla-bootstrap-cql --from-file=bootstrap.cql=.\deployment\scylla\bootstrap.cql --dry-run=client -o yaml | kubectl apply -f -
+
 
 helm upgrade --install scylla scylla/scylla -n docratis-store -f ./deployment/scylla/values.yaml
 # várj, míg a node-ok felállnak:
@@ -128,7 +129,6 @@ docker run -it --rm --entrypoint cqlsh scylladb/scylla host.docker.internal 2904
 # cassandra GUI dev-en, és teszt
 docker rm -f cassandra-web 2>$null
 # ipushc/cassandra-web a XXXX-es porton futtatva
-docker run -d --name cassandra-web -p 9876:3000 -e HOST_PORT=":3000" -e APP_PATH="/" -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=$U -e CASSANDRA_PASSWORD=$P ipushc/cassandra-web:latest
 docker run -d --name cassandra-web -p 9876:8083 -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=docratis -e CASSANDRA_PASSWORD=DocratisScyllaPassword ipushc/cassandra-web:v1.1.0
 docker logs cassandra-web --tail 200
 Invoke-WebRequest http://localhost:9876/ | Select-Object StatusCode, StatusDescription
@@ -166,3 +166,13 @@ kubectl -n docratis-store run -it --rm cqltest --image=scylladb/scylla --restart
 
 
 Get-Content -Path $path -Encoding Byte -TotalCount 4 | ForEach-Object { "{0:X2}" -f $_ } -join " "
+
+
+kubectl -n docratis-store exec -it scylla-docratis-r1-0 -c scylla -- bash -lc 'echo "memory.max: $(cat /sys/fs/cgroup/memory.max)"; echo "cpu.max: $(cat /sys/fs/cgroup/cpu.max)"; nproc; free -m'
+
+
+kubectl -n docratis-store get events --field-selector involvedObject.name=scylla-docratis-r1-2 --sort-by=.lastTimestamp
+
+
+
+

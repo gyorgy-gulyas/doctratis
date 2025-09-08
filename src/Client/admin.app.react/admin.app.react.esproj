@@ -21,6 +21,7 @@
     <Exec Command="npm run typecheck" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
   <ItemGroup>
-    <None Include=".vscode\launch.json" />
+    <None Remove=".vscode\**" />
+    <TypeScriptConfiguration Remove=".vscode\**" />
   </ItemGroup>
 </Project>
