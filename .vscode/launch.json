@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Vite dev server",
+      "type": "pwa-node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src/Client/admin.app.react",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "80", "--strictPort"],
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true
+    },
+    {
+      "name": "Chrome: admin.app.react",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:80",
+      "webRoot": "${workspaceFolder}/src/Client/admin.app.react",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "sourceMapPathOverrides": {
+        "/src/*": "${webRoot}/src/*",
+        "vite:///*": "${webRoot}/*"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Vite and Chrome",
+      "configurations": ["Launch Vite dev server", "Chrome: admin.app.react"],
+      "stopAll": true
+    }
+  ]
+}
