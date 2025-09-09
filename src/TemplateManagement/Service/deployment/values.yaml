@@ -1,3 +1,4 @@
+#src\TemplateManagement\Service\deployment\values.yaml
 serviceName: template-management
 
 ports:

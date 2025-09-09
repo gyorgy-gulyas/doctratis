@@ -1,3 +1,4 @@
+#deployment\kong\values.yaml
 fullnameOverride: kong-gateway
 
 image:
