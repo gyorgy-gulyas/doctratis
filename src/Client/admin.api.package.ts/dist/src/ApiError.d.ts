@@ -1,0 +1,6 @@
+export interface ApiError {
+    status: number;
+    message: string;
+    additionalInformation?: string;
+}
+//# sourceMappingURL=ApiError.d.ts.map

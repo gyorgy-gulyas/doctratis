@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ApiError, BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
 import { Description, Input, Label, LoadingButton, Button, PasswordInput } from "@docratis/ui.package.react"
-import { Search } from "lucide-react"
 
 export default function EmailPasswordLoginPage() {
     const auth = useAuth();
@@ -22,7 +21,7 @@ export default function EmailPasswordLoginPage() {
         setErr("");
         try {
             setIsLoading(true);
-            const r = await LoginIF.V1.LoginWithAD(email, pwd);
+            const r = await LoginIF.V1.LoginWithEmailPassword(email, pwd);
 
             switch (r.result) {
                 case SignInResult.Ok:
