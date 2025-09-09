@@ -11,7 +11,11 @@
     <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\..\</SolutionDir>
   </PropertyGroup>
   <ItemGroup>
-    <Protobuf Include="Protos\*.proto" GrpcServices="Both" AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
+    <Protobuf 
+      Include="Protos\*.proto"
+      GrpcServices="Both"
+      OutputDir="Generated"
+      AdditionalImportDirs="$(SolutionDir)src;$(ServiceKitNetProtoRoot)" />
   </ItemGroup>
 
   <ItemGroup>

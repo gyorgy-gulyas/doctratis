@@ -10,23 +10,28 @@ helm upgrade --install template-management ./deployment/docratis-services --valu
 helm upgrade --install identity-and-access-management ./deployment/docratis-services --values ./deployment/docratis-services/values.yaml --values ./src/IAM/Service/deployment/values.yaml --namespace docratis
 
 # -- KONG Ingress --
-helm repo add kong https://charts.konghq.com
+helm repo add kong https://charts.konghq.com	
 helm repo update
-helm upgrade --install kong-gateway kong/kong -n docratis-infra -f ./deployment/kong/values.yaml
+Dev:
+	helm upgrade --install kong-gateway kong/kong -n docratis-infra -f ./deployment/kong/values.yaml -f ./deployment/kong/dev-values.yaml
+Prod:
+	helm upgrade --install kong-gateway kong/kong -n docratis-infra -f ./deployment/kong/values.yaml
+
 kubectl apply -n docratis-infra -f ./deployment/kong/ingress.yaml
 
 # -- Metrics Ingress --
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-release:
-	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n docratis-infra -f ./deployment/monitoring/values.yaml
-docker desktop:
+Dev:
 	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n docratis-infra -f ./deployment/monitoring/values.yaml --set kubeControllerManager.enabled=false --set kubeScheduler.enabled=false --set kubeProxy.enabled=false --set kubeEtcd.enabled=false
 	kubectl apply -f deployment/kong/kong-servicemonitor.yaml
 	kubectl apply -f deployment/kong/kong-metrics-service.yaml
 	kubectl apply -f deployment/kong/kong-prometheus-plugin.yaml
 	kubectl apply -f deployment/kong/ui-paths.yaml
+Prod:
+	helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n docratis-infra -f ./deployment/monitoring/values.yaml
 
+# ellenörzés
 promteus:
 	kubectl -n docratis-infra port-forward svc/monitoring-kube-prometheus-prometheus 9090
 	http://localhost:9090/targets
@@ -44,7 +49,7 @@ kubectl apply -f ./deployment/mongo/secrets.yaml -n docratis-store
 Dev:
 	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f .\deployment\mongo\values.yaml -f .\deployment\mongo\dev-values.yaml
 	kubectl apply -f .\deployment\mongo\dev-external-svc.yaml -n docratis-store
-	powershell -File .\deployment\mongo\dev-expose_scylla.ps1
+	powershell -File .\deployment\mongo\dev-expose_mongo.ps1
 Prod:
 	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f ./deployment/mongo/values.yaml
 	kubectl apply -f .\deployment\mongo\prod-external-svc.yaml -n docratis-store
@@ -79,6 +84,7 @@ helm list -n scylla-operator | findstr /I scylla-operator
 kubectl apply -f .\deployment\scylla\auth-config.yaml
 kubectl apply -f .\deployment\scylla\secrets.yaml
 kubectl -n docratis-store create configmap scylla-bootstrap-cql --from-file=bootstrap.cql=.\deployment\scylla\bootstrap.cql --dry-run=client -o yaml | kubectl apply -f -
+
 
 helm upgrade --install scylla scylla/scylla -n docratis-store -f ./deployment/scylla/values.yaml
 # várj, míg a node-ok felállnak:
@@ -128,7 +134,6 @@ docker run -it --rm --entrypoint cqlsh scylladb/scylla host.docker.internal 2904
 # cassandra GUI dev-en, és teszt
 docker rm -f cassandra-web 2>$null
 # ipushc/cassandra-web a XXXX-es porton futtatva
-docker run -d --name cassandra-web -p 9876:3000 -e HOST_PORT=":3000" -e APP_PATH="/" -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=$U -e CASSANDRA_PASSWORD=$P ipushc/cassandra-web:latest
 docker run -d --name cassandra-web -p 9876:8083 -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=docratis -e CASSANDRA_PASSWORD=DocratisScyllaPassword ipushc/cassandra-web:v1.1.0
 docker logs cassandra-web --tail 200
 Invoke-WebRequest http://localhost:9876/ | Select-Object StatusCode, StatusDescription
@@ -152,17 +157,9 @@ kubectl get events -n docratis --field-selector "involvedObject.kind=Ingress,inv
 kubectl run -it --rm curl --image=curlimages/curl -n docratis -- sh -lc "set -x; curl -i http://template-management:8080/projects/projectif/v1/listaccessibleprojects; echo; curl -i http://template-management:8080/templatemanagement/projects/projectif/v1/listaccessibleprojects; echo; curl -i http://template-management:8080/swagger/index.html || true"
 
 
-http://localhost/templatemanagement/projects/projectif/v1/listaccessibleprojects
-http://template-management:8080/templatemanagement/projects/projectif/v1/listaccessibleprojects
+http://localhost:31000/templatemanagement/projects/projectif/v1/listaccessibleprojects
+
 
 
 kubectl get deploy -n docratis template-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
 kubectl get deploy -n docratis identity-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
-
-
-
-
-kubectl -n docratis-store run -it --rm cqltest --image=scylladb/scylla --restart=Never -- cqlsh scylla-client 9042 -u cassandra -p cassandra -e "SHOW VERSION"
-
-
-Get-Content -Path $path -Encoding Byte -TotalCount 4 | ForEach-Object { "{0:X2}" -f $_ } -join " "

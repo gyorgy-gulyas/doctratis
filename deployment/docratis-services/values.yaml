@@ -1,3 +1,4 @@
+#deployment/docratis-services/values.yaml
 replicaCount: 1
 
 image:

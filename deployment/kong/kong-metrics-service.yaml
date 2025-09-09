@@ -1,3 +1,4 @@
+#deployment\kong\kong-metrics-service.yaml
 apiVersion: v1
 kind: Service
 metadata:

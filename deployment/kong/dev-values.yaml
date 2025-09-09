@@ -1,0 +1,5 @@
+#deployment/kong/dev-values.yaml
+proxy:
+  type: NodePort
+  http:
+    nodePort: 31000
