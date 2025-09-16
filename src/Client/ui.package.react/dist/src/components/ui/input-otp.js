@@ -14,9 +14,11 @@ import * as React from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { MinusIcon } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { Alert, AlertTitle, AlertDescription, AlertCircleIcon } from "./alert";
 function InputOTP(_a) {
-    var { className, containerClassName } = _a, props = __rest(_a, ["className", "containerClassName"]);
-    return (_jsx(OTPInput, Object.assign({ "data-slot": "input-otp", containerClassName: cn("flex items-center gap-2 has-disabled:opacity-50", containerClassName), className: cn("disabled:cursor-not-allowed", className) }, props)));
+    var { className, containerClassName, description, descriptionAlign = "left", errorMessage, errorDescription } = _a, props = __rest(_a, ["className", "containerClassName", "description", "descriptionAlign", "errorMessage", "errorDescription"]);
+    const showError = Boolean(errorMessage);
+    return (_jsxs("div", { className: "flex flex-col gap-1", children: [_jsx(OTPInput, Object.assign({ "data-slot": "input-otp", "aria-invalid": showError || undefined, containerClassName: cn("flex items-center gap-2 has-disabled:opacity-50", containerClassName), className: cn("disabled:cursor-not-allowed", className) }, props)), errorMessage && (_jsxs(Alert, { variant: "destructive", noBorder: true, children: [_jsx(AlertCircleIcon, {}), _jsx(AlertTitle, { children: errorMessage }), errorDescription && (_jsx(AlertDescription, { children: errorDescription }))] })), description && (_jsx("p", { className: cn("text-xs text-muted-foreground", descriptionAlign === "center" && "text-center", descriptionAlign === "right" && "text-right"), children: description }))] }));
 }
 function InputOTPGroup(_a) {
     var { className } = _a, props = __rest(_a, ["className"]);

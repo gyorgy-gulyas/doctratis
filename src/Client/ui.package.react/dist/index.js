@@ -9,4 +9,6 @@ export * from "./src/components/ui/label";
 export * from "./src/components/ui/loading-button";
 export * from "./src/components/ui/passwordinput";
 export * from "./src/components/ui/tile";
+export * from "./src/components/ui/two-row-menu";
+export * from "./src/components/ui/tooltip";
 //# sourceMappingURL=index.js.map

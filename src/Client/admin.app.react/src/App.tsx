@@ -9,6 +9,7 @@ import RequireAuth from "./auth/RequireAuth";
 import HomePage from "./pages/HomePage";
 
 import AuthLayout from "./layouts/AuthLayout";
+import MainLayout from "./layouts/MainLayout";
 import LoginMethodPage from "./pages/login/LoginMethodPage";
 import EmailPasswordLoginPage from "./pages/login/EmailPasswordLoginPage";
 import TwoFactorPage from "./pages/login/TwoFactorPage";
@@ -51,11 +52,15 @@ function App() {
             
             {/* Protected paths */}
             <Route element={<RequireAuth />}>
-                <Route path="/" element={<HomePage />} />
+                <Route element={<MainLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                </Route>
             </Route>
 
             {/* Fallback */}
-            <Route path="*" element={<LoginMethodPage />} />
+            <Route element={<AuthLayout />}>
+                <Route path="*" element={<LoginMethodPage />} />
+            </Route>
         </Routes>
     )
 }
