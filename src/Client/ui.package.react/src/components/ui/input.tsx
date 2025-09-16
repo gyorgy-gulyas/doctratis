@@ -1,11 +1,14 @@
 import * as React from "react"
 import { cn } from "../../lib/utils"
+import { AlertCircleIcon } from "lucide-react"
+import { Alert, AlertTitle, AlertDescription } from "./alert"
 
 type InputProps = React.ComponentProps<"input"> & {
     description?: string
     descriptionAlign?: "left" | "center" | "right"
     clearable?: boolean
     errorMessage?: string
+    errorDescription?: React.ReactNode
     maxLength?: number
     rightIcon?: React.ReactNode
     rightIconAction?: () => void
@@ -18,6 +21,7 @@ export function Input({
     descriptionAlign = "left",
     clearable,
     errorMessage,
+    errorDescription,
     maxLength,
     rightIcon,
     rightIconAction,
@@ -95,7 +99,13 @@ export function Input({
             </div>
 
             {errorMessage && (
-                <p className="text-xs text-destructive">{errorMessage}</p>
+                <Alert variant="destructive" noBorder>
+                    <AlertCircleIcon />
+                    <AlertTitle>{errorMessage}</AlertTitle>
+                    {errorDescription && (
+                        <AlertDescription>{errorDescription}</AlertDescription>
+                    )}
+                </Alert>
             )}
 
             {maxLength && (

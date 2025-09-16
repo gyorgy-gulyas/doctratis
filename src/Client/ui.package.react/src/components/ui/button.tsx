@@ -40,7 +40,6 @@ export interface ButtonProps
   asChild?: boolean
   description?: string
   descriptionAlign?: DescriptionAlign
-  /** Tooltip tartalom a gomb jobb felső sarkában lévő infó ikonhoz. */
   infoContent?: React.ReactNode
 }
 

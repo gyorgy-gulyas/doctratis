@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { ApiError, BFFRestClient, LoginIF, SignInResult } from "@docratis/bff.api.package.ts";
 import { useAuth } from "../../auth/AuthContext";
-import { Description, Input, Label, LoadingButton, Button, PasswordInput } from "@docratis/ui.package.react"
+import { Description, Input, Label, LoadingButton, PasswordInput, Alert, AlertDescription, AlertTitle, AlertCircleIcon } from "@docratis/ui.package.react"
 
 export default function EmailPasswordLoginPage() {
     const auth = useAuth();
@@ -13,12 +13,12 @@ export default function EmailPasswordLoginPage() {
 
     const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
-    const [err, setErr] = useState("");
+    const [err, setErr] = useState({ message:"", description:""});
     const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setErr("");
+        setErr({ message: "", description: "" });
         try {
             setIsLoading(true);
             const r = await LoginIF.V1.LoginWithEmailPassword(email, pwd);
@@ -42,22 +42,22 @@ export default function EmailPasswordLoginPage() {
                     }
                     break;
                 case SignInResult.InvalidUserNameOrPassword:
-                    setErr("Invalid username or password provided");
+                    setErr({ message: "Invalid username or password provided", description: "Kérlek ellenörzid hogy helyesen adtad-e meg az adatokat. Amennyiben a belépési adatok helyesek, akkor kérlek vedd fel a kapcsolatot az adminisztrátorral. " });
                     break;
                 case SignInResult.EmailNotConfirmed:
-                    setErr("Email has not been confirmed by the user");
+                    setErr({ message: "Email has not been confirmed by the user", description: "" });
                     break;
                 case SignInResult.UserIsNotActive:
-                    setErr("The user account is deactivated or locked");
+                    setErr({ message: "The user account is deactivated or locked", description: "" });
                     break;
                 case SignInResult.PasswordExpired:
                     nav(`/login/password-change?from=${encodeURIComponent(from)}&email=${encodeURIComponent(email)}`, { replace: true });
                     break;
                 default:
-                    setErr("Email has not been confirmed by the user");
+                    setErr({ message: "Email has not been confirmed by the user", description: "" });
             }
         } catch (e) {
-            setErr(`Sikertelen belépés.${(e as ApiError).message} ${(e as ApiError).additionalInformation}`);
+            setErr({ message: (e as ApiError).message, description:((e as ApiError).additionalInformation ?? "")});
         }
         finally {
             setIsLoading(false);
@@ -70,7 +70,19 @@ export default function EmailPasswordLoginPage() {
             <Description>Ez a bejelentkezési mód csak előzetesen regisztrált felhasználók számára érhető el. Ha szeretnél hozzáférést a rendszerhez, vedd fel a kapcsolatot a rendszer adminisztrátorral.</Description>
             <div className={isLoading ? "space-y-6 pointer-events-none opacity-50" : "space-y-6"}>
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label
+                        htmlFor="email"
+                        infoContent={
+                            <div className="max-w-64">
+                                <h4 className="font-semibold mb-1">Keresés funkció</h4>
+                                <p className="text-xs opacity-90">
+                                    Ez a gomb a keresési folyamatot indítja el.
+                                    <br />
+                                    Tipp: használj pontos kulcsszót a gyorsabb találatokhoz.
+                                </p>
+                            </div>
+                        }
+                    >Email</Label>
                     <Input
                         id="email"
                         name="email"
@@ -89,7 +101,6 @@ export default function EmailPasswordLoginPage() {
                     <PasswordInput
                         id="password"
                         name="password"
-                        errorMessage="saewf"
                         value={pwd}
                         onChange={(e) => setPwd(e.target.value)}
                         placeholder="your password"
@@ -98,26 +109,27 @@ export default function EmailPasswordLoginPage() {
                 </div>
             </div>
 
-            {err && <div className="text-destructive h-8">{err}</div>}
+            {err.message && (
+                <Alert variant="destructive" noBorder>
+                    <AlertCircleIcon />
+                    <AlertTitle>{err.message}</AlertTitle>
+                    {err.description && (
+                        <AlertDescription>{err.description}</AlertDescription>
+                    )}
+                </Alert>
+            )}
 
             <div>
-                <Button
+                <LoadingButton
                     type="submit"
                     size="lg"
                     className="w-full"
-                    infoContent={
-                        <div className="max-w-64">
-                            <h4 className="font-semibold mb-1">Keresés funkció</h4>
-                            <p className="text-xs opacity-90">
-                                Ez a gomb a keresési folyamatot indítja el.
-                                <br />
-                                Tipp: használj pontos kulcsszót a gyorsabb találatokhoz.
-                            </p>
-                        </div>
-                    }
+                    isLoading={isLoading}
+                    loadingText="Bejelentkezés…"
+                    
                 >
                     Belépés
-                </Button>
+                </LoadingButton>
             </div>
 
             <Link

@@ -1,11 +1,20 @@
-﻿# only development: create compass user
-initdbScripts:
-  compass-user.js: |
-    db.getSiblingDB('admin').createUser({
-      user: 'compass',
-      pwd: 'CompassPassword123',
-      roles: [
-        { role: 'readWriteAnyDatabase', db: 'admin' },
-        { role: 'clusterMonitor', db: 'admin' }
-      ]
-    });
+# mongo/values.yaml
+architecture: standalone
+
+auth:
+  enabled: true
+  rootUser: root
+  rootPassword: "MongoRootPassword"
+  username: "docratis"
+  password: "DocratisMongoPassword"
+  database: "docratis_documents"
+
+service:
+  type: NodePort
+  nodePorts:
+    mongodb: 30017   # fix port on host machine
+  port: 27017
+
+persistence:
+  enabled: true
+  size: 8Gi

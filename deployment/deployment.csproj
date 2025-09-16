@@ -25,11 +25,7 @@
   <ItemGroup>
     <None Include="cert-manager\values.yaml" />
     <None Include="kong\dev-values.yaml" />
-    <None Include="mongo\dev-expose_mongo.ps1" />
     <None Include="mongo\dev-values.yaml" />
-    <None Include="mongo\dev-external-svc.yaml" />
-    <None Include="mongo\prod-external-svc.yaml" />
-    <None Include="mongo\secrets.yaml" />
     <None Include="scylla\values.yaml" />
   </ItemGroup>
 

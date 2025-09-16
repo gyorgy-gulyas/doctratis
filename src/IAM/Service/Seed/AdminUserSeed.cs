@@ -45,6 +45,7 @@ namespace IAM.Service.Seed
                 id = Guid.NewGuid().ToString(),
                 etag = null,
                 LastUpdate = DateTime.UtcNow,
+                
 
                 isActive = true,
                 Name = "docratis",

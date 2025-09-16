@@ -342,6 +342,11 @@ namespace IAM.Identities.Service.Implementations
         /// Returns a SignInResult indicating success or failure reason
         private ILoginIF_v1.SignInResult _trySignInWithPassword(Account account, EmailAuth auth, string password)
         {
+            // If password does not match, return InvalidUserNameOrPassword
+            // to avoid leaking information about valid usernames
+            if (_passwordAgent.IsPasswordValid(password, auth.passwordSalt, auth.passwordHash) == false)
+                return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
+
             // If the account is not active, explicitly return UserIsNotActive
             if (!account.isActive || auth.isActive == false)
                 return ILoginIF_v1.SignInResult.UserIsNotActive;
@@ -353,11 +358,6 @@ namespace IAM.Identities.Service.Implementations
             // If the password has expired, explicitly return PasswordExpired
             if (auth.passwordExpiresAt < DateOnly.FromDateTime(DateTime.UtcNow))
                 return ILoginIF_v1.SignInResult.PasswordExpired;
-
-            // If password does not match, return InvalidUserNameOrPassword
-            // to avoid leaking information about valid usernames
-            if (_passwordAgent.IsPasswordValid(password, auth.passwordSalt, auth.passwordHash) == false)
-                return ILoginIF_v1.SignInResult.InvalidUserNameOrPassword;
 
             // Successful sign-in
             return ILoginIF_v1.SignInResult.Ok;

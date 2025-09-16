@@ -57,8 +57,8 @@ namespace TemplateManagement.Projects.Service
 
     public class ProjectStoreProvider : StoreProvider
     {
-        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin");
-        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_files?replicaSet=rs0&authSource=admin");
+        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true");
+        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true");
         protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore("host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis");
 
         //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");

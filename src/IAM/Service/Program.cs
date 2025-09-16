@@ -79,6 +79,7 @@ public class IAMServiceHost : BaseServiceHost
 
 namespace IAM.Identities.Service
 {
+    using MongoDB.Driver.Core.Configuration;
     using PolyPersist.Net.BlobStore.GridFS;
     using PolyPersist.Net.BlobStore.Memory;
     using PolyPersist.Net.ColumnStore.Cassandra;
@@ -89,8 +90,18 @@ namespace IAM.Identities.Service
 
     public class IdentityStoreProvider : StoreProvider
     {
-        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin");
-        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://root:DocratisMongoPassword@\\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_files?replicaSet=rs0&authSource=admin");
+        protected override IDocumentStore GetDocumentStore() 
+        {
+            var connectionString = "mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true";
+            Console.WriteLine(connectionString);
+            return new MongoDB_DocumentStore(connectionString);
+        }
+        protected override IBlobStore GetBlobStore()
+        {
+            var connectionString = "mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true";
+            Console.WriteLine(connectionString);
+            return new GridFS_BlobStore(connectionString);
+        }
         protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore("host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis");
 
         //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");

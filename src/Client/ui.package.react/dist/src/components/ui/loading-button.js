@@ -11,15 +11,13 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Loader2 } from "lucide-react";
-import { Button } from "./button";
 import { cn } from "../../lib/utils";
+import { Button } from "./button";
 export function LoadingButton(_a) {
-    var { isLoading = false, loadingText, spinnerPosition = "end", disabled, children, className } = _a, props = __rest(_a, ["isLoading", "loadingText", "spinnerPosition", "disabled", "children", "className"]);
+    var { isLoading = false, loadingText, spinnerPosition = "end", disabled, children, className, infoContent, description, descriptionAlign } = _a, props = __rest(_a, ["isLoading", "loadingText", "spinnerPosition", "disabled", "children", "className", "infoContent", "description", "descriptionAlign"]);
     const label = isLoading && loadingText ? loadingText : children;
     const spinner = (_jsx(Loader2, { className: "h-4 w-4 animate-spin", "aria-hidden": "true" }));
-    return (_jsxs(Button, Object.assign({}, props, { disabled: isLoading || disabled, "aria-busy": isLoading, "aria-live": "polite", "aria-label": typeof label === "string" ? label : undefined, "data-loading": isLoading ? "" : undefined, className: cn(
-        // biztos, ami biztos: középre igazítás + kis rés a tartalom között
-        "justify-center gap-2", className), children: [isLoading && spinnerPosition !== "end" && spinner, spinnerPosition === "only"
+    return (_jsxs(Button, Object.assign({}, props, { disabled: isLoading || disabled, "aria-busy": isLoading, "aria-live": "polite", "aria-label": typeof label === "string" ? label : undefined, "data-loading": isLoading ? "" : undefined, className: cn("justify-center gap-2", className), infoContent: infoContent, description: description, descriptionAlign: descriptionAlign, children: [isLoading && spinnerPosition !== "end" && spinner, spinnerPosition === "only"
                 ? _jsx("span", { className: "sr-only", children: children })
                 : label, isLoading && spinnerPosition === "end" && spinner] })));
 }

@@ -18,7 +18,7 @@ import ADLoginPage from "./pages/login/ADLoginPage";
 import ForgotPasswordPage from "./pages/login/ForgotPassword";
 
 function App() {
-    const backendAddress_dockerLocal = "http://localhost/";
+    const backendAddress_dockerLocal = "http://localhost:31000/";
 
     // Init only once
     useEffect(() => {

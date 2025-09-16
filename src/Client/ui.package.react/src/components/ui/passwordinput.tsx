@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Eye, EyeOff, AlertTriangle, Check, X } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { Alert, AlertDescription, AlertTitle, AlertCircleIcon } from "./alert";
 
 export type PasswordRules = {
     minLength?: number;
@@ -20,6 +21,7 @@ type PasswordInputProps = Omit<React.ComponentProps<"input">, "type"> & {
     description?: string,
     descriptionAlign?: "left" | "center" | "right",
     errorMessage?: string
+    errorDescription?: React.ReactNode
 };
 
 type RuleResult = { key: string; ok: boolean; text: string };
@@ -101,6 +103,7 @@ export function PasswordInput({
     description,
     descriptionAlign = "left",
     errorMessage,
+    errorDescription,
     ...props
 }: PasswordInputProps) {
     const [visible, setVisible] = React.useState(false);
@@ -212,7 +215,13 @@ export function PasswordInput({
             )}
 
             {errorMessage && (
-                <p className="text-xs text-destructive">{errorMessage}</p>
+                <Alert variant="destructive" noBorder>
+                    <AlertCircleIcon />
+                    <AlertTitle>{errorMessage}</AlertTitle>
+                    {errorDescription && (
+                        <AlertDescription>{errorDescription}</AlertDescription>
+                    )}
+                </Alert>
             )}
 
             {passwordRules && value !== "" && ruleResults.length > 0 && (

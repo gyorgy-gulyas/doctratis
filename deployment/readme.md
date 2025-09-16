@@ -17,7 +17,7 @@ Dev:
 Prod:
 	helm upgrade --install kong-gateway kong/kong -n docratis-infra -f ./deployment/kong/values.yaml
 
-kubectl apply -n docratis-infra -f ./deployment/kong/ingress.yaml
+kubectl apply -n docratis -f ./deployment/kong/ingress.yaml
 
 # -- Metrics Ingress --
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -45,14 +45,12 @@ grafana:
 # ------------------MONGO------------------------------
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
+
 kubectl apply -f ./deployment/mongo/secrets.yaml -n docratis-store
+helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f .\deployment\mongo\values.yaml
 Dev:
-	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f .\deployment\mongo\values.yaml -f .\deployment\mongo\dev-values.yaml
-	kubectl apply -f .\deployment\mongo\dev-external-svc.yaml -n docratis-store
-	powershell -File .\deployment\mongo\dev-expose_mongo.ps1
-Prod:
-	helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -n docratis-store -f ./deployment/mongo/values.yaml
-	kubectl apply -f .\deployment\mongo\prod-external-svc.yaml -n docratis-store
+	helm install my-mongo bitnami/mongodb -n docratis-store -f deployment/mongo/values.yaml
+
 
 check:
 kubectl -n docratis-store get pods -l app.kubernetes.io/instance=mongodb -o wide
@@ -163,3 +161,15 @@ http://localhost:31000/templatemanagement/projects/projectif/v1/listaccessiblepr
 
 kubectl get deploy -n docratis template-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
 kubectl get deploy -n docratis identity-management `-o jsonpath='{.spec.template.spec.containers[0].image}{"`n"}'
+
+kubectl -n docratis run curl --rm -it --image=curlimages/curl --   curl -sS -v http://template-management:8080/health/ready
+
+
+kubectl -n docratis get endpointslice -l kubernetes.io/service-name=template-management -o jsonpath="{range .items[*].endpoints[*]}{.addresses[0]} Ready={.conditions.ready} Serving={.conditions.serving} Terminating={.conditions.terminating}{'\n'}{end}"
+
+kubectl -n docratis-infra logs kong-gateway-7879576bd-mbbmx -c proxy --since=30m | Select-String -Pattern "balancer|ring|peer|template-management|upstream|health"
+
+
+kubectl -n docratis-infra exec -it kong-gateway-7879576bd-mbbmx -c proxy -- sh -lc 'apk add -q --no-cache curl || true; curl -sS -v http://127.0.0.1:8000/templatemanagement/health/ready'
+
+(Invoke-WebRequest -UseBasicParsing -SkipCertificateCheck -Uri https://localhost:8444/routes).Content | ConvertFrom-Json | Select-Object -Expand data | Where-Object { ($_.paths -join ',') -match '/templatemanagement|/iam' } | Select-Object id,paths,@{n='service_id';e={$_.service.id}}
