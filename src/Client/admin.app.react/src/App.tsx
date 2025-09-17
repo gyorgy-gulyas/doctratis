@@ -17,6 +17,7 @@ import PasswordChangePage from "./pages/login/PasswordChangePage";
 import KAULoginPage from "./pages/login/KAULoginPage";
 import ADLoginPage from "./pages/login/ADLoginPage";
 import ForgotPasswordPage from "./pages/login/ForgotPassword";
+import UserList from "./pages/admin/UserList";
 
 function App() {
     const backendAddress_dockerLocal = "http://localhost:31000/";
@@ -54,6 +55,7 @@ function App() {
             <Route element={<RequireAuth />}>
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/admin/users" element={<UserList />} />
                 </Route>
             </Route>
 
