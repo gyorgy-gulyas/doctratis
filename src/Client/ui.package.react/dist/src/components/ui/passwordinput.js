@@ -93,10 +93,6 @@ export function PasswordInput(_a) {
     const clickedRevealRef = React.useRef(false);
     // mindig kontrollált
     const value = (_b = valueProp) !== null && _b !== void 0 ? _b : "";
-    React.useEffect(() => {
-        console.log("can reveal changed");
-        console.log(canReveal);
-    }, [canReveal]);
     const handleBlur = (e) => {
         if (clickedRevealRef.current) {
             clickedRevealRef.current = false;

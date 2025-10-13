@@ -11,4 +11,5 @@ export * from "./src/components/ui/passwordinput";
 export * from "./src/components/ui/tile";
 export * from "./src/components/ui/two-row-menu";
 export * from "./src/components/ui/tooltip";
+export * from "./src/components/treegrid/TreeGrid";
 //# sourceMappingURL=index.js.map
