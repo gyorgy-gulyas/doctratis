@@ -6,3 +6,9 @@ ports:
   grpc: true
   https: false
   grpcs: false
+
+# The store connection strings come from a Secret that is created in the cluster, never committed.
+# See deployment/docratis-services/values.yaml for the kubectl command that creates it.
+envFrom:
+  - secretRef:
+      name: docratis-store-secrets

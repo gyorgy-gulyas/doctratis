@@ -70,7 +70,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .FirstOrDefault();
             if (currentAccess == null)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"User with id '{ctx.IdentityId}:{ctx.IdentityName}' does not have an access for project '{project.id}'" });
-            if (original.CanAccessEdit(currentAccess))
+            if (original.CanAccessEdit(currentAccess) == false)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"User with id '{ctx.IdentityId}:{ctx.IdentityName}' does not have an permission to edit the project '{project.id}'" });
 
             await using var tx = new Transaction();
@@ -199,7 +199,7 @@ namespace TemplateManagement.Projects.Service.Implementations
                 .FirstOrDefault();
             if (access == null)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"Current identity '{ctx.IdentityId}:{ctx.IdentityName}' does not have an access fot project: '{projectId}'" });
-            if (project.CanAccessEdit(access))
+            if (project.CanAccessEdit(access) == false)
                 return new(new Error() { Status = Statuses.Unauthorized, MessageText = $"Current identity '{ctx.IdentityId}:{ctx.IdentityName}' does not have an permission to add other access for project: '{projectId}'" });
 
             var already = _context
@@ -213,6 +213,7 @@ namespace TemplateManagement.Projects.Service.Implementations
             ProjectAccess newAccess = new()
             {
                 IdentityId = identityId,
+                IdentityName = identityName,
                 ProjectId = project.id,
                 Role = role,
                 Status = ProjectAccess.Statuses.Active,
@@ -221,7 +222,7 @@ namespace TemplateManagement.Projects.Service.Implementations
 
             _context.Audit(Core.Auditing.TrailOperations.Update, ctx, project);
 
-            return new(access);
+            return new(newAccess);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace IAM.Identities.Service.Implementations
 
         Task<Response<string>> ILoginService.GetKAULoginURL(CallingContext ctx, string redirectUrl, string backendCallbackUrl)
         {
-            var state = _kauAuthenticator.GenerateUniqueState(redirectUrl);
+            var state = _kauAuthenticator.GenerateUniqueState(redirectUrl, backendCallbackUrl);
 
             var loginUrl = _kauAuthenticator.GetLoginUrl(state, backendCallbackUrl);
 
@@ -108,10 +108,11 @@ namespace IAM.Identities.Service.Implementations
 
         async Task<Response<ILoginService.KAUCallbackResponse>> ILoginService.KAUCallback(CallingContext ctx, string code, string state)
         {
-            if (!_kauAuthenticator.ValidateState(state, out var returnUrl))
+            if (!_kauAuthenticator.ValidateState(state, out var returnUrl, out var backendCallbackUrl))
                 return Unauthorized("Invalid or expired state");
 
-            var tokenResponse = await _kauAuthenticator.ExchangeCodeForToken(code, "https://backend.hu/callback");
+            // the same callback URL the authorize request was built with, carried in the signed state
+            var tokenResponse = await _kauAuthenticator.ExchangeCodeForToken(code, backendCallbackUrl);
             if (tokenResponse?.id_token == null)
                 return TokenError(returnUrl);
 
@@ -396,7 +397,7 @@ namespace IAM.Identities.Service.Implementations
 
             var send = await _emailAgent.SendForgotPassword(ctx, auth.email, token, expiresAt).ConfigureAwait(false);
             if (send.IsFailed())
-                return new(find.Error);
+                return new(send.Error);
 
             return Response.Success();
         }
@@ -418,7 +419,7 @@ namespace IAM.Identities.Service.Implementations
 
             var set = await _accountAuthService.setPassword(ctx, account.id, auth.id, auth.etag, newPassword).ConfigureAwait( false );
             if (set.IsFailed())
-                return new(find.Error);
+                return new(set.Error);
 
             return Response.Success();
         }
@@ -440,7 +441,7 @@ namespace IAM.Identities.Service.Implementations
 
             var set = await _accountAuthService.setEmailConfirmed(ctx, account.id, auth.id, auth.etag, true).ConfigureAwait(false);
             if (set.IsFailed())
-                return new(find.Error);
+                return new(set.Error);
 
             return Response.Success();
         }

@@ -4,9 +4,9 @@ architecture: standalone
 auth:
   enabled: true
   rootUser: root
-  rootPassword: "MongoRootPassword"
+  rootPassword: "CHANGE_ME"      # supply at install time: --set auth.rootPassword=...
   username: "docratis"
-  password: "DocratisMongoPassword"
+  password: "CHANGE_ME"          # supply at install time: --set auth.password=...
   database: "docratis_documents"
 
 service:

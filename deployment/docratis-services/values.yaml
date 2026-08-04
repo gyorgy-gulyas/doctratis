@@ -9,6 +9,24 @@ image:
 service:
   type: ClusterIP
 
+# The store connection strings and the one-off seed password carry credentials, so they are NOT in
+# the source and NOT in this file - they come from a Secret that lives outside the repository.
+# The application reads Stores__Document, Stores__Blob, Stores__Column and, on a first start only,
+# Seed__AdminPassword; a missing value stops the service with an explicit message.
+#
+#   kubectl -n <namespace> create secret generic docratis-store-secrets \
+#     --from-literal=Stores__Document='mongodb://<user>:<password>@<host>:27017/<db>?directConnection=true' \
+#     --from-literal=Stores__Blob='mongodb://<user>:<password>@<host>:27017/<db>?directConnection=true' \
+#     --from-literal=Stores__Column='host=<host>;port=9042;username=<user>;password=<password>;keyspace=<keyspace>'
+#
+# then point the chart at it:
+#
+#   envFrom:
+#     - secretRef:
+#         name: docratis-store-secrets
+envFrom: []
+env: []
+
 ingress:
   enabled: false
 

@@ -29,7 +29,7 @@ public class IAMServiceHost : BaseServiceHost
 
     protected override void _AfterAddServices(IServiceCollection services, Options options)
     {
-        services.AddSingleton<IStoreProvider>(new IdentityStoreProvider());
+        services.AddSingleton<IStoreProvider>(provider => new IdentityStoreProvider(provider.GetRequiredService<IConfiguration>()));
         services.AddSingleton<IdentityStoreContext>();
         services.AddAuditWorker();
 
@@ -90,22 +90,28 @@ namespace IAM.Identities.Service
 
     public class IdentityStoreProvider : StoreProvider
     {
-        protected override IDocumentStore GetDocumentStore() 
-        {
-            var connectionString = "mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true";
-            Console.WriteLine(connectionString);
-            return new MongoDB_DocumentStore(connectionString);
-        }
-        protected override IBlobStore GetBlobStore()
-        {
-            var connectionString = "mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true";
-            Console.WriteLine(connectionString);
-            return new GridFS_BlobStore(connectionString);
-        }
-        protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore("host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis");
+        private readonly IConfiguration _configuration;
 
-        //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
-        //protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
-        //protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
+        public IdentityStoreProvider(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore(_RequiredConnectionString("Stores:Document"));
+        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore(_RequiredConnectionString("Stores:Blob"));
+        protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore(_RequiredConnectionString("Stores:Column"));
+
+        // A connection string carries credentials, so it comes from configuration - in the cluster
+        // from environment variables (Stores__Document and so on), fed from a secret. Missing means
+        // stop: starting without a store would only fail later, somewhere far less obvious. The
+        // value is never logged.
+        private string _RequiredConnectionString(string key)
+        {
+            var connectionString = _configuration[key];
+            if (string.IsNullOrWhiteSpace(connectionString) == true)
+                throw new InvalidOperationException($"The connection string '{key}' is not configured. Set it in configuration, or as the '{key.Replace(":", "__")}' environment variable.");
+
+            return connectionString;
+        }
     }
 }

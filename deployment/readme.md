@@ -56,9 +56,9 @@ check:
 kubectl -n docratis-store get pods -l app.kubernetes.io/instance=mongodb -o wide
 kubectl -n docratis-store get svc mongodb,mongodb-headless,mongodb-external
 kubectl -n docratis-store get svc mongodb-external
-mongosh mongodb://root:DocratisMongoPassword@127.0.0.1:28000/admin?directConnection=true
+mongosh mongodb://root:$MONGO_ROOT_PASSWORD@127.0.0.1:28000/admin?directConnection=true
 # ASP.NET connection string
-mongodb://root:DocratisMongoPassword@\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin
+mongodb://root:$MONGO_ROOT_PASSWORD@\mongodb-0.mongodb-headless.docratis-store.svc.cluster.local:27017/docratis_documents?replicaSet=rs0&authSource=admin
 
 # ----------------- cert-manager ------------------------------------
 # helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 -n docratis-infra --set crds.enabled=true
@@ -132,12 +132,12 @@ docker run -it --rm --entrypoint cqlsh scylladb/scylla host.docker.internal 2904
 # cassandra GUI dev-en, és teszt
 docker rm -f cassandra-web 2>$null
 # ipushc/cassandra-web a XXXX-es porton futtatva
-docker run -d --name cassandra-web -p 9876:8083 -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=docratis -e CASSANDRA_PASSWORD=DocratisScyllaPassword ipushc/cassandra-web:v1.1.0
+docker run -d --name cassandra-web -p 9876:8083 -e CASSANDRA_HOST=host.docker.internal -e CASSANDRA_PORT=29042 -e CASSANDRA_USERNAME=docratis -e CASSANDRA_PASSWORD=$SCYLLA_PASSWORD ipushc/cassandra-web:v1.1.0
 docker logs cassandra-web --tail 200
 Invoke-WebRequest http://localhost:9876/ | Select-Object StatusCode, StatusDescription
 browser: http://localhost:9876/
 # ASP.NET connection string
-host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis
+host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=$SCYLLA_PASSWORD;keyspace=docratis
 
 
 -- docker image ls

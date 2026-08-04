@@ -22,11 +22,15 @@ namespace IAM.Identities.Service.Implementations.Helpers
             _httpClient = http;
         }
 
-        public string GenerateUniqueState(string returnUrl)
+        // The backend callback URL travels inside the signed state, because the token exchange must
+        // present the SAME redirect_uri the authorize request used - the provider rejects it
+        // otherwise. The state is HMAC signed, so the caller cannot tamper with it.
+        public string GenerateUniqueState(string returnUrl, string backendCallbackUrl)
         {
             var payload = new StatePayload()
             {
                 ReturnUrl = returnUrl,
+                BackendCallbackUrl = backendCallbackUrl,
                 Nonce = Guid.NewGuid().ToString(),
                 TimestampUTC = DateTime.UtcNow,
             };
@@ -43,9 +47,10 @@ namespace IAM.Identities.Service.Implementations.Helpers
             return $"{payloadBase64}.{signatureBase64}";
         }
 
-        public bool ValidateState(string state, out string returnUrl)
+        public bool ValidateState(string state, out string returnUrl, out string backendCallbackUrl)
         {
             returnUrl = null;
+            backendCallbackUrl = null;
 
             var parts = state.Split('.');
             if (parts.Length != 2)
@@ -67,6 +72,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
             var payload = JsonSerializer.Deserialize<StatePayload>(payloadJson, JsonOptionsProvider.Options());
 
             returnUrl = payload.ReturnUrl;
+            backendCallbackUrl = payload.BackendCallbackUrl;
 
             return true;
         }
@@ -140,6 +146,7 @@ namespace IAM.Identities.Service.Implementations.Helpers
         internal class StatePayload
         {
             public string ReturnUrl { get; set; }
+            public string BackendCallbackUrl { get; set; }
             public string Nonce { get; set; }
             public DateTime TimestampUTC { get; set; }
         }

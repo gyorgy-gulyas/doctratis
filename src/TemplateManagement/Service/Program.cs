@@ -23,7 +23,7 @@ public class TemplateManagementServiceHost : BaseServiceHost
 
     protected override void _AfterAddServices(IServiceCollection services, Options options)
     {
-        services.AddSingleton<IStoreProvider>(new ProjectStoreProvider());
+        services.AddSingleton<IStoreProvider>(provider => new ProjectStoreProvider(provider.GetRequiredService<IConfiguration>()));
         services.AddSingleton<ProjectStoreContext>();
         services.AddAuditWorker();
 
@@ -57,12 +57,28 @@ namespace TemplateManagement.Projects.Service
 
     public class ProjectStoreProvider : StoreProvider
     {
-        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore("mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true");
-        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore("mongodb://docratis:DocratisMongoPassword@mongodb.docratis-store.svc.cluster.local:27017/docratis_documents?directConnection=true");
-        protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore("host=scylla-client.docratis-store.svc.cluster.local;port=9042;username=docratis;password=DocratisScyllaPassword;keyspace=docratis");
+        private readonly IConfiguration _configuration;
 
-        //protected override IDocumentStore GetDocumentStore() => new Memory_DocumentStore("");
-        //protected override IBlobStore GetBlobStore() => new Memory_BlobStore("");
-        //protected override IColumnStore GetColumnStore() => new Memory_ColumnStore("");
+        public ProjectStoreProvider(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        protected override IDocumentStore GetDocumentStore() => new MongoDB_DocumentStore(_RequiredConnectionString("Stores:Document"));
+        protected override IBlobStore GetBlobStore() => new GridFS_BlobStore(_RequiredConnectionString("Stores:Blob"));
+        protected override IColumnStore GetColumnStore() => new Cassandra_ColumnStore(_RequiredConnectionString("Stores:Column"));
+
+        // A connection string carries credentials, so it comes from configuration - in the cluster
+        // from environment variables (Stores__Document and so on), fed from a secret. Missing means
+        // stop: starting without a store would only fail later, somewhere far less obvious. The
+        // value is never logged.
+        private string _RequiredConnectionString(string key)
+        {
+            var connectionString = _configuration[key];
+            if (string.IsNullOrWhiteSpace(connectionString) == true)
+                throw new InvalidOperationException($"The connection string '{key}' is not configured. Set it in configuration, or as the '{key.Replace(":", "__")}' environment variable.");
+
+            return connectionString;
+        }
     }
 }

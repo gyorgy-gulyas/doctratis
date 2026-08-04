@@ -9,18 +9,25 @@ namespace IAM.Service.Seed
 {
     public class AdminUserSeed
     {
+        // The one-off password of the seeded 'docratis' account. It is only read on a FIRST start -
+        // once the account exists, seeding returns early and never looks at it.
+        private const string InitialPasswordKey = "Seed:AdminPassword";
+
         private readonly ILogger<AdminUserSeed> _logger;
         private readonly IdentityStoreContext _context;
         private readonly PasswordAgent _passwordAgent;
+        private readonly IConfiguration _configuration;
 
         public AdminUserSeed(
             ILogger<AdminUserSeed> logger,
             IdentityStoreContext context,
-            PasswordAgent passwordAgent)
+            PasswordAgent passwordAgent,
+            IConfiguration configuration)
         {
             _logger = logger;
             _context = context;
             _passwordAgent = passwordAgent;
+            _configuration = configuration;
         }
 
         internal async Task Execute()
@@ -39,6 +46,12 @@ namespace IAM.Service.Seed
                 return;
             }
 
+            // Refuse to invent one: a default here would be a known credential on every install.
+            // This only stops a FIRST start, so an already seeded deployment is never affected.
+            var initialPassword = _configuration[InitialPasswordKey];
+            if (string.IsNullOrWhiteSpace(initialPassword) == true)
+                throw new InvalidOperationException($"The initial password of the 'docratis' account is not configured. Set '{InitialPasswordKey}' in configuration, or the '{InitialPasswordKey.Replace(":", "__")}' environment variable, before the first start.");
+
             await using var tx = new Transaction();
             var account = new Account()
             {
@@ -56,7 +69,7 @@ namespace IAM.Service.Seed
             await tx.Insert(_context.Accounts, account);
 
             var salt = _passwordAgent.CreateLifetimeSalt();
-            var passwordHash = _passwordAgent.GeneratePasswordHash("Docratis#2025", salt);
+            var passwordHash = _passwordAgent.GeneratePasswordHash(initialPassword, salt);
             var auth = new EmailAuth()
             {
                 id = Guid.NewGuid().ToString(),
